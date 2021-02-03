@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  app:
+    container_name: node
+    restart: always
+    build: .
+    ports:
+      - '5000:5000'
+    links:
+      - db
+    volumes:
+      - './src:/usr/src/app/src'
+  db:
+    container_name: pg_db
+    image: postgres
+    restart: always
+    ports: 
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=nodus
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=db_1
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data

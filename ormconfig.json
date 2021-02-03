@@ -1,0 +1,19 @@
+{
+  "type": "postgres",
+  "host": "db",
+  "port": 5432,
+  "username": "nodus",
+  "password": "pass",
+  "database": "db_1",
+  "synchronize": true,
+  "logging": false,
+  "entities": [
+     "src/**/*.ts"
+  ],
+  "migrations": [
+     "src/migration/**/*.ts"
+  ],
+  "subscribers": [
+     "src/subscriber/**/*.ts"
+  ]
+}
