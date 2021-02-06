@@ -1,8 +1,8 @@
 <script lang="typescript">
   import { createEventDispatcher } from 'svelte'
-  import type UserClientType from '../../clients/UserClient'
+  import type GameClient from '../../clients/GameClient'
   import Navbar from '../../components/Navbar.svelte'
-  export let userClient: UserClientType
+  export let gameClient: 
 
   const dispatch = createEventDispatcher()
 
