@@ -4,10 +4,11 @@
   import CreateGame from './CreateGame.svelte'
   import Dashboard from './Dashboard.svelte'
   import GameClient from '../../clients/GameClient'
+import Lobby from './Lobby.svelte'
   
   export let userClient: UserClientType
   let view = 'dashboard'
-  const gameClient = new GameClient(userClient)
+  let gameClient = new GameClient(userClient)
   const dispatch = createEventDispatcher()
   
   const navigate = (location) => {
@@ -23,17 +24,38 @@
     try {
       await gameClient.getSessionGame()
       if(gameClient.key) {
+        if(!gameClient.socketConnected) {
+          gameClient.connectToGameSession(rerender)
+        }
         view = 'lobby'
       }
     } catch(err) {}
   }
-
+  
   if(!userClient.id) {
     dispatch('logout')
   } else {
     checkGameSession()
   }
+  
+  const rerender = () => {
+    gameClient = gameClient
+  }
+  
+  const createGame = async () => {
+    try {
+      await gameClient.createGame()
+      gameClient.connectToGameSession(rerender)
+      navigate('lobby')
+    } catch(err) {
+      navigate('dashboard')
+    }
+  }
 
+  const joinGame = async () => {
+    gameClient.connectToGameSession(rerender)
+    navigate('lobby')
+  }
 </script>
 
 <div>
@@ -42,19 +64,31 @@
       gameClient={gameClient} 
       on:logout={() => dispatch('logout')}
       on:create={() => navigate('create')}
+      on:join={() => navigate('join')}
     />
   {/if}
   {#if view === 'create'}
     <CreateGame
     on:navigate-lobby={() => navigate('lobby')}
-    on:navigate-dashboard={() => navigate('dashboard')} 
+    on:create-game={() => createGame()}
     gameClient={gameClient} />
   {/if}
   {#if view === 'lobby'}
-    <div>
-      <h1>Welcome to game lobby</h1>
-      <h1>game key: {gameClient.key}</h1>
-      <button class="btn btn-danger" on:click={deleteGame}>DELETE</button>
+    <Lobby 
+      gameClient={gameClient}
+      on:logout={() => dispatch('logout')}
+      on:navigate-dashboard={() => navigate('dashboard')}
+    />
+  {/if}
+  {#if view === 'join'}
+    <div class="form-container">
+      <form>
+        <div class="form-group">
+          <label class="form-label" for="customRange2">Enter game Key</label>
+          <input type="text" class="form-control" placeholder="Enter game key" bind:value={gameClient.key}>
+        </div>
+      </form>
+      <button class="btn btn-danger" on:click={joinGame}>Join game</button>
     </div>
   {/if}
 </div>
