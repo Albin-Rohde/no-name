@@ -2,8 +2,8 @@ import axios from 'axios'
 
 export interface UserData {
   id: number
-  email: string
-  password: string
+  email?: string
+  password?: string
   username: string
 }
 
@@ -18,6 +18,14 @@ export default class UserClient {
   username: string
   isActive: boolean = false
   
+  constructor(id: number = null, username: string = null) {
+    if(id) {
+      this.id = id
+    }
+    if(username){
+      this.username = username
+    }
+  }
   
   login = async (email: string = this.email, password: string = this.password) => {
     this.email = email
