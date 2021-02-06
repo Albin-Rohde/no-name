@@ -5,16 +5,6 @@
 
   export let gameClient: GameClientType
   const dispatch = createEventDispatcher()
-
-  const createGame = async () => {
-    try {
-      await gameClient.createGame()
-      dispatch('navigate-lobby')
-    } catch(err) {
-      dispatch('navigate-dashboard')
-    }
-  }
-
   const deleteGame = () => {
     gameClient.deleteGame()
     dispatch('navigate-dashboard')
@@ -67,7 +57,7 @@
         </form>
         <div class="btn-container">
           <button class="btn btn-danger" on:click={deleteGame}>Abort</button>
-          <button class="btn btn-success" on:click={createGame}>Create</button>
+          <button class="btn btn-success" on:click={() => dispatch('create-game')}>Create</button>
         </div>
       </div>
     </div>
