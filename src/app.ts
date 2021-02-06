@@ -63,9 +63,30 @@ createConnection().then(async () => {
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
   
+  io.on('connection', (socket) => {
+    socket.on('create', (key: string) => {
+      socket.join(key)
+    })
+    socket.on('join', async (key: string) => {
+      const userId: number = socket.handshake.session?.user?.id
+      if(!userId) {
+        socket.disconnect()
+      }
 
+      const user = await User.findOneOrFail(userId)
+      console.log('join event from user: ', user.username)
+      const game = await Game.findOneOrFail(key, {relations: ['users']})
+      if(!game.users.some(u => u.id == user.id)) {
+        game.users.push(user)
+      }
+      game.save()
+      socket.join(game.key)
+      console.log('all users on game: ', game.users)
+      console.log('update all clients connected to ', game.key)
+      io.in(game.key).emit('update', game);
+    })
+  })
   
-
   // Start server
   server.listen(5000, () => console.log(`Server started on port: 5000 `))
 }).catch(error => console.log(error));
