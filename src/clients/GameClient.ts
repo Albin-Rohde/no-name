@@ -85,6 +85,9 @@ export default class GameClient {
       this.socketConnected = true
       rerenderCb()
     })
+    this.socket.on('disconnect', () => {
+      rerenderCb('disconnect')
+    })
   }
 
   private makeRequest = async (url: string, method: 'put' | 'get' | 'post' | 'delete', data: object = {}) => {
