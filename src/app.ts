@@ -77,7 +77,6 @@ createConnection().then(async () => {
             return socket.disconnect()
           }
         }
-        console.log('got join event from user ', user.username, 'on game', game.key)
         if(!game.users.some(u => u.id == user.id)) {
           game.users.push(user)
         }
