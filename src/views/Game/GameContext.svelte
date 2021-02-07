@@ -5,6 +5,7 @@
   import Dashboard from './Dashboard.svelte'
   import GameClient from '../../clients/GameClient'
 import Lobby from './Lobby.svelte'
+import JoinGame from './JoinGame.svelte'
   
   export let userClient: UserClientType
   let view = 'dashboard'
@@ -38,7 +39,10 @@ import Lobby from './Lobby.svelte'
     checkGameSession()
   }
   
-  const rerender = () => {
+  const rerender = (err: string | undefined = undefined) => {
+    if(err) {
+      return navigate('dashboard')
+    }
     gameClient = gameClient
   }
   
@@ -81,15 +85,7 @@ import Lobby from './Lobby.svelte'
     />
   {/if}
   {#if view === 'join'}
-    <div class="form-container">
-      <form>
-        <div class="form-group">
-          <label class="form-label" for="customRange2">Enter game Key</label>
-          <input type="text" class="form-control" placeholder="Enter game key" bind:value={gameClient.key}>
-        </div>
-      </form>
-      <button class="btn btn-danger" on:click={joinGame}>Join game</button>
-    </div>
+    <JoinGame gameClient={gameClient} on:join={joinGame}/>
   {/if}
 </div>
 
