@@ -5,11 +5,6 @@
 
   export let gameClient: GameClientType
   const dispatch = createEventDispatcher()
-  const deleteGame = () => {
-    gameClient.deleteGame()
-    dispatch('navigate-dashboard')
-  }
-
 </script>
 
 <div class="content-grid">
@@ -54,7 +49,7 @@
         </div>
       </form>
       <div class="btn-container">
-        <button class="btn btn-danger" on:click={deleteGame}>Abort</button>
+        <button class="btn btn-danger" on:click={() => dispatch('abort')}>Abort</button>
         <button class="btn btn-success" on:click={() => dispatch('create-game')}>Create</button>
       </div>
     </div>

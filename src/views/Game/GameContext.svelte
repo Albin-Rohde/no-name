@@ -17,6 +17,11 @@
     view = location
   }
   
+  const deleteGame = () => {
+    gameClient.deleteGame()
+    navigate('dashboard')
+  }
+
   const checkGameSession = async () => {
     try {
       await gameClient.getSessionGame()
@@ -72,6 +77,7 @@
     <CreateGame
       on:navigate-lobby={() => navigate('lobby')}
       on:create-game={() => createGame()}
+      on:abort={deleteGame}
       gameClient={gameClient} />
     {/if}
     {#if view === 'lobby'}
@@ -79,10 +85,15 @@
       gameClient={gameClient}
       on:logout={() => dispatch('logout')}
       on:navigate-dashboard={() => navigate('dashboard')}
+      on:abort={deleteGame}
     />
   {/if}
   {#if view === 'join'}
-    <JoinGame gameClient={gameClient} on:join={joinGame}/>
+    <JoinGame 
+      gameClient={gameClient}
+      on:join={joinGame}
+      on:abort={deleteGame}
+    />
   {/if}
 </div>
 
@@ -90,7 +101,7 @@
   .main-grid {
       display: grid;
       grid-template-columns: auto;
-      grid-template-rows: 5% 65% 30%;
+      grid-template-rows: 5% auto;
       width: 100vw;
       height: 100vh
     }

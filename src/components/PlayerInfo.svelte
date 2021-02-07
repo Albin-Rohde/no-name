@@ -80,15 +80,3 @@
     grid-column-end: 2;
   }
 </style>
-
-
-
-<!-- 
-<div class="players">
-    {#each gameClient.users as user}
-        <p class="fs-5">{user.username}</p>
-      {/each}
-  </div>
-
-
--->
