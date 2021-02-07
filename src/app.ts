@@ -64,26 +64,27 @@ createConnection().then(async () => {
   app.use('/game', gameRouter)
   
   io.on('connection', (socket) => {
-    socket.on('create', (key: string) => {
-      socket.join(key)
-    })
     socket.on('join', async (key: string) => {
-      const userId: number = socket.handshake.session?.user?.id
+      const userId = socket.handshake.session?.user?.id
       if(!userId) {
         socket.disconnect()
       }
-
-      const user = await User.findOneOrFail(userId)
-      console.log('join event from user: ', user.username)
-      const game = await Game.findOneOrFail(key, {relations: ['users']})
-      if(!game.users.some(u => u.id == user.id)) {
-        game.users.push(user)
-      }
-      game.save()
-      socket.join(game.key)
-      console.log('all users on game: ', game.users)
-      console.log('update all clients connected to ', game.key)
-      io.in(game.key).emit('update', game);
+      try {
+        const user = await User.findOneOrFail(userId)
+        const game = await Game.findOneOrFail(key, {relations: ['users']})
+        if(game.users.length === game.player_limit) {
+          if(!game.users.some(u => u.id === user.id)) {
+            return socket.disconnect()
+          }
+        }
+        console.log('got join event from user ', user.username, 'on game', game.key)
+        if(!game.users.some(u => u.id == user.id)) {
+          game.users.push(user)
+        }
+        game.save()
+        socket.join(key)
+        io.in(game.key).emit('update', game)
+      } catch(e) {}
     })
   })
   
