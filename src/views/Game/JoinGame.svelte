@@ -1,24 +1,22 @@
 <script lang="typescript">
   import { createEventDispatcher } from 'svelte'
-  import type GameClient from '../../clients/GameClient'
-  import Navbar from '../../components/Navbar.svelte'
-  export let gameClient: 
-
+  import type GameClientType from '../../clients/GameClient'
+  
+  export let gameClient: GameClientType
   const dispatch = createEventDispatcher()
 
 </script>
 
-<div class="main-grid">
-  <Navbar on:logout={() => dispatch('logout')}/>
-  
+<div class="form-container">
+  <form>
+    <div class="form-group">
+      <label class="form-label" for="customRange2">Enter game Key</label>
+      <input type="text" class="form-control" placeholder="Enter game key" bind:value={gameClient.key}>
+    </div>
+  </form>
+  <button class="btn btn-danger" on:click={() => dispatch('join')}>Join game</button>
 </div>
 
 <style>
-  .main-grid {
-    display: grid;
-    grid-template-columns: auto;
-    grid-template-rows: 5% 65% 30%;
-    width: 100vw;
-    height: 100vh
-  }
+
 </style>
