@@ -8,29 +8,19 @@
 
 </script>
 
-<div class="main-grid">
-  <Navbar on:logout={() => dispatch('logout')} username={gameClient.user.username}/>
-  <div class="middle">
-    <h1>No name-game</h1>
+<div class="middle">
+  <h1>No name-game</h1>
+</div>
+<div class="bottom">
+  <div class="button-conatiner start">
+    <button class="btn btn-primary" on:click={() => dispatch('create')}>Create Game</button>
   </div>
-  <div class="bottom">
-    <div class="button-conatiner start">
-      <button class="btn btn-primary" on:click={() => dispatch('create')}>Create Game</button>
-    </div>
-    <div class="button-conatiner join">
-      <button class="btn btn-success" on:click={() => dispatch('join')}>Join Game</button>
-    </div>
+  <div class="button-conatiner join">
+    <button class="btn btn-success" on:click={() => dispatch('join')}>Join Game</button>
   </div>
 </div>
 
 <style>
-  .main-grid {
-    display: grid;
-    grid-template-columns: auto;
-    grid-template-rows: 5% 65% 30%;
-    width: 100vw;
-    height: 100vh
-  }
   .middle {
     display: flex;
     align-items: center;

@@ -14,26 +14,23 @@
 
 </script>
 
-<div class="main-grid">
-  <Navbar on:logout={() => dispatch('logout')} username={gameClient.user.username}/>
-  <div class="content-grid">
-    <PlayerInfo gameClient={gameClient} />
-    <div class="inner-grid">
-      <div class="flex-center">
-        <p class="fs-3">Waiting for players ({gameClient.users.length}/{gameClient.playerLimit})</p>
-      </div>
-      <div class="flex-center">
-        <p class="fs-4">Invite players with the following key</p><br>
-      </div>
-      <div class="flex-center">
-        <CopyTextField value={gameClient.key} />
-      </div>
-      <div class="button-grid">
-        <div class="form-container">
-          <div class="btn-container">
-            <button class="btn btn-danger" on:click={deleteGame}>Delete</button>
-            <button class="btn btn-success" on:click={() => dispatch('create-game')}> Start </button>
-          </div>
+<div class="content-grid">
+  <PlayerInfo gameClient={gameClient} />
+  <div class="inner-grid">
+    <div class="flex-center">
+      <p class="fs-3">Waiting for players ({gameClient.users.length}/{gameClient.playerLimit})</p>
+    </div>
+    <div class="flex-center">
+      <p class="fs-4">Invite players with the following key</p><br>
+    </div>
+    <div class="flex-center">
+      <CopyTextField value={gameClient.key} />
+    </div>
+    <div class="button-grid">
+      <div class="form-container">
+        <div class="btn-container">
+          <button class="btn btn-danger" on:click={deleteGame}>Delete</button>
+          <button class="btn btn-success" on:click={() => dispatch('create-game')}> Start </button>
         </div>
       </div>
     </div>
@@ -41,12 +38,6 @@
 </div>
 
 <style>
-  .main-grid {
-    height: 100vh;
-    width: 100vw;
-    grid-template-rows: 45px auto;
-    grid-template-columns: 100%;
-  }
   .content-grid {
     display: grid;
     grid-template-columns: 20% 60% 20%;

@@ -4,8 +4,9 @@
   import CreateGame from './CreateGame.svelte'
   import Dashboard from './Dashboard.svelte'
   import GameClient from '../../clients/GameClient'
-import Lobby from './Lobby.svelte'
-import JoinGame from './JoinGame.svelte'
+  import Lobby from './Lobby.svelte'
+  import JoinGame from './JoinGame.svelte'
+  import Navbar from '../../components/Navbar.svelte'
   
   export let userClient: UserClientType
   let view = 'dashboard'
@@ -14,11 +15,6 @@ import JoinGame from './JoinGame.svelte'
   
   const navigate = (location) => {
     view = location
-  }
-  
-  const deleteGame = async () => {
-    await gameClient.deleteGame()
-    navigate('dashboard')
   }
   
   const checkGameSession = async () => {
@@ -62,7 +58,8 @@ import JoinGame from './JoinGame.svelte'
   }
 </script>
 
-<div>
+<div class="main-grid">
+  <Navbar on:logout={() => dispatch('logout')} username={gameClient.user.username}/>
   {#if view === 'dashboard'}
     <Dashboard 
       gameClient={gameClient} 
@@ -73,11 +70,11 @@ import JoinGame from './JoinGame.svelte'
   {/if}
   {#if view === 'create'}
     <CreateGame
-    on:navigate-lobby={() => navigate('lobby')}
-    on:create-game={() => createGame()}
-    gameClient={gameClient} />
-  {/if}
-  {#if view === 'lobby'}
+      on:navigate-lobby={() => navigate('lobby')}
+      on:create-game={() => createGame()}
+      gameClient={gameClient} />
+    {/if}
+    {#if view === 'lobby'}
     <Lobby 
       gameClient={gameClient}
       on:logout={() => dispatch('logout')}
@@ -90,5 +87,11 @@ import JoinGame from './JoinGame.svelte'
 </div>
 
 <style>
-
+  .main-grid {
+      display: grid;
+      grid-template-columns: auto;
+      grid-template-rows: 5% 65% 30%;
+      width: 100vw;
+      height: 100vh
+    }
 </style>
