@@ -4,61 +4,105 @@
   import CreateGame from './CreateGame.svelte'
   import Dashboard from './Dashboard.svelte'
   import GameClient from '../../clients/GameClient'
+  import Lobby from './Lobby.svelte'
+  import JoinGame from './JoinGame.svelte'
+  import Navbar from '../../components/Navbar.svelte'
   
   export let userClient: UserClientType
   let view = 'dashboard'
-  const gameClient = new GameClient(userClient)
+  let gameClient = new GameClient(userClient)
   const dispatch = createEventDispatcher()
   
   const navigate = (location) => {
     view = location
   }
   
-  const deleteGame = async () => {
-    await gameClient.deleteGame()
+  const deleteGame = () => {
+    gameClient.deleteGame()
     navigate('dashboard')
   }
-  
+
   const checkGameSession = async () => {
     try {
       await gameClient.getSessionGame()
       if(gameClient.key) {
+        if(!gameClient.socketConnected) {
+          gameClient.connectToGameSession(rerender)
+        }
         view = 'lobby'
       }
     } catch(err) {}
   }
-
+  
   if(!userClient.id) {
     dispatch('logout')
   } else {
     checkGameSession()
   }
+  
+  const rerender = (err: string | undefined = undefined) => {
+    if(err) {
+      return navigate('dashboard')
+    }
+    gameClient = gameClient
+  }
+  
+  const createGame = async () => {
+    try {
+      await gameClient.createGame()
+      gameClient.connectToGameSession(rerender)
+      navigate('lobby')
+    } catch(err) {
+      navigate('dashboard')
+    }
+  }
 
+  const joinGame = async () => {
+    gameClient.connectToGameSession(rerender)
+    navigate('lobby')
+  }
 </script>
 
-<div>
+<div class="main-grid">
+  <Navbar on:logout={() => dispatch('logout')} username={gameClient.user.username}/>
   {#if view === 'dashboard'}
     <Dashboard 
       gameClient={gameClient} 
       on:logout={() => dispatch('logout')}
       on:create={() => navigate('create')}
+      on:join={() => navigate('join')}
     />
   {/if}
   {#if view === 'create'}
     <CreateGame
-    on:navigate-lobby={() => navigate('lobby')}
-    on:navigate-dashboard={() => navigate('dashboard')} 
-    gameClient={gameClient} />
+      on:navigate-lobby={() => navigate('lobby')}
+      on:create-game={() => createGame()}
+      on:abort={deleteGame}
+      gameClient={gameClient} />
+    {/if}
+    {#if view === 'lobby'}
+    <Lobby 
+      gameClient={gameClient}
+      on:logout={() => dispatch('logout')}
+      on:navigate-dashboard={() => navigate('dashboard')}
+      on:abort={deleteGame}
+    />
   {/if}
-  {#if view === 'lobby'}
-    <div>
-      <h1>Welcome to game lobby</h1>
-      <h1>game key: {gameClient.key}</h1>
-      <button class="btn btn-danger" on:click={deleteGame}>DELETE</button>
-    </div>
+  {#if view === 'join'}
+    <JoinGame 
+      gameClient={gameClient}
+      on:join={joinGame}
+      on:abort={deleteGame}
+    />
   {/if}
 </div>
 
 <style>
-
+  .main-grid {
+      display: grid;
+      grid-template-columns: auto;
+      grid-template-rows: 5% auto;
+      width: 100vw;
+      height: 100vh
+    }
 </style>

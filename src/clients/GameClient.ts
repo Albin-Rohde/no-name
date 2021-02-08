@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type userClientType from './UserClient'
-import type { UserData } from './UserClient'
+import type { UserData} from './UserClient'
+import { io, Socket } from 'socket.io-client'
 
 interface gameResponse {
   play_cards: number
@@ -16,21 +17,19 @@ export default class GameClient {
   private baseUrl = 'http://localhost:5000'
   private route = '/game'
   user: userClientType
+  socket: Socket
   
   playCards: number = 5
   rounds: number = 3
   playerLimit: number = 2
   private: boolean = true
   cardDeck: string = 'default'
+  users: [UserData?] = []
   key: string = ''
-  
+  socketConnected: boolean = false
+
   constructor(userClient: userClientType) {
     this.user = userClient
-  }
-
-  users = async () => {
-    const {users} = await this.makeRequest('/users', 'get')
-    return users ? users : []
   }
 
   getSessionGame = async () => {
@@ -72,6 +71,23 @@ export default class GameClient {
       this.cardDeck = 'default'
       this.key = ''
     } catch(err) {}
+  }
+
+  connectToGameSession = (rerenderCb) => {
+    this.socket = io(this.baseUrl, {
+      withCredentials: true,
+    })
+    this.socket.emit('join', this.key)
+
+    this.socket.on('update', (game: gameResponse) => {
+      this.users = game?.users
+      this.playerLimit = game?.player_limit
+      this.socketConnected = true
+      rerenderCb()
+    })
+    this.socket.on('disconnect', () => {
+      rerenderCb('disconnect')
+    })
   }
 
   private makeRequest = async (url: string, method: 'put' | 'get' | 'post' | 'delete', data: object = {}) => {
