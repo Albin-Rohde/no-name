@@ -5,7 +5,7 @@ const authUser = async (sessionUser: User) => {
   if(!sessionUser) {
     throw new Error('NO_SESSION_USER')
   }
-  const user = await User.findOne(sessionUser.id, {relations: ['game']})
+  const user = await User.findOne(sessionUser.id, {relations: ['game', 'game.users']})
   if(!user) {
     throw new Error('NO_DB_USER')
   }
@@ -30,10 +30,10 @@ export const gameRequired = async (req: Request, res: Response, next: NextFuncti
   try {
     const user = await authUser(req.session.user)
     if(!user.game) {
-      res.status(401).json('GAME_REQUIRED')
+      return res.status(401).json('GAME_REQUIRED')
     }
     req.session.user = user
     req.session.save()
-    next()
+    return next()
   } catch(err) {}
 }

@@ -7,7 +7,7 @@ const gameRouter = Router()
 gameRouter.use(loginRequired)
 
 gameRouter.get('/', gameRequired, async (req: Request, res: Response) => {
-  req.session.user.game
+  return res.json(req.session.user.game)
 })
 
 gameRouter.post('/', async (req: Request, res: Response) => {
