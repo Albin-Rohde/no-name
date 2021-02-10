@@ -1,4 +1,5 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, Unique, BaseEntity, ManyToOne, JoinColumn} from "typeorm"
+import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, Unique, BaseEntity, ManyToOne, JoinColumn, OneToMany} from "typeorm"
+import { PlayerCard } from "../../card/models/PlayerCard";
 import { Game } from '../../game/models/Game'
 
 @Entity({name: "player"})
@@ -23,6 +24,10 @@ export class User extends BaseEntity {
   })
   @JoinColumn()
   game: Game
+
+  @OneToMany(type => PlayerCard, card => card.user)
+  @JoinColumn({name: 'user_game_session_key'})
+  cards: PlayerCard[]
 
   @CreateDateColumn()
   created_at: string
