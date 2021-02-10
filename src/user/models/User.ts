@@ -1,7 +1,7 @@
 import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, Unique, BaseEntity, ManyToOne, JoinColumn} from "typeorm"
 import { Game } from '../../game/models/Game'
 
-@Entity()
+@Entity({name: "player"})
 @Unique(["email"])
 @Unique(["username"])
 

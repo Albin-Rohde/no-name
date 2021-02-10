@@ -14,7 +14,7 @@ const login = async (body: loginRequestBody) => {
     if(!user) {
       throw new Error('USER_NOT_FOUND')
     }
-    if(user.password !== body.password) {
+    if(!await bcrypt.compare(body.password, user.password)) {
       throw new Error('AUTH_FAILED')
     }
     return user
@@ -35,9 +35,8 @@ const create = async (body: registerRequestBody) => {
     if(!body.email || !body.password || !body.username) {
       throw new Error('BAD_REQUEST')
     }
-    user.password = await bcrypt.hash(body.email, 10)
+    user.password = await bcrypt.hash(body.password, 10)
     user.email = body.email
-    user.password = body.password
     user.username = body.username
     await user.save()
     return user
