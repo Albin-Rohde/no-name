@@ -9,7 +9,8 @@
     "build": "tsc -p .",
     "prebuild": "",
     "test": "",
-    "dev": "nodemon src/app.ts"
+    "dev": "nodemon src/app.ts",
+		"prepop": "node src/script/populateDb.ts"
   },
   "repository": {
     "type": "git",
