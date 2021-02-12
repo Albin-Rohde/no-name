@@ -5,8 +5,8 @@ import { User } from "../../user/models/User"
 
 @Unique(['text'])
 export class PlayerCard extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  key: string
+  @PrimaryGeneratedColumn()
+  id: number
 
   @Column({
     default: null
@@ -19,6 +19,6 @@ export class PlayerCard extends BaseEntity {
   @ManyToOne(type => User, user => user.cards, {
     cascade: true,
   })
-  @JoinColumn()
+  @JoinColumn({name: 'user_id_fk'})
   user: User
 }
