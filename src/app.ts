@@ -13,7 +13,8 @@ import {User} from './user/models/User'
 
 import userRoute from './user/route'
 import gameRouter from "./game/route"
-import { Game } from "./game/models/Game"
+import { joinGame } from "./game/services"
+import addWhiteCardsToDb from "./scripts/populate"
 
 declare module 'express-session' {
   interface Session {
@@ -64,29 +65,11 @@ createConnection().then(async () => {
   app.use('/game', gameRouter)
   
   io.on('connection', (socket) => {
-    socket.on('join', async (key: string) => {
-      const userId = socket.handshake.session?.user?.id
-      if(!userId) {
-        socket.disconnect()
-      }
-      try {
-        const user = await User.findOneOrFail(userId)
-        const game = await Game.findOneOrFail(key, {relations: ['users']})
-        if(game.users.length === game.player_limit) {
-          if(!game.users.some(u => u.id === user.id)) {
-            return socket.disconnect()
-          }
-        }
-        if(!game.users.some(u => u.id == user.id)) {
-          game.users.push(user)
-        }
-        game.save()
-        socket.join(key)
-        io.in(game.key).emit('update', game)
-      } catch(e) {}
-    })
-  })
-  
+    socket.on('join', (key: string) => joinGame(io, socket, key))
+	})
+
+	// Set up db
+	addWhiteCardsToDb()
   // Start server
   server.listen(5000, () => console.log(`Server started on port: 5000 `))
 }).catch(error => console.log(error));

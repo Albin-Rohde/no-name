@@ -1,3 +1,6 @@
+import type { Server } from 'socket.io'
+import { getUniqueCards } from '../card/services';
+
 import { User } from "../user/models/User";
 import { Game } from "./models/Game";
 
@@ -41,4 +44,28 @@ const deleteGame = async (user: User) => {
   game.remove()
 }
 
-export {createNewGame, deleteGame, getGameByKey}
+const joinGame = async (io: Server, socket: any, key: string) => {
+	const userId = socket.handshake.session?.user?.id
+	if(!userId) {
+		socket.disconnect()
+	}
+	try {
+		const user = await User.findOneOrFail(userId)
+		const game = await Game.findOneOrFail(key, {relations: ['users']})
+		if(game.users.length === game.player_limit) {
+			if(!game.users.some(u => u.id === user.id)) {
+				return socket.disconnect()
+			}
+		}
+		if(!game.users.some(u => u.id == user.id)) {
+			game.users.push(user)
+		}
+		game.save()
+		socket.join(key)
+		io.in(game.key).emit('update', {game, user})
+	} catch(e) {
+		socket.disconnect()
+	}
+}
+
+export {createNewGame, deleteGame, getGameByKey, joinGame}
