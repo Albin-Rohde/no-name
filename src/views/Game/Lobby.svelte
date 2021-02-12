@@ -26,7 +26,7 @@
       <div class="form-container">
         <div class="btn-container">
           <button class="btn btn-danger" on:click={() => dispatch('abort')}>Delete</button>
-          <button class="btn btn-success" on:click={() => dispatch('create-game')}> Start </button>
+          <button class="btn btn-success" on:click={() => dispatch('start-game')}> Start </button>
         </div>
       </div>
     </div>

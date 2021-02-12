@@ -3,7 +3,7 @@ import type userClientType from './UserClient'
 import type { UserData} from './UserClient'
 import { io, Socket } from 'socket.io-client'
 
-interface gameResponse {
+interface GameResponse {
   play_cards: number
   rounds: number
   player_limit: number
@@ -13,10 +13,15 @@ interface gameResponse {
   users?: [UserData]
 }
 
+interface UpdateResponse {
+	game: GameResponse,
+	user: UserData
+}
+
 export default class GameClient {
   private baseUrl = 'http://localhost:5000'
   private route = '/game'
-  user: userClientType
+  currentUser: UserData
   socket: Socket
   
   playCards: number = 5
@@ -28,13 +33,13 @@ export default class GameClient {
   key: string = ''
   socketConnected: boolean = false
 
-  constructor(userClient: userClientType) {
-    this.user = userClient
+  constructor(userData: UserData) {
+    this.currentUser = userData
   }
 
   getSessionGame = async () => {
     try {
-      const data: gameResponse = await this.makeRequest('', 'get')
+      const data: GameResponse = await this.makeRequest('', 'get')
       this.playCards = data.play_cards
       this.playerLimit = data.player_limit
       this.rounds = data.rounds
@@ -46,7 +51,7 @@ export default class GameClient {
 
   createGame = async () => {
     try {
-      const data: gameResponse = await this.makeRequest('', 'post', {
+      const data: GameResponse = await this.makeRequest('', 'post', {
         playCards: this.playCards,
         rounds: this.rounds,
         playerLimit: this.playerLimit,
@@ -79,10 +84,17 @@ export default class GameClient {
     })
     this.socket.emit('join', this.key)
 
-    this.socket.on('update', (game: gameResponse) => {
-      this.users = game?.users
-      this.playerLimit = game?.player_limit
-      this.socketConnected = true
+    this.socket.on('update', (res: UpdateResponse) => {
+			if(res.user) {
+				this.currentUser = res.user
+			}
+			if(res.game) {
+				this.users = res.game.users
+				this.playerLimit = res.game.player_limit
+				this.socketConnected = true
+			}
+			console.log('got update')
+			console.log(this.currentUser)
       rerenderCb()
     })
     this.socket.on('disconnect', () => {
@@ -90,9 +102,13 @@ export default class GameClient {
     })
   }
 
+	startGame = () => {
+		this.socket.emit('start')
+	}
+
   private makeRequest = async (url: string, method: 'put' | 'get' | 'post' | 'delete', data: object = {}) => {
     try {
-      const res: gameResponse = await axios({
+      const res: GameResponse = await axios({
         withCredentials: true,
         url: `${this.baseUrl}${this.route}/${url}`,
         method,

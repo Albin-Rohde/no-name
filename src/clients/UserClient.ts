@@ -5,8 +5,13 @@ export interface UserData {
   email?: string
   password?: string
   username: string
+	cards?: CardData[]
 }
 
+export interface CardData {
+	id: number
+	text: number
+}
 
 export default class UserClient {
   private baseUrl = 'http://localhost:5000'
@@ -16,15 +21,15 @@ export default class UserClient {
   email: string
   password: string
   username: string
+	cards: CardData[] = []
   isActive: boolean = false
   
-  constructor(id: number = null, username: string = null) {
-    if(id) {
-      this.id = id
-    }
-    if(username){
-      this.username = username
-    }
+  constructor(user: UserData | undefined = undefined) {
+		if(user) {
+			this.id = user.id
+			this.username = user.username
+			this.cards = user.cards
+		}
   }
   
   login = async (email: string = this.email, password: string = this.password) => {
@@ -84,6 +89,16 @@ export default class UserClient {
     this.username = userData.username
     this.isActive = true
   }
+
+	getData = (): UserData => {
+		return {
+			id: this.id,
+			email: this.email,
+			password: this.password,
+			username: this.username,
+			cards: this.cards,
+		}
+	}
 
   private makeRequest = async (url: string, method: 'put' | 'get' | 'post' | 'delete', data: object = {}) => {
     try {
