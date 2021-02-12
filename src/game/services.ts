@@ -68,4 +68,19 @@ const joinGame = async (io: Server, socket: any, key: string) => {
 	}
 }
 
-export {createNewGame, deleteGame, getGameByKey, joinGame}
+const startGame = async (io: Server, socket: any) => {
+	const user: User = socket.handshake.session?.user
+	if(!user) {
+		socket.disconnect()
+	}
+	const game = await Game.findOneOrFail(user.game.key, {relations: ['users', 'users.cards']})
+	game.users.forEach(async (user) => {
+		user.cards = await getUniqueCards(game.play_cards)
+		await user.save()
+	})
+	const currentUser = game.users.filter(u => u.id === user.id)[0]
+	await game.save()
+	io.in(game.key).emit('update', {game, user: currentUser})
+}
+
+export {createNewGame, deleteGame, getGameByKey, joinGame, startGame}
