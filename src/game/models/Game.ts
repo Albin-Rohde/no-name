@@ -21,6 +21,9 @@ export class Game extends BaseEntity {
   @Column()
   player_limit: number
 
+	@Column({default: false})
+	started: boolean
+
   @OneToMany(type => User, user => user.game, {
     onDelete: "CASCADE",
   })

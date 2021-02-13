@@ -1,4 +1,5 @@
 import type { Server } from 'socket.io'
+import { getManager } from 'typeorm';
 import { getUniqueCards } from '../card/services';
 
 import { User } from "../user/models/User";
@@ -38,20 +39,22 @@ const createNewGame = async (user: User, options: optionsShape) => {
 }
 
 const deleteGame = async (user: User) => {
-  const {game} = await User.findOneOrFail(user.id, {relations: ['game']})
-  game.users = []
-  game.save()
+	const {game} = await User.findOneOrFail(user.id, {relations: ['game']})
+	await getManager().query(`
+		UPDATE player
+		SET game_fk=NULL
+		WHERE game_fk = '${game.key}';
+	`)
   game.remove()
 }
 
 const joinGame = async (io: Server, socket: any, key: string) => {
-	const userId = socket.handshake.session?.user?.id
-	if(!userId) {
+	const user = socket.handshake.session?.user
+	if(!user) {
 		socket.disconnect()
 	}
 	try {
-		const user = await User.findOneOrFail(userId)
-		const game = await Game.findOneOrFail(key, {relations: ['users']})
+		const game = await Game.findOneOrFail(key, {relations: ['users', 'users.cards']})
 		if(game.users.length === game.player_limit) {
 			if(!game.users.some(u => u.id === user.id)) {
 				return socket.disconnect()
@@ -62,7 +65,7 @@ const joinGame = async (io: Server, socket: any, key: string) => {
 		}
 		game.save()
 		socket.join(key)
-		io.in(game.key).emit('update', {game, user})
+		io.in(game.key).emit('update', game)
 	} catch(e) {
 		socket.disconnect()
 	}
@@ -78,9 +81,9 @@ const startGame = async (io: Server, socket: any) => {
 		user.cards = await getUniqueCards(game.play_cards)
 		await user.save()
 	})
-	const currentUser = game.users.filter(u => u.id === user.id)[0]
+	game.started = true
 	await game.save()
-	io.in(game.key).emit('update', {game, user: currentUser})
+	io.in(game.key).emit('update', game)
 }
 
 export {createNewGame, deleteGame, getGameByKey, joinGame, startGame}

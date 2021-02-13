@@ -22,7 +22,7 @@ const getUniqueCard = async(count: number): Promise<PlayerCard> => {
 
 const getUniqueCards = async (card_amount: number): Promise<PlayerCard[]> => {
 	try {
-		const entityManager = getManager();
+		const entityManager = getManager()
 		// remove type orm?
 		const [{count}] = await entityManager.query(`SELECT COUNT(*) FROM player_card`)
 		const cards: Promise<PlayerCard>[] = []
