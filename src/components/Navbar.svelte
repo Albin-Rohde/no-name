@@ -2,6 +2,7 @@
   import { Dropdown, DropdownMenu, DropdownItem, DropdownToggle} from 'sveltestrap'
   import {createEventDispatcher} from 'svelte'
   export let username: string
+	export let gameActive: boolean
 
   let dropdownOpen = false
   const dispatch = createEventDispatcher()
@@ -23,6 +24,11 @@
         <DropdownItem class="disabled">
           User settings
         </DropdownItem>
+				{#if gameActive}
+				<DropdownItem on:click={() => dispatch('delete-game')}>
+          <p class="text-danger">Delete game</p>
+        </DropdownItem>
+				{/if}
       </DropdownMenu>
     </Dropdown>
   </div>
