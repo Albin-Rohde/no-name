@@ -10,7 +10,7 @@
   
   export let userClient: UserClientType
   let view = 'dashboard'
-  let gameClient = new GameClient(userClient)
+  let gameClient = new GameClient(userClient.getData())
   const dispatch = createEventDispatcher()
   
   const navigate = (location) => {
@@ -64,7 +64,7 @@
 </script>
 
 <div class="main-grid">
-  <Navbar on:logout={() => dispatch('logout')} username={gameClient.user.username}/>
+  <Navbar on:logout={() => dispatch('logout')} username={gameClient.currentUser.username}/>
   {#if view === 'dashboard'}
     <Dashboard 
       gameClient={gameClient} 
@@ -86,6 +86,7 @@
       on:logout={() => dispatch('logout')}
       on:navigate-dashboard={() => navigate('dashboard')}
       on:abort={deleteGame}
+			on:start-game={gameClient.startGame}
     />
   {/if}
   {#if view === 'join'}
