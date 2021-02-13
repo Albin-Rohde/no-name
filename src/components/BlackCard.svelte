@@ -1,0 +1,25 @@
+<script lang="typescript">
+  export let text = ''
+</script>
+
+
+<div class="card">
+	<p>{text}</p>
+</div>
+
+
+<style>
+	.card {
+		width: 170px;
+		height: 220px;
+		background-color: rgb(53, 53, 53);
+    box-shadow: 0px 2px 5px rgb(124, 124, 124);
+		padding: 10px;
+	}
+	p {
+		color:rgb(202, 202, 202);
+		font-weight: 600;
+	}
+
+
+</style>

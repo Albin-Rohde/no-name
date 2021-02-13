@@ -9,13 +9,9 @@ interface GameResponse {
   player_limit: number
   private_lobby: boolean
   card_deck: string
+	started: boolean
   key?: string
   users?: [UserData]
-}
-
-interface UpdateResponse {
-	game: GameResponse,
-	user: UserData
 }
 
 export default class GameClient {
@@ -32,6 +28,7 @@ export default class GameClient {
   users: [UserData?] = []
   key: string = ''
   socketConnected: boolean = false
+	gameStarted: boolean = false
 
   constructor(userData: UserData) {
     this.currentUser = userData
@@ -75,6 +72,10 @@ export default class GameClient {
       this.private = true
       this.cardDeck = 'default'
       this.key = ''
+			this.currentUser.cards = []
+			this.users = [this.currentUser]
+			this.gameStarted = false
+			this.socketConnected = false
     } catch(err) {}
   }
 
@@ -84,14 +85,13 @@ export default class GameClient {
     })
     this.socket.emit('join', this.key)
 
-    this.socket.on('update', (res: UpdateResponse) => {
-			if(res.user) {
-				this.currentUser = res.user
-			}
-			if(res.game) {
-				this.users = res.game.users
-				this.playerLimit = res.game.player_limit
+    this.socket.on('update', (game: GameResponse) => {
+			if(game) {
+				this.users = game.users
+				this.playerLimit = game.player_limit
+				this.gameStarted = game.started
 				this.socketConnected = true
+				this.currentUser = game.users.filter(u => u.id === this.currentUser.id)[0]
 			}
 			console.log('got update')
 			console.log(this.currentUser)
@@ -104,6 +104,7 @@ export default class GameClient {
 
 	startGame = () => {
 		this.socket.emit('start')
+		this.gameStarted = true
 	}
 
   private makeRequest = async (url: string, method: 'put' | 'get' | 'post' | 'delete', data: object = {}) => {

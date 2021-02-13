@@ -2,7 +2,6 @@
   import { createEventDispatcher } from 'svelte'
   import type GameClientType from '../../clients/GameClient'
   import CopyTextField from '../../components/CopyTextField.svelte'
-  import Navbar from '../../components/Navbar.svelte'
   import PlayerInfo from '../../components/PlayerInfo.svelte'
 
   export let gameClient: GameClientType
