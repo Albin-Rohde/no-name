@@ -7,6 +7,7 @@
   import Lobby from './Lobby.svelte'
   import JoinGame from './JoinGame.svelte'
   import Navbar from '../../components/Navbar.svelte'
+	import Ingame from './Ingame.svelte';
   
   export let userClient: UserClientType
   let view = 'dashboard'
@@ -29,6 +30,9 @@
         if(!gameClient.socketConnected) {
           gameClient.connectToGameSession(rerender)
         }
+				if(gameClient.gameStarted) {
+					view = 'ingame'
+				}
         view = 'lobby'
       }
     } catch(err) {}
@@ -45,6 +49,9 @@
       return navigate('dashboard')
     }
     gameClient = gameClient
+		if(gameClient.gameStarted) {
+			view = 'ingame'
+		}
   }
   
   const createGame = async () => {
@@ -64,7 +71,12 @@
 </script>
 
 <div class="main-grid">
-  <Navbar on:logout={() => dispatch('logout')} username={gameClient.currentUser.username}/>
+  <Navbar 
+		username={gameClient.currentUser.username}
+		gameActive={gameClient.socketConnected}
+		on:logout={() => dispatch('logout')}
+		on:delete-game={deleteGame}
+	/>
   {#if view === 'dashboard'}
     <Dashboard 
       gameClient={gameClient} 
@@ -96,6 +108,9 @@
       on:abort={deleteGame}
     />
   {/if}
+	{#if view === 'ingame'}
+		<Ingame gameClient={gameClient}/>
+	{/if}
 </div>
 
 <style>
