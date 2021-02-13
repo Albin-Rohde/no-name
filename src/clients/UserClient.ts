@@ -10,7 +10,7 @@ export interface UserData {
 
 export interface CardData {
 	id: number
-	text: number
+	text: string
 }
 
 export default class UserClient {
