@@ -13,7 +13,7 @@ import {User} from './user/models/User'
 
 import userRoute from './user/route'
 import gameRouter from "./game/route"
-import { joinGame, startGame } from "./game/services"
+import { joinGame, playCard, startGame } from "./game/services"
 import addWhiteCardsToDb from "./scripts/populate"
 
 declare module 'express-session' {
@@ -67,6 +67,7 @@ createConnection().then(async () => {
   io.on('connection', (socket) => {
     socket.on('join', (key: string) => joinGame(io, socket, key))
 		socket.on('start', () => startGame(io, socket))
+		socket.on('play-card', (cardId: number) => playCard(io, socket, cardId))
 	})
 
 	// Set up db

@@ -4,6 +4,7 @@ import { getUniqueCards } from '../card/services'
 import { normalizeGameResponse } from './normalizeRespose'
 import { User } from "../user/models/User"
 import { Game } from "./models/Game"
+import { CardState, PlayerCard } from '../card/models/PlayerCard'
 
 interface optionsShape {
   playCards: number
@@ -94,5 +95,18 @@ const startGame = async (io: Server, socket: any) => {
 	io.in(game.key).emit('update', normalizeGameResponse(game))
 }
 
+const playCard = async(io: Server, socket: any, cardId: number) => {
+	const user: User = socket.handshake.session?.user
+	if(!user) {
+		socket.disconnect()
+	}
+	const card = await PlayerCard.findOne({id: cardId, game_key: user.game.key, user_id_fk: user.id})
+	if(card) {
+		card.state = CardState.PLAYED_HIDDEN
+		await card.save()
+	}
+	const game = await Game.findOneOrFail(user.game.key, {relations: ['users', 'users.cards', 'users.cards.white_card']})
+	io.in(game.key).emit('update', normalizeGameResponse(game))
+}
 
-export {createNewGame, deleteGame, getGameByKey, joinGame, startGame}
+export {createNewGame, deleteGame, getGameByKey, joinGame, startGame, playCard}
