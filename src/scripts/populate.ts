@@ -1,6 +1,6 @@
 import fs from 'fs'
 import {getConnection} from 'typeorm'
-import {PlayerCard} from '../card/models/PlayerCard'
+import {WhiteCard} from '../card/models/WhiteCard'
 
 
 async function addWhiteCardsToDb() {
@@ -10,9 +10,9 @@ async function addWhiteCardsToDb() {
 			const cards = JSON.parse(rawData.toString()).white
 			Object.keys(cards).forEach( async key => {
 				const text = cards[key].content
-				const existingCard = await PlayerCard.findOne({text: text})
+				const existingCard = await WhiteCard.findOne({text: text})
 				if(!existingCard) {
-					const card = new PlayerCard()
+					const card = new WhiteCard()
 					card.text = cards[key].content
 					card.save()
 				}
