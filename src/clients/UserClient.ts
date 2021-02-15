@@ -1,17 +1,6 @@
 import axios from 'axios'
 
-export interface UserData {
-  id: number
-  email?: string
-  password?: string
-  username: string
-	cards?: CardData[]
-}
-
-export interface CardData {
-	id: number
-	text: string
-}
+import type { UserData, UserResponse, CardResponse } from './ResponseTypes'
 
 export default class UserClient {
   private baseUrl = 'http://localhost:5000'
@@ -21,7 +10,7 @@ export default class UserClient {
   email: string
   password: string
   username: string
-	cards: CardData[] = []
+	cards: CardResponse[] = []
   isActive: boolean = false
   
   constructor(user: UserData | undefined = undefined) {
@@ -90,11 +79,9 @@ export default class UserClient {
     this.isActive = true
   }
 
-	getData = (): UserData => {
+	getData = (): UserResponse => {
 		return {
 			id: this.id,
-			email: this.email,
-			password: this.password,
 			username: this.username,
 			cards: this.cards,
 		}
