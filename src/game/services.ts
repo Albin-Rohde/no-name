@@ -1,9 +1,9 @@
 import type { Server } from 'socket.io'
-import { getManager } from 'typeorm';
-import { getUniqueCards } from '../card/services';
-
-import { User } from "../user/models/User";
-import { Game } from "./models/Game";
+import { getManager } from 'typeorm'
+import { getUniqueCards } from '../card/services'
+import { normalizeGameResponse } from './normalizeRespose'
+import { User } from "../user/models/User"
+import { Game } from "./models/Game"
 
 interface optionsShape {
   playCards: number
@@ -45,6 +45,10 @@ const deleteGame = async (user: User) => {
 		SET game_fk=NULL
 		WHERE game_fk = '${game.key}';
 	`)
+	await getManager().query(`
+		DELETE FROM player_card_ref
+		WHERE game_key = '${game.key}';
+	`)
   game.remove()
 }
 
@@ -54,7 +58,9 @@ const joinGame = async (io: Server, socket: any, key: string) => {
 		socket.disconnect()
 	}
 	try {
-		const game = await Game.findOneOrFail(key, {relations: ['users', 'users.cards']})
+		console.log('join event')
+		const game = await Game.findOneOrFail(key, {relations: ['users', 'users.cards', 'users.cards.white_card']})
+		console.log('game: ', game)
 		if(game.users.length === game.player_limit) {
 			if(!game.users.some(u => u.id === user.id)) {
 				return socket.disconnect()
@@ -65,7 +71,7 @@ const joinGame = async (io: Server, socket: any, key: string) => {
 		}
 		game.save()
 		socket.join(key)
-		io.in(game.key).emit('update', game)
+		io.in(game.key).emit('update', normalizeGameResponse(game))
 	} catch(e) {
 		socket.disconnect()
 	}
@@ -76,14 +82,17 @@ const startGame = async (io: Server, socket: any) => {
 	if(!user) {
 		socket.disconnect()
 	}
-	const game = await Game.findOneOrFail(user.game.key, {relations: ['users', 'users.cards']})
-	game.users.forEach(async (user) => {
-		user.cards = await getUniqueCards(game.play_cards)
-		await user.save()
-	})
+	const game = await Game.findOneOrFail(user.game.key, {relations: ['users', 'users.cards', 'users.cards.white_card']})
+
+	await Promise.all(game.users.map(async (user) => {
+		user.cards = await getUniqueCards(game.play_cards, game.key)
+		return user.save()
+	}))
+
 	game.started = true
 	await game.save()
-	io.in(game.key).emit('update', game)
+	io.in(game.key).emit('update', normalizeGameResponse(game))
 }
+
 
 export {createNewGame, deleteGame, getGameByKey, joinGame, startGame}
