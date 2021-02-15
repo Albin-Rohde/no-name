@@ -22,8 +22,11 @@ export class User extends BaseEntity {
   @ManyToOne(type => Game, game => game.users, {
     cascade: true,
   })
-  @JoinColumn()
+  @JoinColumn({name: 'game_fk'})
   game: Game
+
+	@Column({ nullable: true })
+  game_fk: string | null
 
   @OneToMany(type => PlayerCard, card => card.user)
   @JoinColumn({name: 'user_game_session_key'})
