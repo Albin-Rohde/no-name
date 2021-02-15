@@ -10,11 +10,12 @@
 
 <style>
 	.card {
-		width: 170px;
+		width: 8.9vw;
 		height: 220px;
 		background-color: rgb(53, 53, 53);
     box-shadow: 0px 2px 5px rgb(124, 124, 124);
 		padding: 10px;
+		margin-right: 10px;
 	}
 	p {
 		color:rgb(202, 202, 202);

@@ -1,23 +1,12 @@
 import axios from 'axios'
-import type userClientType from './UserClient'
-import type { UserData} from './UserClient'
 import { io, Socket } from 'socket.io-client'
+import type { UserResponse, GameResponse, GameSocketResponse, CardResponse } from './ResponseTypes'
 
-interface GameResponse {
-  play_cards: number
-  rounds: number
-  player_limit: number
-  private_lobby: boolean
-  card_deck: string
-	started: boolean
-  key?: string
-  users?: [UserData]
-}
 
 export default class GameClient {
   private baseUrl = 'http://localhost:5000'
   private route = '/game'
-  currentUser: UserData
+  currentUser: UserResponse
   socket: Socket
   
   playCards: number = 5
@@ -25,13 +14,14 @@ export default class GameClient {
   playerLimit: number = 2
   private: boolean = true
   cardDeck: string = 'default'
-  users: [UserData?] = []
+  users: UserResponse[] = []
   key: string = ''
   socketConnected: boolean = false
 	gameStarted: boolean = false
 
-  constructor(userData: UserData) {
+  constructor(userData: UserResponse) {
     this.currentUser = userData
+		console.log(this.currentUser.cards)
   }
 
   getSessionGame = async () => {
@@ -85,16 +75,20 @@ export default class GameClient {
     })
     this.socket.emit('join', this.key)
 
-    this.socket.on('update', (game: GameResponse) => {
+    this.socket.on('update', (game: GameSocketResponse) => {
 			if(game) {
+				this.playCards = game.gameOptions.cardLimit
+				this.rounds = game.gameOptions.rounds
+				this.playerLimit = game.gameOptions.playerLimit
+				this.private = game.gameOptions.privateLobby
+				this.cardDeck = game.gameOptions.deck
 				this.users = game.users
-				this.playerLimit = game.player_limit
 				this.gameStarted = game.started
 				this.socketConnected = true
 				this.currentUser = game.users.filter(u => u.id === this.currentUser.id)[0]
 			}
 			console.log('got update')
-			console.log(this.currentUser)
+			console.log(game)
       rerenderCb()
     })
     this.socket.on('disconnect', () => {
@@ -105,6 +99,11 @@ export default class GameClient {
 	startGame = () => {
 		this.socket.emit('start')
 		this.gameStarted = true
+	}
+
+	playCard = (card: CardResponse) => {
+		console.log('playing card to socket..')
+		this.socket.emit('play-card', card.id)
 	}
 
   private makeRequest = async (url: string, method: 'put' | 'get' | 'post' | 'delete', data: object = {}) => {
