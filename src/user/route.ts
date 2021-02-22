@@ -33,6 +33,8 @@ userRouter.post('/logout', loginRequired, async (req: Request, res: Response) =>
 userRouter.post('/register', async (req: Request, res: Response) => {
   try {
     const user = await create(req.body)
+		req.session.user = user
+    req.session.save()
     res.json(user)
   } catch(err) {
     return res.status(400).json(err.message)
