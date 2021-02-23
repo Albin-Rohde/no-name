@@ -1,4 +1,5 @@
 import { getManager } from 'typeorm'
+import { getUniqueCards } from '../card/services'
 import { User } from "../user/models/User"
 import { Game } from "./models/Game"
 
@@ -49,6 +50,15 @@ const deleteGame = async (user: User) => {
   game.remove()
 }
 
+const givePlayersCards = async (game: Game) => {
+	await Promise.all(game.users.map(async (user) => {
+		user.cards = await getUniqueCards(game.play_cards - user.cards.length, game.key)
+		return user.save()
+	}))
+}
 
+const addPlayerToGame = async (game: Game, user: User) => {
 
-export {createNewGame, deleteGame, getGameByKey}
+}
+
+export {createNewGame, deleteGame, getGameByKey, givePlayersCards}

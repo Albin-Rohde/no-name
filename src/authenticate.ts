@@ -1,3 +1,4 @@
+import { Socket } from 'socket.io'
 import { NextFunction, Request, Response } from 'express'
 import { User } from './user/models/User'
 
@@ -36,4 +37,14 @@ export const gameRequired = async (req: Request, res: Response, next: NextFuncti
     req.session.save()
     return next()
   } catch(err) {}
+}
+
+// Socket.handshake.session is not accacible in types
+export const authSocketUser = (socket: any, next: any) => {
+	const user: User = socket.handshake.session?.user
+	if(!user) {
+		next(new Error('User not authenticated on session'))
+	} else {
+		next()
+	}
 }

@@ -15,6 +15,7 @@ import userRoute from './user/route'
 import gameRouter from "./game/route"
 import { joinGame, playCard, startGame } from "./game/socket"
 import addWhiteCardsToDb from "./scripts/populate"
+import { authSocketUser } from "./authenticate"
 
 declare module 'express-session' {
   interface Session {
@@ -64,6 +65,7 @@ createConnection().then(async () => {
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
   
+	io.use(authSocketUser)
   io.on('connection', (socket) => {
     socket.on('join', (key: string) => joinGame(io, socket, key))
 		socket.on('start', () => startGame(io, socket))
