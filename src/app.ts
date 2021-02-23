@@ -1,8 +1,7 @@
 import "reflect-metadata"
 import http from 'http'
 import { Socket, Server } from 'socket.io'
-import sharedSession from 'express-socket.io-session'
-import express, {Application, Request} from 'express'
+import express, {Application} from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
@@ -13,13 +12,17 @@ import {User} from './user/models/User'
 
 import userRoute from './user/route'
 import gameRouter from "./game/route"
-import { joinGame, playCard, startGame } from "./game/services"
+import { joinGameEvent, playCardEvent, startGameEvent } from "./game/socket"
 import addWhiteCardsToDb from "./scripts/populate"
+import { authSocketUser } from "./authenticate"
 
-declare module 'express-session' {
-  interface Session {
-    user: User
-  }
+declare module 'http' {
+	interface IncomingMessage {
+		session: {
+			user: User,
+			[propName: string]: any
+		}
+	}
 }
 
 // Set up app
@@ -41,7 +44,7 @@ createConnection().then(async () => {
   app.use(cookieParser())
   app.set('trust proxy', true)
   app.use(cors({origin: 'http://localhost',credentials: true}))
-  app.use((req, res, next) => {
+  app.use((_req, res, next) => {
     res.header({'Access-Control-Allow-Headers': 'http://localhost'})
     next()
   })
@@ -58,16 +61,19 @@ createConnection().then(async () => {
     }
   })
   app.use(userSession)
-  io.use(sharedSession(userSession))
+
+	const expressResponse: any = {}
+  io.use((socket: any, next: any) => userSession(socket.request, expressResponse, next))
 
   // Routes
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
   
-  io.on('connection', (socket) => {
-    socket.on('join', (key: string) => joinGame(io, socket, key))
-		socket.on('start', () => startGame(io, socket))
-		socket.on('play-card', (cardId: number) => playCard(io, socket, cardId))
+	io.use(authSocketUser)
+  io.on('connection', async (socket: Socket) => {
+    socket.on('join', (key: string) => joinGameEvent(io, socket, key))
+		socket.on('start', () => startGameEvent(io, socket))
+		socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
 	})
 
 	// Set up db

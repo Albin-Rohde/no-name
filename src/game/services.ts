@@ -1,10 +1,8 @@
-import type { Server } from 'socket.io'
 import { getManager } from 'typeorm'
+import { CardState, PlayerCard } from '../card/models/PlayerCard'
 import { getUniqueCards } from '../card/services'
-import { normalizeGameResponse } from './normalizeRespose'
 import { User } from "../user/models/User"
 import { Game } from "./models/Game"
-import { CardState, PlayerCard } from '../card/models/PlayerCard'
 
 interface optionsShape {
   playCards: number
@@ -53,60 +51,43 @@ const deleteGame = async (user: User) => {
   game.remove()
 }
 
-const joinGame = async (io: Server, socket: any, key: string) => {
-	const user = socket.handshake.session?.user
-	if(!user) {
-		socket.disconnect()
-	}
-	try {
-		console.log('join event')
-		const game = await Game.findOneOrFail(key, {relations: ['users', 'users.cards', 'users.cards.white_card']})
-		console.log('game: ', game)
-		if(game.users.length === game.player_limit) {
-			if(!game.users.some(u => u.id === user.id)) {
-				return socket.disconnect()
-			}
-		}
-		if(!game.users.some(u => u.id == user.id)) {
-			game.users.push(user)
-		}
-		game.save()
-		socket.join(key)
-		io.in(game.key).emit('update', normalizeGameResponse(game))
-	} catch(e) {
-		socket.disconnect()
-	}
-}
-
-const startGame = async (io: Server, socket: any) => {
-	const user: User = socket.handshake.session?.user
-	if(!user) {
-		socket.disconnect()
-	}
-	const game = await Game.findOneOrFail(user.game.key, {relations: ['users', 'users.cards', 'users.cards.white_card']})
-
+const givePlayersCards = async (game: Game) => {
 	await Promise.all(game.users.map(async (user) => {
-		user.cards = await getUniqueCards(game.play_cards, game.key)
+		user.cards = await getUniqueCards(game.play_cards - user.cards.length, game.key)
 		return user.save()
 	}))
-
-	game.started = true
-	await game.save()
-	io.in(game.key).emit('update', normalizeGameResponse(game))
 }
 
-const playCard = async(io: Server, socket: any, cardId: number) => {
-	const user: User = socket.handshake.session?.user
-	if(!user) {
-		socket.disconnect()
+const addPlayerToGame = async (game: Game, user: User) => {
+	if(game.users.length === game.player_limit) {
+		throw new Error('Player limit reached.')
 	}
-	const card = await PlayerCard.findOne({id: cardId, game_key: user.game.key, user_id_fk: user.id})
-	if(card) {
-		card.state = CardState.PLAYED_HIDDEN
-		await card.save()
+	if(!game.users.some(u => u.id === user.id)) {
+		game.users.push(user)
+		await game.save()
 	}
-	const game = await Game.findOneOrFail(user.game.key, {relations: ['users', 'users.cards', 'users.cards.white_card']})
-	io.in(game.key).emit('update', normalizeGameResponse(game))
 }
 
-export {createNewGame, deleteGame, getGameByKey, joinGame, startGame, playCard}
+const startGame = async (game: Game) => {
+	if(game.started) {
+		throw new Error('Game already started')
+	} else {
+		await givePlayersCards(game)
+		game.started = true
+		await game.save()
+	}
+}
+
+const handlePlayCard = async (game: Game, user: User, cardId: number) => {
+		const card = await PlayerCard.findOne({id: cardId, game_key: user.game.key, user_id_fk: user.id})
+		if(card) {
+			if(card.state === CardState.PLAYED_HIDDEN) {
+				throw new Error('Card has already been played.')
+			} else {
+				card.state = CardState.PLAYED_HIDDEN
+				await card.save()
+			}
+		}
+}
+
+export {createNewGame, deleteGame, getGameByKey, givePlayersCards, addPlayerToGame, startGame, handlePlayCard}

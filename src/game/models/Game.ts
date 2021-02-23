@@ -1,5 +1,6 @@
-import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinColumn, OneToMany} from "typeorm"
+import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinColumn, OneToMany, OneToOne} from "typeorm"
 import { User } from "../../user/models/User"
+import { GameRound } from "./GameRound"
 
 @Entity()
 export class Game extends BaseEntity {
@@ -24,9 +25,13 @@ export class Game extends BaseEntity {
 	@Column({default: false})
 	started: boolean
 
+	@Column({default: 1})
+	current_round: number
+
   @OneToMany(type => User, user => user.game, {
     onDelete: "CASCADE",
   })
+
   @JoinColumn({name: 'user_game_session_key'})
   users: User[]
 }
