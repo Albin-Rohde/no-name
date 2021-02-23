@@ -21,8 +21,8 @@ const getGameByKey = async (key: string) => {
   }
 }
 
-const gameRoundCompositeKey = (game: Game) => {
-	return `${game.key}_${game.current_round}`
+const gameRoundCompositeKey = (game: Game, roundNumber: number = game.current_round) => {
+	return `${game.key}_${roundNumber}`
 }
 
 const createNewGame = async (user: User, options: optionsShape) => {
@@ -75,13 +75,15 @@ const addPlayerToGame = async (game: Game, user: User) => {
 
 const createRounds = async (game: Game) => {
 	if(game.users.length === 0) throw new Error('No users on game.')
-	for(let i = 0; i < game.rounds; i++) {
-		if(i > game.users.length) i = 0
-		const round = new GameRound()
-		round.game_key_round_number = gameRoundCompositeKey(game)
-		round.CardWizz = game.users[i]
-		round.save()
-	}
+	let userIdx = 0
+	const gameRounds = new Array().fill(new GameRound, 0, game.rounds).map(async (gameRound: GameRound, index: number) => {
+		if(userIdx > game.users.length) userIdx = 0
+		gameRound.game_key_round_number = gameRoundCompositeKey(game, index)
+		gameRound.CardWizz = game.users[userIdx]
+		userIdx++
+		return gameRound.save()
+	})
+	await Promise.all(gameRounds)
 }
 
 const startGame = async (game: Game) => {

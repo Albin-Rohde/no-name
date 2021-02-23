@@ -20,8 +20,10 @@ const startGameEvent = async (io: Server, socket: any) => {
 		const user = socket.request.session.user
 		const game = await Game.findOneOrFail(user.game.key, {relations: ['users', 'users.cards', 'users.cards.white_card']})
 		await startGame(game)
+		console.log('game: ', game)
 		io.in(game.key).emit('update', normalizeGameResponse(game))
 	} catch(err) {
+		console.log(err)
 		socket.emit('connection_error', err.message)
 	}
 }
