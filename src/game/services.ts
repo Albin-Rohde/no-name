@@ -3,6 +3,7 @@ import { CardState, PlayerCard } from '../card/models/PlayerCard'
 import { getUniqueCards } from '../card/services'
 import { User } from "../user/models/User"
 import { Game } from "./models/Game"
+import { GameRound } from './models/GameRound'
 
 interface optionsShape {
   playCards: number
@@ -18,6 +19,10 @@ const getGameByKey = async (key: string) => {
   } catch {
     throw new Error('GAME_NOT_FOUND')
   }
+}
+
+const gameRoundCompositeKey = (game: Game) => {
+	return `${game.key}_${game.current_round}`
 }
 
 const createNewGame = async (user: User, options: optionsShape) => {
@@ -68,11 +73,22 @@ const addPlayerToGame = async (game: Game, user: User) => {
 	}
 }
 
+const createRounds = async (game: Game) => {
+	if(game.users.length === 0) throw new Error('No users on game.')
+	for(let i = 0; i < game.rounds; i++) {
+		if(i > game.users.length) i = 0
+		const round = new GameRound()
+		round.game_key_round_number = gameRoundCompositeKey(game)
+		round.CardWizz = game.users[i]
+		round.save()
+	}
+}
+
 const startGame = async (game: Game) => {
 	if(game.started) {
 		throw new Error('Game already started')
 	} else {
-		await givePlayersCards(game)
+		await Promise.all([givePlayersCards(game), createRounds(game)])
 		game.started = true
 		await game.save()
 	}
