@@ -36,6 +36,9 @@ const startGame = async (io: Server, socket: any) => {
 		socket.disconnect()
 	}
 	const game = await Game.findOneOrFail(user.game.key, {relations: ['users', 'users.cards', 'users.cards.white_card']})
+	if(game.started) {
+		return
+	}
 
 	await Promise.all(game.users.map(async (user) => {
 		user.cards = await getUniqueCards(game.play_cards, game.key)
