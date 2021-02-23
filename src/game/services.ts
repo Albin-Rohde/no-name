@@ -78,7 +78,7 @@ const startGame = async (game: Game) => {
 	}
 }
 
-const handlePlayCard = async (game: Game, user: User, cardId: number) => {
+const handlePlayCard = async (user: User, cardId: number) => {
 		const card = await PlayerCard.findOne({id: cardId, game_key: user.game.key, user_id_fk: user.id})
 		if(card) {
 			if(card.state === CardState.PLAYED_HIDDEN) {
