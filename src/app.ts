@@ -13,7 +13,7 @@ import {User} from './user/models/User'
 
 import userRoute from './user/route'
 import gameRouter from "./game/route"
-import { joinGame, playCard, startGame } from "./game/services"
+import { joinGame, playCard, startGame } from "./game/socket"
 import addWhiteCardsToDb from "./scripts/populate"
 
 declare module 'express-session' {
