@@ -12,7 +12,7 @@ import {User} from './user/models/User'
 
 import userRoute from './user/route'
 import gameRouter from "./game/route"
-import { joinGame, playCard, startGame } from "./game/socket"
+import { joinGameEvent, playCardEvent, startGameEvent } from "./game/socket"
 import addWhiteCardsToDb from "./scripts/populate"
 import { authSocketUser } from "./authenticate"
 
@@ -71,9 +71,9 @@ createConnection().then(async () => {
   
 	io.use(authSocketUser)
   io.on('connection', (socket: Socket) => {
-    socket.on('join', (key: string) => joinGame(io, socket, key))
-		socket.on('start', () => startGame(io, socket))
-		socket.on('play-card', (cardId: number) => playCard(io, socket, cardId))
+    socket.on('join', (key: string) => joinGameEvent(io, socket, key))
+		socket.on('start', () => startGameEvent(io, socket))
+		socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
 	})
 
 	// Set up db

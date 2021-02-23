@@ -1,4 +1,5 @@
 import { getManager } from 'typeorm'
+import { CardState, PlayerCard } from '../card/models/PlayerCard'
 import { getUniqueCards } from '../card/services'
 import { User } from "../user/models/User"
 import { Game } from "./models/Game"
@@ -58,7 +59,37 @@ const givePlayersCards = async (game: Game) => {
 }
 
 const addPlayerToGame = async (game: Game, user: User) => {
-
+	if(game.users.length === game.player_limit) {
+		throw new Error('Player limit reached.')
+	}
+	if(!game.users.some(u => u.id === user.id)) {
+		game.users.push(user)
+		await game.save()
+	} else {
+		throw new Error('Player already exist on game.')
+	}
 }
 
-export {createNewGame, deleteGame, getGameByKey, givePlayersCards}
+const startGame = async (game: Game) => {
+	if(game.started) {
+		throw new Error('Game already started')
+	} else {
+		await givePlayersCards(game)
+		game.started = true
+		await game.save()
+	}
+}
+
+const handlePlayCard = async (game: Game, user: User, cardId: number) => {
+		const card = await PlayerCard.findOne({id: cardId, game_key: user.game.key, user_id_fk: user.id})
+		if(card) {
+			if(card.state === CardState.PLAYED_HIDDEN) {
+				throw new Error('Card has already been played.')
+			} else {
+				card.state = CardState.PLAYED_HIDDEN
+				await card.save()
+			}
+		}
+}
+
+export {createNewGame, deleteGame, getGameByKey, givePlayersCards, addPlayerToGame, startGame, handlePlayCard}
