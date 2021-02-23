@@ -65,8 +65,6 @@ const addPlayerToGame = async (game: Game, user: User) => {
 	if(!game.users.some(u => u.id === user.id)) {
 		game.users.push(user)
 		await game.save()
-	} else {
-		throw new Error('Player already exist on game.')
 	}
 }
 

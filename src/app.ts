@@ -44,7 +44,7 @@ createConnection().then(async () => {
   app.use(cookieParser())
   app.set('trust proxy', true)
   app.use(cors({origin: 'http://localhost',credentials: true}))
-  app.use((req, res, next) => {
+  app.use((_req, res, next) => {
     res.header({'Access-Control-Allow-Headers': 'http://localhost'})
     next()
   })
@@ -70,7 +70,7 @@ createConnection().then(async () => {
   app.use('/game', gameRouter)
   
 	io.use(authSocketUser)
-  io.on('connection', (socket: Socket) => {
+  io.on('connection', async (socket: Socket) => {
     socket.on('join', (key: string) => joinGameEvent(io, socket, key))
 		socket.on('start', () => startGameEvent(io, socket))
 		socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
