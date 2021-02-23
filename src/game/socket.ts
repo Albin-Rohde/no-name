@@ -1,13 +1,11 @@
-import type { Server } from 'socket.io'
-import { getUniqueCards } from '../card/services'
+import type { Server, Socket } from 'socket.io'
 import { normalizeGameResponse } from './normalizeRespose'
-import { User } from "../user/models/User"
 import { Game } from "./models/Game"
 import { CardState, PlayerCard } from '../card/models/PlayerCard'
 import { givePlayersCards } from './services'
 
-const joinGame = async (io: Server, socket: any, key: string) => {
-	const user = socket.handshake.session?.user
+const joinGame = async (io: Server, socket: Socket, key: string) => {
+	const user = socket.request.session.user
 	try {
 		const game = await Game.findOneOrFail(key, {relations: ['users', 'users.cards', 'users.cards.white_card']})
 		if(game.users.length === game.player_limit) {
@@ -27,7 +25,7 @@ const joinGame = async (io: Server, socket: any, key: string) => {
 }
 
 const startGame = async (io: Server, socket: any) => {
-	const user: User = socket.handshake.session?.user
+	const user = socket.request.session.user
 	try {
 		const game = await Game.findOneOrFail(user.game.key, {relations: ['users', 'users.cards', 'users.cards.white_card']})
 		if(game.started) {
@@ -43,7 +41,7 @@ const startGame = async (io: Server, socket: any) => {
 }
 
 const playCard = async(io: Server, socket: any, cardId: number) => {
-	const user: User = socket.handshake.session?.user
+	const user = socket.request.session.user
 	const card = await PlayerCard.findOne({id: cardId, game_key: user.game.key, user_id_fk: user.id})
 	if(card) {
 		card.state = CardState.PLAYED_HIDDEN

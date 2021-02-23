@@ -39,9 +39,8 @@ export const gameRequired = async (req: Request, res: Response, next: NextFuncti
   } catch(err) {}
 }
 
-// Socket.handshake.session is not accacible in types
-export const authSocketUser = (socket: any, next: any) => {
-	const user: User = socket.handshake.session?.user
+export const authSocketUser = (socket: Socket, next: any) => {
+	const user: User = socket.request.session.user
 	if(!user) {
 		next(new Error('User not authenticated on session'))
 	} else {
