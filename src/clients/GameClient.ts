@@ -21,7 +21,6 @@ export default class GameClient {
 
   constructor(userData: UserResponse) {
     this.currentUser = userData
-		console.log(this.currentUser.cards)
   }
 
   getSessionGame = async () => {
@@ -106,7 +105,9 @@ export default class GameClient {
 	}
 
 	playCard = (card: CardResponse) => {
-		this.socket.emit('play-card', card.id)
+		if(!this.currentUser.hasPlayed) {
+			this.socket.emit('play-card', card.id)
+		}
 	}
 
   private makeRequest = async (url: string, method: 'put' | 'get' | 'post' | 'delete', data: object = {}) => {
