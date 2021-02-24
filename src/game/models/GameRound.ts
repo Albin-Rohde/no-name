@@ -15,9 +15,9 @@ export class GameRound extends BaseEntity {
 	round_number: number
 
 	@ManyToOne(type => User)
-	@JoinColumn({name: 'user_id_fk'})
-	CardWizz: User
+	@JoinColumn({name: 'card_wizz_user_id_fk'})
+	cardWizz: User
 
-	@Column({name: 'user_id_fk', nullable: false})
-	user_id_fk: number
+	@Column({name: 'card_wizz_user_id_fk', nullable: false})
+	card_wizz_user_id_fk: number
 }

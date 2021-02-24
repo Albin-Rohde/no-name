@@ -77,7 +77,7 @@ const createRounds = async (game: Game) => {
 		const round = new GameRound()
 		round.game_key = game.key
 		round.round_number = r+1
-		round.CardWizz = game.users[userIdx]
+		round.cardWizz = game.users[userIdx]
 		await round.save()
 		userIdx++
 	}
