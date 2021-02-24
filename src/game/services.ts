@@ -102,6 +102,8 @@ const handlePlayCard = async (user: User, cardId: number) => {
 				throw new Error('Card has already been played.')
 			} else {
 				card.state = CardState.PLAYED_HIDDEN
+				user.has_played = true
+				await user.save()
 				await card.save()
 			}
 		}
