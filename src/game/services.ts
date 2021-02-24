@@ -65,6 +65,8 @@ const addPlayerToGame = async (game: Game, user: User) => {
 	}
 	if(!game.users.some(u => u.id === user.id)) {
 		game.users.push(user)
+		user.game = game
+		console.log(user)
 		await game.save()
 	}
 }
