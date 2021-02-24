@@ -43,7 +43,7 @@ const normalizeGameResponse = (game: Game, currentRound: GameRound | undefined):
 			rounds: game.rounds
 		},
 		started: game.started,
-		users: [...game.users.map(user => normalizeUserResponse(user, currentRound))]
+		users: game.users ? [...game.users.map(user => normalizeUserResponse(user, currentRound))] : []
 	}
 }
 
@@ -51,7 +51,7 @@ const normalizeUserResponse = (user: User, currentRound: GameRound | undefined):
 	return {
 		id: user.id,
 		username: user.username,
-		cards: [...user.cards.map(normalizeCardResponse)],
+		cards: user.cards ? [...user.cards.map(normalizeCardResponse)] : [],
 		cardWizz: currentRound?.card_wizz_user_id_fk === user.id
 	}
 }

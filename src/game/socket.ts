@@ -6,7 +6,7 @@ import { addPlayerToGame, handlePlayCard, startGame } from './services'
 const joinGameEvent = async (io: Server, socket: Socket, key: string) => {
 	try {
 		const user = socket.request.session.user
-		const game = await Game.findOneOrFail(user.game.key, {relations: ['users', 'users.cards', 'users.cards.white_card']})
+		const game = await Game.findOneOrFail(key, {relations: ['users', 'users.cards', 'users.cards.white_card']})
 		await addPlayerToGame(game, user)
 		socket.join(key)
 		io.in(game.key).emit('update', await makeGameResponse(game))
@@ -20,7 +20,6 @@ const startGameEvent = async (io: Server, socket: any) => {
 		const user = socket.request.session.user
 		const game = await Game.findOneOrFail(user.game.key, {relations: ['users', 'users.cards', 'users.cards.white_card']})
 		await startGame(game)
-		console.log('game: ', game)
 		io.in(game.key).emit('update', await makeGameResponse(game))
 	} catch(err) {
 		console.log(err)
