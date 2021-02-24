@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, Unique, BaseEntity, ManyToOne, JoinColumn, OneToMany} from "typeorm"
+import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, Unique, BaseEntity, ManyToOne, JoinColumn, OneToMany, Index} from "typeorm"
 import { PlayerCard } from "../../card/models/PlayerCard";
 import { Game } from '../../game/models/Game'
 
@@ -16,6 +16,7 @@ export class User extends BaseEntity {
   @Column()
   password: string
 
+	@Index('username_idx')
   @Column({name: "username"})
   username: string
 
