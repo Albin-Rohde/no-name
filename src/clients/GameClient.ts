@@ -94,6 +94,10 @@ export default class GameClient {
     this.socket.on('disconnect', () => {
       rerenderCb('disconnect')
     })
+
+		this.socket.on('connection_error', (err: string) => {
+			console.error(err)
+		})
   }
 
 	startGame = () => {
@@ -102,7 +106,6 @@ export default class GameClient {
 	}
 
 	playCard = (card: CardResponse) => {
-		console.log('playing card to socket..')
 		this.socket.emit('play-card', card.id)
 	}
 

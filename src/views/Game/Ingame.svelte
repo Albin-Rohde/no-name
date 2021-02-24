@@ -1,5 +1,6 @@
 <script lang="typescript">
   import type GameClientType from '../../clients/GameClient'
+	import type { CardResponse } from '../../clients/ResponseTypes'
 	import { CardState } from '../../clients/ResponseTypes'
 	import BlackCard from '../../components/BlackCard.svelte'
   import PlayerInfo from '../../components/PlayerInfo.svelte'
@@ -7,6 +8,13 @@
 
   export let gameClient: GameClientType
 
+
+	const playCard = (card: CardResponse) => {
+		console.log('is cardwizz: ', gameClient.currentUser.cardWizz)
+		if(!gameClient.currentUser.cardWizz) {
+			gameClient.playCard(card)
+		}
+	}
 </script>
 
 <div>
@@ -32,8 +40,8 @@
 	<div class="white-cards">
 		{#each gameClient.currentUser.cards as card}
 			{#if card.state === CardState.HAND}
-			<div class="white-card" on:click={() => gameClient.playCard(card)}>
-				<WhiteCard text={card.text}/>
+			<div class="white-card" on:click={() => playCard(card)}>
+				<WhiteCard text={card.text} disabled={gameClient.currentUser.cardWizz}/>
 			</div>
 			{/if}
 		{/each}

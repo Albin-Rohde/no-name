@@ -16,7 +16,7 @@
   <div class="players">
     <br>
     {#each gameClient.users as user}
-      <p class="fs-5">{user.username}</p>
+      <p class={user.cardWizz ? "fs-5 card-wizz" : "fs-5"}>{user.username}</p>
     {/each}
   </div>
   <div class="score">
@@ -79,4 +79,7 @@
     grid-column-start: 1;
     grid-column-end: 2;
   }
+	.card-wizz {
+		font-weight: 600;
+	}
 </style>
