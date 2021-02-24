@@ -29,6 +29,7 @@ export interface UserResponse {
 	id: number
 	username: string
 	cards: CardResponse[]
+	cardWizz: boolean
 }
 
 export enum CardState {

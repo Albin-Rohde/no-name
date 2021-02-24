@@ -106,7 +106,6 @@ export default class GameClient {
 	}
 
 	playCard = (card: CardResponse) => {
-		console.log('playing card to socket..')
 		this.socket.emit('play-card', card.id)
 	}
 
