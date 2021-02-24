@@ -14,7 +14,6 @@ const getCardById = async (id: number) => {
 const getUniqueCard = async(count: number, game_key: string): Promise<PlayerCard> => {
 	const randomCardId = Math.floor(Math.random() * (count - 0))
 	const whiteCard = await WhiteCard.findOneOrFail(randomCardId)
-	console.log(whiteCard)
 	if(await PlayerCard.findOne({white_card_id_fk: whiteCard.id, game_key: game_key})) {
 		// Card is already in current game.
 		return getUniqueCard(count, game_key)

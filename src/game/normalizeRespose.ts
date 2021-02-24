@@ -1,6 +1,7 @@
 import { CardState, PlayerCard } from '../card/models/PlayerCard'
 import { User } from '../user/models/User'
 import { Game } from '../game/models/Game'
+import { GameRound } from './models/GameRound'
 
 interface GameResponse {
 	key: string
@@ -21,6 +22,7 @@ interface UserResponse {
 	id: number
 	username: string
 	cards: CardResponse[]
+	cardWizz: boolean
 }
 
 interface CardResponse {
@@ -30,7 +32,7 @@ interface CardResponse {
 }
 
 
-const normalizeGameResponse = (game: Game): GameResponse => {
+const normalizeGameResponse = (game: Game, currentRound: GameRound | undefined): GameResponse => {
 	return {
 		key: game.key,
 		gameOptions: {
@@ -41,15 +43,16 @@ const normalizeGameResponse = (game: Game): GameResponse => {
 			rounds: game.rounds
 		},
 		started: game.started,
-		users: [...game.users.map(normalizeUserResponse)]
+		users: [...game.users.map(user => normalizeUserResponse(user, currentRound))]
 	}
 }
 
-const normalizeUserResponse = (user: User): UserResponse => {
+const normalizeUserResponse = (user: User, currentRound: GameRound | undefined): UserResponse => {
 	return {
 		id: user.id,
 		username: user.username,
-		cards: [...user.cards.map(normalizeCardResponse)]
+		cards: [...user.cards.map(normalizeCardResponse)],
+		cardWizz: currentRound?.card_wizz_user_id_fk === user.id
 	}
 }
 
@@ -61,4 +64,7 @@ const normalizeCardResponse = (card: PlayerCard): CardResponse => {
 	}
 }
 
-export {normalizeGameResponse}
+export const makeGameResponse = async (game: Game): Promise<GameResponse> => {
+	const currentRound = await GameRound.findOne({game_key: game.key, round_number: game.current_round})
+	return normalizeGameResponse(game, currentRound)
+}
