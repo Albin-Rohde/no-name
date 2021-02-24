@@ -33,6 +33,9 @@ export class User extends BaseEntity {
   @JoinColumn({name: 'user_game_session_key'})
   cards: PlayerCard[]
 
+	@Column({nullable: false, name: 'has_played', default: false})
+	has_played: boolean
+
   @CreateDateColumn()
   created_at: string
 
