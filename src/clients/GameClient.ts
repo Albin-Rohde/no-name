@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { io, Socket } from 'socket.io-client'
 import type { UserResponse, GameResponse, GameSocketResponse, CardResponse } from './ResponseTypes'
-
+import shuffle from '../utils/shuffle'
 
 export default class GameClient {
   private baseUrl = 'http://localhost:5000'
@@ -81,7 +81,7 @@ export default class GameClient {
 				this.playerLimit = game.gameOptions.playerLimit
 				this.private = game.gameOptions.privateLobby
 				this.cardDeck = game.gameOptions.deck
-				this.users = game.users
+				this.users = shuffle(game.users)
 				this.gameStarted = game.started
 				this.socketConnected = true
 				this.currentUser = game.users.filter(u => u.id === this.currentUser.id)[0]
