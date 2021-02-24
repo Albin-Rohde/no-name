@@ -21,10 +21,6 @@ const getGameByKey = async (key: string) => {
   }
 }
 
-const gameRoundCompositeKey = (game: Game, roundNumber: number = game.current_round) => {
-	return `${game.key}_${roundNumber}`
-}
-
 const createNewGame = async (user: User, options: optionsShape) => {
   try {
     const game = new Game()
