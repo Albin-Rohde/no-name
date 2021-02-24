@@ -94,6 +94,10 @@ export default class GameClient {
     this.socket.on('disconnect', () => {
       rerenderCb('disconnect')
     })
+
+		this.socket.on('connection_error', (err: string) => {
+			console.error(err)
+		})
   }
 
 	startGame = () => {
