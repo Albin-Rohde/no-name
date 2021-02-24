@@ -98,9 +98,9 @@ const startGame = async (game: Game) => {
 const handlePlayCard = async (user: User, cardId: number) => {
 		const card = await PlayerCard.findOne({id: cardId, game_key: user.game.key, user_id_fk: user.id})
 		if(card) {
-			if(card.state === CardState.PLAYED_HIDDEN) {
-				throw new Error('Card has already been played.')
-			} else {
+			if(card.state === CardState.PLAYED_HIDDEN) throw new Error('Card has already been played.')
+			else if(user.has_played)  throw new Error('User has already played this round.')
+		 	else {
 				card.state = CardState.PLAYED_HIDDEN
 				user.has_played = true
 				await user.save()
