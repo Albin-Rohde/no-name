@@ -30,6 +30,7 @@ export interface UserResponse {
 	username: string
 	cards: CardResponse[]
 	cardWizz: boolean
+	hasPlayed: boolean
 }
 
 export enum CardState {
