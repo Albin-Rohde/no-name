@@ -77,9 +77,14 @@ createConnection().then(async () => {
   
 	io.use(authSocketUser)
   io.on('connection', async (socket: Socket) => {
-    socket.on('join', (key: string) => joinGameEvent(io, socket, key))
-		socket.on('start', () => startGameEvent(io, socket))
-		socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
+		try {
+			socket.on('join', (key: string) => joinGameEvent(io, socket, key))
+			socket.on('start', () => startGameEvent(io, socket))
+			socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
+		} catch(error) {
+			console.log(error)
+			socket.emit('connection_error', error.message)
+		}
 	})
 
 	// Set up db
