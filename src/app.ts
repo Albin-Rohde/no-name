@@ -5,7 +5,7 @@ import express, {Application} from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import session from 'express-session'
+import session, {Cookie} from 'express-session'
 import {createConnection} from "typeorm";
 
 import {User} from './user/models/User'
@@ -19,8 +19,15 @@ import { authSocketUser } from "./authenticate"
 declare module 'http' {
 	interface IncomingMessage {
 		session: {
-			user: User,
-			[propName: string]: any
+			user: User
+			id: string
+			cookie: Cookie
+			regenerate: ((err?: any) => void)
+			destroy: ((err?: any) => void)
+			reload: ((err?: any) => void)
+			resetMaxAge: () => void
+			save: ((err?: any) => void)
+			touch: () => void
 		}
 	}
 }
@@ -62,8 +69,7 @@ createConnection().then(async () => {
   })
   app.use(userSession)
 
-	const expressResponse: any = {}
-  io.use((socket: any, next: any) => userSession(socket.request, expressResponse, next))
+  io.use((socket: any, next: any) => userSession(socket.request, {} as any, next))
 
   // Routes
   app.use('/user', userRoute)
