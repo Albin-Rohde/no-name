@@ -5,7 +5,7 @@ import express, {Application} from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import session from 'express-session'
+import session, {Cookie} from 'express-session'
 import {createConnection} from "typeorm";
 
 import {User} from './user/models/User'
@@ -19,8 +19,15 @@ import { authSocketUser } from "./authenticate"
 declare module 'http' {
 	interface IncomingMessage {
 		session: {
-			user: User,
-			[propName: string]: any
+			user: User
+			id: string
+			cookie: Cookie
+			regenerate: ((err?: any) => void)
+			destroy: ((err?: any) => void)
+			reload: ((err?: any) => void)
+			resetMaxAge: () => void
+			save: ((err?: any) => void)
+			touch: () => void
 		}
 	}
 }
@@ -62,8 +69,7 @@ createConnection().then(async () => {
   })
   app.use(userSession)
 
-	const expressResponse: any = {}
-  io.use((socket: any, next: any) => userSession(socket.request, expressResponse, next))
+  io.use((socket: any, next: any) => userSession(socket.request, {} as any, next))
 
   // Routes
   app.use('/user', userRoute)
@@ -71,9 +77,14 @@ createConnection().then(async () => {
   
 	io.use(authSocketUser)
   io.on('connection', async (socket: Socket) => {
-    socket.on('join', (key: string) => joinGameEvent(io, socket, key))
-		socket.on('start', () => startGameEvent(io, socket))
-		socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
+		try {
+			socket.on('join', (key: string) => joinGameEvent(io, socket, key))
+			socket.on('start', () => startGameEvent(io, socket))
+			socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
+		} catch(error) {
+			console.log(error)
+			socket.emit('connection_error', error.message)
+		}
 	})
 
 	// Set up db

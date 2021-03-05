@@ -38,7 +38,7 @@ const createNewGame = async (user: User, options: optionsShape) => {
   }
 }
 
-const deleteGame = async (user: User) => {
+const deleteGame = async (user: User): Promise<void> => {
 	const {game} = await User.findOneOrFail(user.id, {relations: ['game']})
 	await getManager().query(`
 		UPDATE player
@@ -50,28 +50,34 @@ const deleteGame = async (user: User) => {
 		WHERE game_key = '${game.key}';
 	`)
   game.remove()
+	return
 }
 
-const givePlayersCards = async (game: Game) => {
-	await Promise.all(game.users.map(async (user) => {
+const givePlayersCards = async (game: Game): Promise<void[]> => {
+	return Promise.all(game.users.map(async (user) => {
 		user.cards = await getUniqueCards(game.play_cards - user.cards.length, game.key)
-		return user.save()
+		return
 	}))
 }
 
-const addPlayerToGame = async (game: Game, user: User) => {
+const addPlayerToGame = async (user: User, gameKey: string): Promise<void> => {
+	const game = await Game.findOneOrFail(gameKey, {relations: ['users']})
+	const existingUser = game.users.some(u => u.id === user.id)
+	if(existingUser) return
 	if(game.users.length === game.player_limit) {
 		throw new Error('Player limit reached.')
 	}
+	console.log()
 	if(!game.users.some(u => u.id === user.id)) {
-		game.users.push(user)
-		user.game = game
-		console.log(user)
+		game.users = [...game.users, user]
 		await game.save()
+		user.game = game
+		return
 	}
 }
 
-const createRounds = async (game: Game) => {
+const createRounds = async (game: Game): Promise<void> => {
+	console.log(game.users)
 	if(game.users.length === 0) throw new Error('No users on game.')
 	let userIdx = 0
 	for(let r = 0; r < game.rounds; r++) {
@@ -85,25 +91,28 @@ const createRounds = async (game: Game) => {
 	}
 }
 
-const startGame = async (game: Game) => {
+const startGame = async (game: Game): Promise<void> => {
 	if(game.started) {
 		throw new Error('Game already started')
 	} else {
 		await Promise.all([givePlayersCards(game), createRounds(game)])
 		game.started = true
-		await game.save()
+		return
 	}
 }
 
-const handlePlayCard = async (user: User, cardId: number) => {
-		const card = await PlayerCard.findOne({id: cardId, game_key: user.game.key, user_id_fk: user.id})
+const handlePlayCard = async (user: User, cardId: number): Promise<void> => {
+		const card = user.cards.filter(card => card.id == cardId)[0]
 		if(card) {
-			if(card.state === CardState.PLAYED_HIDDEN) {
-				throw new Error('Card has already been played.')
-			} else {
+			if(card.state === CardState.PLAYED_HIDDEN) throw new Error('Card has already been played.')
+			else if(user.has_played)  throw new Error('User has already played a card this round.')
+		 	else {
 				card.state = CardState.PLAYED_HIDDEN
-				await card.save()
+				user.has_played = true
+				return
 			}
+		} else {
+			throw new Error('CardId not found on user.')
 		}
 }
 

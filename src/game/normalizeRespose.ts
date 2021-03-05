@@ -23,6 +23,7 @@ interface UserResponse {
 	username: string
 	cards: CardResponse[]
 	cardWizz: boolean
+	hasPlayed: boolean
 }
 
 interface CardResponse {
@@ -52,7 +53,8 @@ const normalizeUserResponse = (user: User, currentRound: GameRound | undefined):
 		id: user.id,
 		username: user.username,
 		cards: user.cards ? [...user.cards.map(normalizeCardResponse)] : [],
-		cardWizz: currentRound?.card_wizz_user_id_fk === user.id
+		cardWizz: currentRound?.card_wizz_user_id_fk === user.id,
+		hasPlayed: user.has_played
 	}
 }
 
@@ -64,7 +66,8 @@ const normalizeCardResponse = (card: PlayerCard): CardResponse => {
 	}
 }
 
-export const makeGameResponse = async (game: Game): Promise<GameResponse> => {
-	const currentRound = await GameRound.findOne({game_key: game.key, round_number: game.current_round})
-	return normalizeGameResponse(game, currentRound)
+export const makeGameResponse = async (user: User): Promise<GameResponse> => {
+	await user.save()
+	const currentRound = await GameRound.findOne({game_key: user.game.key, round_number: user.game.current_round})
+	return normalizeGameResponse(user.game, currentRound)
 }
