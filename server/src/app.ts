@@ -12,9 +12,8 @@ import {User} from './user/models/User'
 
 import userRoute from './user/route'
 import gameRouter from "./game/route"
-import { joinGameEvent, playCardEvent, startGameEvent } from "./game/socket"
+import { socketEventHandler } from "./socket/events"
 import addWhiteCardsToDb from "./scripts/populate"
-import { authSocketUser } from "./authenticate"
 
 declare module 'http' {
 	interface IncomingMessage {
@@ -75,19 +74,8 @@ createConnection().then(async () => {
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
   
-  io.on('connection', async (socket: Socket) => {
-		try {
-			// All socket events need to have an authenticated user
-			io.use(authSocketUser)
-
-			// Socket event listeners
-			socket.on('join', (key: string) => joinGameEvent(io, socket, key))
-			socket.on('start', () => startGameEvent(io, socket))
-			socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
-		} catch(error) {
-			console.log(error)
-			socket.emit('connection_error', error.message)
-		}
+  io.on('connection', async () => {
+		io.use((socket: Socket, next: any) => socketEventHandler(socket, io, next))
 	})
 
 	// Set up db

@@ -1,6 +1,22 @@
 import type { Server, Socket } from 'socket.io'
-import { makeGameResponse } from './normalizeRespose'
+import { authSocketUser } from '../authenticate'
+import { makeGameResponse } from '../game/normalizeRespose'
 import { addPlayerToGame, handlePlayCard, startGame } from './services'
+
+const socketEventHandler = async (socket: Socket, io: Server, next: any) => {
+	try {
+		io.use(authSocketUser)
+		socket.on('join', (key: string) => joinGameEvent(io, socket, key))
+		socket.on('start', () => startGameEvent(io, socket))
+		socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
+		next()
+	} catch (error) {
+		console.log(error)
+		socket.emit('connection_error', error.message)
+	}
+}
+
+
 
 const joinGameEvent = async (io: Server, socket: Socket, key: string) => {
 	const {user} = socket.request.session
@@ -21,4 +37,4 @@ const playCardEvent = async(io: Server, socket: any, cardId: number) => {
 	io.in(user.game.key).emit('update', await makeGameResponse(user))
 }
 
-export {joinGameEvent, startGameEvent, playCardEvent}
+export {socketEventHandler}
