@@ -5,6 +5,7 @@ import { WhiteCard } from './models/WhiteCard';
 const getCardById = async (id: number) => {
 	try {
 		const card = await PlayerCard.findOneOrFail(id)
+		return card
 	} catch(err) {
 		throw new Error('NOT_FOUND')
 	}
@@ -12,10 +13,10 @@ const getCardById = async (id: number) => {
 
 
 const getUniqueCard = async(count: number, game_key: string): Promise<PlayerCard> => {
-	const randomCardId = Math.floor(Math.random() * (count - 0))
+	const randomCardId = Math.floor(Math.random() * (count - 0)) + 1
 	const whiteCard = await WhiteCard.findOneOrFail(randomCardId)
 	if(await PlayerCard.findOne({white_card_id_fk: whiteCard.id, game_key: game_key})) {
-		// Card is already in current game.
+		// Card is already in current game. retrieve a new one instead
 		return getUniqueCard(count, game_key)
 	}
 	const playerCard = new PlayerCard()
@@ -29,7 +30,6 @@ const getUniqueCard = async(count: number, game_key: string): Promise<PlayerCard
 const getUniqueCards = async (card_amount: number, game_key: string): Promise<PlayerCard[]> => {
 	try {
 		const entityManager = getManager()
-		// remove type orm?
 		const [{count}] = await entityManager.query(`SELECT COUNT(*) FROM white_card`)
 		const cards: Promise<PlayerCard>[] = []
 		for(let i = 0; i < card_amount; i++) {
@@ -37,7 +37,8 @@ const getUniqueCards = async (card_amount: number, game_key: string): Promise<Pl
 		}
 		return Promise.all(cards)
 	} catch(err) {
-		return []
+		console.log(err)
+		throw new Error('Error assigning white cards to user')
 	}
 }
 
