@@ -1,1 +1,4 @@
-No-name svelt frontend.
+# Frontend
+
+## Tech
+Frontend is built using svelte.
