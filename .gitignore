@@ -2,9 +2,15 @@
 *.env
 *.env.test
 
-*dist
+# config
 *config
 
-
+# Postgres data
 *postgres-data/
+
+# npm
 *node_modules/
+
+# build
+*build/
+
