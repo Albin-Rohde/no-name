@@ -1,16 +1,16 @@
 version: '3'
 
 services:
-  app:
-    container_name: node
+  server:
+    container_name: server
     restart: always
-    build: .
+    build: ./server
     ports:
       - '5000:5000'
     links:
       - db
     volumes:
-      - './src:/usr/src/app/src'
+      - './server/src:/usr/src/server/src'
   db:
     container_name: pg_db
     image: postgres
@@ -22,4 +22,4 @@ services:
       - POSTGRES_PASSWORD=pass
       - POSTGRES_DB=db_1
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - ./server/postgres-data:/var/lib/postgresql/data

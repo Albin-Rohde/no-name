@@ -1,10 +1,10 @@
 # dotenv environment variables file
-.env
-.env.test
+*.env
+*.env.test
 
-dist
-config
+*dist
+*config
 
 
-postgres-data
-node_modules
+*postgres-data/
+*node_modules/
