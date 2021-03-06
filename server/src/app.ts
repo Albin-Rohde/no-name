@@ -75,9 +75,12 @@ createConnection().then(async () => {
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
   
-	io.use(authSocketUser)
   io.on('connection', async (socket: Socket) => {
 		try {
+			// All socket events need to have an authenticated user
+			io.use(authSocketUser)
+
+			// Socket event listeners
 			socket.on('join', (key: string) => joinGameEvent(io, socket, key))
 			socket.on('start', () => startGameEvent(io, socket))
 			socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))

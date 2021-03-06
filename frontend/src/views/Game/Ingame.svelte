@@ -10,7 +10,6 @@
 
 
 	const playCard = (card: CardResponse) => {
-		console.log('is cardwizz: ', gameClient.currentUser.cardWizz)
 		if(!gameClient.currentUser.cardWizz) {
 			gameClient.playCard(card)
 		}
