@@ -23,3 +23,11 @@ services:
       - POSTGRES_DB=db_1
     volumes:
       - ./server/postgres-data:/var/lib/postgresql/data
+  frontend:
+    container_name: frontend
+    restart: always
+    build: ./frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - './frontend/src:/usr/src/frontend/src'
