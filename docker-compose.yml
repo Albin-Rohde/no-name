@@ -8,4 +8,4 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - './frontend:/usr/src/frontend'
+      - './frontend/src:/usr/src/frontend/src'
