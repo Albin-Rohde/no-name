@@ -46,6 +46,7 @@ export const authSocketUser = async (socket: Socket, next: any) => {
 	const user = await getUserWithRelation(socket.request.session.user.id)
 	if(user) {
 		socket.request.session.user = user
+		socket.request.session.save()
 		next()
 	} else {
 		throw new Error('Authentication for user failed.')
