@@ -67,7 +67,6 @@ const addPlayerToGame = async (user: User, gameKey: string): Promise<void> => {
 	if(game.users.length === game.player_limit) {
 		throw new Error('Player limit reached.')
 	}
-	console.log()
 	if(!game.users.some(u => u.id === user.id)) {
 		game.users = [...game.users, user]
 		await game.save()
@@ -77,7 +76,6 @@ const addPlayerToGame = async (user: User, gameKey: string): Promise<void> => {
 }
 
 const createRounds = async (game: Game): Promise<void> => {
-	console.log(game.users)
 	if(game.users.length === 0) throw new Error('No users on game.')
 	let userIdx = 0
 	for(let r = 0; r < game.rounds; r++) {
