@@ -75,19 +75,19 @@ export default class GameClient {
     this.socket.emit('join', this.key)
 
     this.socket.on('update', (game: GameSocketResponse) => {
+			console.log('got update')
+			console.log(game)
 			if(game) {
 				this.playCards = game.gameOptions.cardLimit
 				this.rounds = game.gameOptions.rounds
 				this.playerLimit = game.gameOptions.playerLimit
 				this.private = game.gameOptions.privateLobby
 				this.cardDeck = game.gameOptions.deck
-				this.users = shuffle(game.users)
+				this.users = game.users
 				this.gameStarted = game.started
 				this.socketConnected = true
 				this.currentUser = game.users.filter(u => u.id === this.currentUser.id)[0]
 			}
-			console.log('got update')
-			console.log(game)
       rerenderCb()
     })
     this.socket.on('disconnect', () => {
