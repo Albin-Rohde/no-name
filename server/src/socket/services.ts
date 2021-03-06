@@ -65,4 +65,8 @@ const handlePlayCard = async (user: User, cardId: number): Promise<void> => {
 		}
 }
 
-export {addPlayerToGame, startGame, handlePlayCard}
+const leaveGame = async (user: User) => {
+	user.game_fk = null
+}
+
+export {addPlayerToGame, startGame, handlePlayCard, leaveGame}

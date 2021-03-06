@@ -1,7 +1,7 @@
 import type { Server, Socket } from 'socket.io'
 import { authSocketUser } from '../authenticate'
 import { makeGameResponse } from '../game/normalizeRespose'
-import { addPlayerToGame, handlePlayCard, startGame } from './services'
+import { addPlayerToGame, handlePlayCard, startGame, leaveGame } from './services'
 
 const socketEventHandler = async (socket: Socket, io: Server, next: any) => {
 	try {
@@ -9,6 +9,7 @@ const socketEventHandler = async (socket: Socket, io: Server, next: any) => {
 		socket.on('join', (key: string) => joinGameEvent(io, socket, key))
 		socket.on('start', () => startGameEvent(io, socket))
 		socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
+		socket.on('leave', () => leaveGameEvent(io, socket))
 		next()
 	} catch (error) {
 		console.log(error)
@@ -33,6 +34,15 @@ const playCardEvent = async(io: Server, socket: Socket, cardId: number) => {
 	const {user} = socket.request.session
 	await handlePlayCard(user, cardId)
 	io.in(user.game.key).emit('update', await makeGameResponse(user))
+}
+
+const leaveGameEvent = async(io: Server, socket: Socket) => {
+	const {user} = socket.request.session
+	const gameKey = user.game.key
+	leaveGame(user)
+	socket.leave(gameKey)
+	io.in(gameKey).emit('update', await makeGameResponse(user))
+	socket.emit('update', {})
 }
 
 export {socketEventHandler}
