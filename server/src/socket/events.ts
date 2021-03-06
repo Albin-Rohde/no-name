@@ -16,8 +16,6 @@ const socketEventHandler = async (socket: Socket, io: Server, next: any) => {
 	}
 }
 
-
-
 const joinGameEvent = async (io: Server, socket: Socket, key: string) => {
 	const {user} = socket.request.session
 	await addPlayerToGame(user, key)
@@ -25,13 +23,13 @@ const joinGameEvent = async (io: Server, socket: Socket, key: string) => {
 	io.in(user.game.key).emit('update', await makeGameResponse(user))
 }
 
-const startGameEvent = async (io: Server, socket: any) => {
+const startGameEvent = async (io: Server, socket: Socket) => {
 	const {user} = socket.request.session
 	await startGame(user.game)
 	io.in(user.game.key).emit('update', await makeGameResponse(user))
 }
 
-const playCardEvent = async(io: Server, socket: any, cardId: number) => {
+const playCardEvent = async(io: Server, socket: Socket, cardId: number) => {
 	const {user} = socket.request.session
 	await handlePlayCard(user, cardId)
 	io.in(user.game.key).emit('update', await makeGameResponse(user))
