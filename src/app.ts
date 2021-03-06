@@ -39,9 +39,9 @@ createConnection().then(async () => {
   const server = http.createServer(app)
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost",
+      origin: "http://localhost:3000",
       methods: ["GET", "POST"],
-      allowedHeaders: ["http://localhost", "user"],
+      allowedHeaders: ["http://localhost:3000", "user"],
       credentials: true
     }
   })
@@ -50,9 +50,9 @@ createConnection().then(async () => {
   app.use(bodyParser.json())
   app.use(cookieParser())
   app.set('trust proxy', true)
-  app.use(cors({origin: 'http://localhost',credentials: true}))
+  app.use(cors({origin: 'http://localhost:3000',credentials: true}))
   app.use((_req, res, next) => {
-    res.header({'Access-Control-Allow-Headers': 'http://localhost'})
+    res.header({'Access-Control-Allow-Headers': 'http://localhost:3000'})
     next()
   })
   const userSession = session({
