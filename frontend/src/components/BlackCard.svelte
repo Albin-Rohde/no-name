@@ -21,6 +21,4 @@
 		color:rgb(202, 202, 202);
 		font-weight: 600;
 	}
-
-
 </style>

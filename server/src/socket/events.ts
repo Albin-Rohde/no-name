@@ -6,6 +6,7 @@ import { addPlayerToGame, handlePlayCard, startGame, leaveGame } from './service
 const socketEventHandler = async (socket: Socket, io: Server, next: any) => {
 	try {
 		io.use(authSocketUser)
+		socket.on('get-game', () => getGameEvent(io, socket))
 		socket.on('join', (key: string) => joinGameEvent(io, socket, key))
 		socket.on('start', () => startGameEvent(io, socket))
 		socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
@@ -14,6 +15,13 @@ const socketEventHandler = async (socket: Socket, io: Server, next: any) => {
 	} catch (error) {
 		console.log(error)
 		socket.emit('connection_error', error.message)
+	}
+}
+
+const getGameEvent = async (_io: Server, socket: Socket) => {
+	const {user} = socket.request.session
+	if(user.game) {
+		socket.emit('update', await makeGameResponse(user))
 	}
 }
 

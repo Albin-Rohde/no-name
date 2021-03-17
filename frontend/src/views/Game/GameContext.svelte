@@ -8,10 +8,17 @@
   import JoinGame from './JoinGame.svelte'
   import Navbar from '../../components/Navbar.svelte'
 	import Ingame from './Ingame.svelte';
+import InGameClient from '../../clients/InGameClient';
   
   export let userClient: UserClientType
   let view = 'dashboard'
   let gameClient = new GameClient(userClient.getData())
+
+	const ello = () => {
+		return
+	}
+
+	let inGameClient = new InGameClient(userClient.getData())
   const dispatch = createEventDispatcher()
   
   const navigate = (location) => {
@@ -22,6 +29,13 @@
     gameClient.deleteGame()
     navigate('dashboard')
   }
+
+	const checkGameSession_2 = async () => {
+		try {
+			await inGameClient.connect(rerender) 
+		} catch(err) {}
+	}
+
 
   const checkGameSession = async () => {
     try {
