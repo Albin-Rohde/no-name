@@ -1,31 +1,31 @@
 <script lang="typescript">
   import { createEventDispatcher } from 'svelte'
-  import type GameClientType from '../../clients/GameClient'
   import CopyTextField from '../../components/CopyTextField.svelte'
   import PlayerInfo from '../../components/PlayerInfo.svelte'
+  import type SocketClient from '../../clients/SocketClient'
 
-  export let gameClient: GameClientType
+  export let socket: SocketClient
   const dispatch = createEventDispatcher()
 
 </script>
 
 <div class="content-grid">
-  <PlayerInfo gameClient={gameClient} />
+  <PlayerInfo gameClient={socket.game} />
   <div class="inner-grid">
     <div class="flex-center">
-      <p class="fs-3">Waiting for players ({gameClient.users.length}/{gameClient.playerLimit})</p>
+      <p class="fs-3">Waiting for players ({socket.game.users.length}/fix)</p>
     </div>
     <div class="flex-center">
       <p class="fs-4">Invite players with the following key</p><br>
     </div>
     <div class="flex-center">
-      <CopyTextField value={gameClient.key} />
+      <CopyTextField value={socket.game.key} />
     </div>
     <div class="button-grid">
       <div class="form-container">
         <div class="btn-container">
           <button class="btn btn-danger" on:click={() => dispatch('abort')}>Delete</button>
-          <button class="btn btn-success" on:click={() => dispatch('start-game')}> Start </button>
+          <button class="btn btn-success" on:click={socket.startGame}> Start </button>
         </div>
       </div>
     </div>
