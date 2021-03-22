@@ -3,83 +3,78 @@
   import type UserClientType from '../../clients/UserClient'
   import CreateGame from './CreateGame.svelte'
   import Dashboard from './Dashboard.svelte'
-  import GameClient from '../../clients/GameClient'
   import Lobby from './Lobby.svelte'
   import JoinGame from './JoinGame.svelte'
   import Navbar from '../../components/Navbar.svelte'
-	import Ingame from './Ingame.svelte';
-  
-  export let userClient: UserClientType
-  let view = 'dashboard'
-  let gameClient = new GameClient(userClient.getData())
+	import Ingame from './Ingame.svelte'
+  import RestClient from '../../clients/RestClient'
+  import SocketClient from '../../clients/SocketClient'
   const dispatch = createEventDispatcher()
-  
-  const navigate = (location) => {
+
+  type views = 'dashboard' | 'ingame' | 'lobby' | 'join' | 'create'
+  let view: views = 'dashboard'
+
+  export let userClient: UserClientType
+  let socket = new SocketClient(userClient.getData())
+
+
+  const navigate = (location: views) => {
     view = location
   }
-  
+
   const deleteGame = () => {
-    gameClient.deleteGame()
+    const gameRestClient = new RestClient('/game')
+    gameRestClient.makeRequest('delete')
     navigate('dashboard')
+  }
+
+  const rerender = (err: string | undefined = undefined) => {
+    if(err) {
+      console.log(err)
+      view = 'dashboard'
+      return
+    }
+    if (view !== 'ingame' && socket.game?.started) {
+      view = 'ingame'
+      return
+    }
+    if(view !== 'lobby' && socket.game?.key) {
+      view = 'lobby'
+    }
+    socket = socket
   }
 
   const checkGameSession = async () => {
     try {
-      await gameClient.getSessionGame()
-      if(gameClient.key) {
-        if(!gameClient.socketConnected) {
-          gameClient.connectToGameSession(rerender)
-        }
-				if(gameClient.gameStarted) {
-					view = 'ingame'
-				}
-        view = 'lobby'
-      }
-    } catch(err) {}
+      await socket.connect(newRerender)
+      await socket.getGame()
+    } catch (err) {
+      console.error(err)
+    }
   }
-  
+
   if(!userClient.id) {
     dispatch('logout')
   } else {
     checkGameSession()
   }
   
-  const rerender = (err: string | undefined = undefined) => {
-    if(err) {
-      return navigate('dashboard')
-    }
-    gameClient = gameClient
-		if(gameClient.gameStarted) {
-			view = 'ingame'
-		}
-  }
-  
-  const createGame = async () => {
-    try {
-      await gameClient.createGame()
-      gameClient.connectToGameSession(rerender)
-      navigate('lobby')
-    } catch(err) {
-      navigate('dashboard')
-    }
+  const onGameCreated = async (key: string) => {
+    view = 'lobby'
+    socket.joinGame(key)
   }
 
-  const joinGame = async () => {
-    gameClient.connectToGameSession(rerender)
-    navigate('lobby')
-  }
 </script>
 
 <div class="main-grid">
   <Navbar 
-		username={gameClient.currentUser.username}
-		gameActive={gameClient.socketConnected}
+		username={socket.currentUser.username}
+		gameActive={!!socket.game.key}
 		on:logout={() => dispatch('logout')}
 		on:delete-game={deleteGame}
 	/>
   {#if view === 'dashboard'}
     <Dashboard 
-      gameClient={gameClient} 
       on:logout={() => dispatch('logout')}
       on:create={() => navigate('create')}
       on:join={() => navigate('join')}
@@ -88,28 +83,26 @@
   {#if view === 'create'}
     <CreateGame
       on:navigate-lobby={() => navigate('lobby')}
-      on:create-game={() => createGame()}
-      on:abort={deleteGame}
-      gameClient={gameClient} />
-    {/if}
+      onGameCreated={onGameCreated}
+      on:abort={() => navigate('lobby')}
+    />
+  {/if}
     {#if view === 'lobby'}
     <Lobby 
-      gameClient={gameClient}
+      socket={socket}
       on:logout={() => dispatch('logout')}
       on:navigate-dashboard={() => navigate('dashboard')}
       on:abort={deleteGame}
-			on:start-game={gameClient.startGame}
     />
   {/if}
   {#if view === 'join'}
     <JoinGame 
-      gameClient={gameClient}
-      on:join={joinGame}
+      socket={socket}
       on:abort={deleteGame}
     />
   {/if}
 	{#if view === 'ingame'}
-		<Ingame gameClient={gameClient}/>
+		<Ingame socket={socket}/>
 	{/if}
 </div>
 
