@@ -1,8 +1,8 @@
 <script lang="typescript">
   import { createEventDispatcher } from 'svelte'
-  import type GameClientType from '../../clients/GameClient'
+  import type SocketClient from '../../clients/SocketClient'
   
-  export let gameClient: GameClientType
+  export let socket: SocketClient
   const dispatch = createEventDispatcher()
 
 </script>
@@ -15,13 +15,13 @@
     <form>
       <div class="form-group">
         <label class="form-label" for="customRange2">Enter game Key</label>
-        <input type="text" class="form-control" placeholder="Enter game key" bind:value={gameClient.key}>
+        <input type="text" class="form-control" placeholder="Enter game key" bind:value={socket.game.key}>
       </div>
     </form>
     <div class="btn-wrapper">
       <div class="btn-container">
         <button class="btn btn-danger" on:click={() => dispatch('abort')}>Abort</button>
-        <button class="btn btn-success" on:click={() => dispatch('join')}>Join game</button>
+        <button class="btn btn-success" on:click={socket.joinGame()}>Join game</button>
       </div>
     </div>
   </div>
