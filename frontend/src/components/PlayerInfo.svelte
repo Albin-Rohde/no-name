@@ -79,7 +79,7 @@
     grid-column-start: 1;
     grid-column-end: 2;
   }
-	.card-wizz {
-		font-weight: 600;
-	}
+  .card-wizz {
+    font-weight: 600;
+  }
 </style>
