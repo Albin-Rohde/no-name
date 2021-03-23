@@ -68,11 +68,11 @@
 
 <div class="main-grid">
   <Navbar 
-		username={socket.currentUser.username}
-		gameActive={!!socket.game.key}
-		on:logout={() => dispatch('logout')}
-		on:delete-game={deleteGame}
-	/>
+    username={socket.currentUser.username}
+    gameActive={!!socket.game.key}
+    on:logout={() => dispatch('logout')}
+    on:delete-game={deleteGame}
+  />
   {#if view === 'dashboard'}
     <Dashboard 
       on:logout={() => dispatch('logout')}
@@ -101,9 +101,9 @@
       on:abort={deleteGame}
     />
   {/if}
-	{#if view === 'ingame'}
-		<Ingame socket={socket}/>
-	{/if}
+  {#if view === 'ingame'}
+    <Ingame socket={socket}/>
+  {/if}
 </div>
 
 <style>
