@@ -1,13 +1,13 @@
 <script lang="typescript">
-	import { createEventDispatcher } from 'svelte'
-	export let msg
-	let email = ''
-	let password = ''
-	const dispatch = createEventDispatcher()
+  import { createEventDispatcher } from 'svelte'
+  export let msg
+  let email = ''
+  let password = ''
+  const dispatch = createEventDispatcher()
 
-	const dispatchAction = (action: string, details: Object = {}) => {
-		dispatch(action, details)
-	}
+  const dispatchAction = (action: string, details: Object = {}) => {
+    dispatch(action, details)
+  }
 </script>
 
 <div>
