@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte'
-	let email
-	let password
-	let username
+  import { createEventDispatcher } from 'svelte'
+  let email
+  let password
+  let username
 
-	const dispatch = createEventDispatcher()
-	
-	const dispatchAction = (action: string, details: Object = {}) => {
-		dispatch(action, details)
-	}
+  const dispatch = createEventDispatcher()
+
+  const dispatchAction = (action: string, details: Object = {}) => {
+    dispatch(action, details)
+  }
 </script>
 
 <div>
@@ -22,32 +22,32 @@
       <input type="text" class="form-control" id="username" placeholder="Username" bind:value={username}>
     </div>
   </form>
-	<button type="submit" class="btn-small btn-primary" on:click={() => dispatchAction('register', {email, password, username})}>Register</button>
-	<br><p class="fs-5">Already have an account?</p>
-	<p class="fs-5 login" on:click={() => dispatchAction('navigate-login')}>Login</p>
+  <button type="submit" class="btn-small btn-primary" on:click={() => dispatchAction('register', {email, password, username})}>Register</button>
+  <br><p class="fs-5">Already have an account?</p>
+  <p class="fs-5 login" on:click={() => dispatchAction('navigate-login')}>Login</p>
 </div>
 
 <style>
-	label {
-		margin-top: 4%;
-	}
-
-	.form-group {
-		margin-top: 5%;
-	}
-	button {
-		margin-top: 3%;
-		border-radius: 10%;
+  label {
+    margin-top: 4%;
   }
-  
-  p {
-		display: inline;
-		margin-top: 3%;
-	}
 
-	.login {
-		color: rgb(61, 61, 255);
-		text-decoration: underline;
-		cursor: pointer;
+  .form-group {
+    margin-top: 5%;
+  }
+  button {
+    margin-top: 3%;
+    border-radius: 10%;
+  }
+
+  p {
+    display: inline;
+    margin-top: 3%;
+  }
+
+  .login {
+    color: rgb(61, 61, 255);
+    text-decoration: underline;
+    cursor: pointer;
   }
 </style>
