@@ -1,7 +1,7 @@
 <script lang="typescript">
   import { createEventDispatcher } from 'svelte'
   import RestClient from "../../clients/RestClient";
-  import {GameResponse} from '../../clients/ResponseTypes'
+  import type {GameResponse} from '../../clients/ResponseTypes'
 
   const dispatch = createEventDispatcher()
   export let onGameCreated
