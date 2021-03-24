@@ -46,7 +46,7 @@
 
   const checkGameSession = async () => {
     try {
-      await socket.connect(newRerender)
+      await socket.connect(rerender)
       await socket.getGame()
     } catch (err) {
       console.error(err)
@@ -60,7 +60,6 @@
   }
   
   const onGameCreated = async (key: string) => {
-    view = 'lobby'
     socket.joinGame(key)
   }
 
@@ -69,7 +68,7 @@
 <div class="main-grid">
   <Navbar 
     username={socket.currentUser.username}
-    gameActive={!!socket.game.key}
+    gameActive={!!socket?.game?.key}
     on:logout={() => dispatch('logout')}
     on:delete-game={deleteGame}
   />
