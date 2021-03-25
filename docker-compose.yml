@@ -7,6 +7,12 @@ services:
     build: ./server
     ports:
       - '5000:5000'
+    environment:
+      - PGHOST=db
+      - PGPORT=5432
+      - PGUSER=nodus
+      - PGPASSWORD=pass
+      - PGDATABASE=db_1
     links:
       - db
     volumes:
