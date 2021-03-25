@@ -9,14 +9,17 @@
 	import Ingame from './Ingame.svelte'
   import RestClient from '../../clients/RestClient'
   import SocketClient from '../../clients/SocketClient'
+  import type {GameSocketResponse, UserResponse} from "../../clients/ResponseTypes";
   const dispatch = createEventDispatcher()
 
   type views = 'dashboard' | 'ingame' | 'lobby' | 'join' | 'create'
   let view: views = 'dashboard'
 
   export let userClient: UserClientType
-  let socket = new SocketClient(userClient.getData())
+  const socket = new SocketClient(userClient.getData())
 
+  let gameData: GameSocketResponse
+  let currentUser: UserResponse = userClient.getData()
 
   const navigate = (location: views) => {
     view = location
@@ -41,7 +44,8 @@
     if(view !== 'lobby' && socket.game?.key) {
       view = 'lobby'
     }
-    socket = socket
+    gameData = socket.game
+    currentUser = socket.currentUser
   }
 
   const checkGameSession = async () => {
@@ -67,8 +71,8 @@
 
 <div class="main-grid">
   <Navbar 
-    username={socket.currentUser.username}
-    gameActive={!!socket?.game?.key}
+    username={currentUser.username}
+    gameActive={!!gameData?.key}
     on:logout={() => dispatch('logout')}
     on:delete-game={deleteGame}
   />
@@ -86,8 +90,9 @@
       on:abort={() => navigate('lobby')}
     />
   {/if}
-    {#if view === 'lobby'}
+    {#if view === 'lobby' && gameData?.key}
     <Lobby 
+      gameData={gameData}
       socket={socket}
       on:logout={() => dispatch('logout')}
       on:navigate-dashboard={() => navigate('dashboard')}
@@ -95,13 +100,18 @@
     />
   {/if}
   {#if view === 'join'}
-    <JoinGame 
+    <JoinGame
       socket={socket}
+      gameData={gameData}
       on:abort={deleteGame}
     />
   {/if}
-  {#if view === 'ingame'}
-    <Ingame socket={socket}/>
+  {#if view === 'ingame' && gameData?.key}
+    <Ingame
+      socket={socket}
+      gameData={gameData}
+      currentUser={currentUser}
+    />
   {/if}
 </div>
 

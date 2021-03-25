@@ -3,23 +3,25 @@
   import CopyTextField from '../../components/CopyTextField.svelte'
   import PlayerInfo from '../../components/PlayerInfo.svelte'
   import type SocketClient from '../../clients/SocketClient'
+  import type {GameSocketResponse} from "../../clients/ResponseTypes";
 
   export let socket: SocketClient
+  export let gameData: GameSocketResponse
   const dispatch = createEventDispatcher()
 
 </script>
 
 <div class="content-grid">
-  <PlayerInfo gameClient={socket.game} />
+  <PlayerInfo gameData={gameData} />
   <div class="inner-grid">
     <div class="flex-center">
-      <p class="fs-3">Waiting for players ({socket.game.users.length}/fix)</p>
+      <p class="fs-3">Waiting for players ({gameData.users.length}/fix)</p>
     </div>
     <div class="flex-center">
       <p class="fs-4">Invite players with the following key</p><br>
     </div>
     <div class="flex-center">
-      <CopyTextField value={socket.game.key} />
+      <CopyTextField value={gameData.key} />
     </div>
     <div class="button-grid">
       <div class="form-container">

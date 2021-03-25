@@ -1,5 +1,5 @@
 <script lang="typescript">
-  import type { CardResponse } from '../../clients/ResponseTypes'
+  import type {CardResponse, GameSocketResponse, UserResponse} from '../../clients/ResponseTypes'
   import { CardState } from '../../clients/ResponseTypes'
   import BlackCard from '../../components/BlackCard.svelte'
   import PlayerInfo from '../../components/PlayerInfo.svelte'
@@ -7,6 +7,8 @@
   import type SocketClient from '../../clients/SocketClient'
 
   export let socket: SocketClient
+  export let gameData: GameSocketResponse
+  export let currentUser: UserResponse
 
   const playCard = (card: CardResponse) => {
     if(!socket.currentUser.cardWizz) {
@@ -18,12 +20,12 @@
 <div>
   <div class="content-grid">
     <div class="left-coll">
-      <PlayerInfo gameClient={socket.game}/>
+      <PlayerInfo gameData={gameData}/>
     </div>
     <div class="main-coll">
       <div class="top-cards">
         <BlackCard text="I am a black card, select a card to fill in the _ blank."/>
-        {#each socket.game.users as user}
+        {#each gameData.users as user}
           {#each user.cards as card}
             {#if card.state === CardState.PLAYED_HIDDEN}
               <div class="white-card">
@@ -36,10 +38,10 @@
     </div>
   </div>
   <div class="white-cards">
-    {#each socket.currentUser.cards as card}
+    {#each currentUser.cards as card}
       {#if card.state === CardState.HAND}
         <div class="white-card" on:click={() => playCard(card)}>
-          <WhiteCard text={card.text} disabled={socket.currentUser.cardWizz}/>
+          <WhiteCard text={card.text} disabled={currentUser.cardWizz}/>
         </div>
       {/if}
     {/each}

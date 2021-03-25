@@ -1,8 +1,10 @@
 <script lang="typescript">
   import { createEventDispatcher } from 'svelte'
   import type SocketClient from '../../clients/SocketClient'
+  import type {GameSocketResponse} from "../../clients/ResponseTypes";
   
   export let socket: SocketClient
+  export let gameData: GameSocketResponse
   const dispatch = createEventDispatcher()
 
 </script>
@@ -15,7 +17,7 @@
     <form>
       <div class="form-group">
         <label class="form-label" for="customRange2">Enter game Key</label>
-        <input type="text" class="form-control" placeholder="Enter game key" bind:value={socket.game.key}>
+        <input type="text" class="form-control" placeholder="Enter game key" bind:value={gameData.key}>
       </div>
     </form>
     <div class="btn-wrapper">
