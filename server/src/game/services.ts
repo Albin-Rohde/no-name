@@ -14,8 +14,7 @@ interface optionsShape {
 
 const getGameByKey = async (key: string) => {
   try {
-    const game = await Game.findOneOrFail(key)
-    return game
+    return await Game.findOneOrFail(key)
   } catch {
     throw new Error('GAME_NOT_FOUND')
   }
@@ -23,6 +22,9 @@ const getGameByKey = async (key: string) => {
 
 const createNewGame = async (user: User, options: optionsShape) => {
   try {
+    if(user.game) {
+      await deleteGame(user)
+    }
     const game = new Game()
     game.play_cards = options.playCards
     game.player_limit = options.playerLimit
@@ -49,7 +51,7 @@ const deleteGame = async (user: User): Promise<void> => {
 		DELETE FROM player_card_ref
 		WHERE game_key = '${game.key}';
 	`)
-  game.remove()
+  await game.remove()
 	return
 }
 
