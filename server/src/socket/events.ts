@@ -1,12 +1,10 @@
 import type { Server, Socket } from 'socket.io'
-import { authSocketUser } from '../authenticate'
 import { makeGameResponse } from '../game/normalizeRespose'
 import { addPlayerToGame, handlePlayCard, startGame } from './services'
 import { getUserWithRelation } from '../user/services'
 
 const socketEventHandler = async (socket: Socket, io: Server, next: any) => {
 	try {
-		io.use(authSocketUser)
 		socket.on('join', (key: string) => joinGameEvent(io, socket, key))
 		socket.on('start', () => startGameEvent(io, socket))
 		socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))

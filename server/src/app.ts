@@ -14,6 +14,7 @@ import userRoute from './user/route'
 import gameRouter from "./game/route"
 import { socketEventHandler } from "./socket/events"
 import addWhiteCardsToDb from "./scripts/populate"
+import {authSocketUser} from "./authenticate";
 
 declare module 'http' {
 	interface IncomingMessage {
@@ -75,6 +76,7 @@ createConnection().then(async () => {
   app.use('/game', gameRouter)
   
   io.on('connection', async () => {
+    io.use(authSocketUser)
 		io.use((socket: Socket, next: any) => socketEventHandler(socket, io, next))
 	})
 
