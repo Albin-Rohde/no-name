@@ -39,9 +39,8 @@
     }
     if (view !== 'ingame' && socket.game?.started) {
       view = 'ingame'
-      return
     }
-    if(view !== 'lobby' && socket.game?.key) {
+    else if(view !== 'lobby' && socket.game?.key) {
       view = 'lobby'
     }
     gameData = socket.game
