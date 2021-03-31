@@ -32,11 +32,6 @@ export default class InGameClient {
     })
   }
 
-  createGame = (gameSettings: GameOptionsResponse) => {
-    if(!this.socket) throw new Error('InGameClient not connected to socket.')
-    this.socket.emit('create-game', gameSettings)
-  }
-
   getGame = () => {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     this.socket.emit('get-game')
