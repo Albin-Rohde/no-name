@@ -6,7 +6,7 @@
   import Lobby from './Lobby.svelte'
   import JoinGame from './JoinGame.svelte'
   import Navbar from '../../components/Navbar.svelte'
-	import Ingame from './Ingame.svelte'
+  import Ingame from './Ingame.svelte'
   import RestClient from '../../clients/RestClient'
   import SocketClient from '../../clients/SocketClient'
   import type {GameSocketResponse, UserResponse} from "../../clients/ResponseTypes";
@@ -40,7 +40,7 @@
     if (view !== 'ingame' && socket.game?.started) {
       view = 'ingame'
     }
-    else if(view !== 'lobby' && socket.game?.key) {
+    else if(view !== 'lobby' && socket.game?.key && !socket.game.started) {
       view = 'lobby'
     }
     gameData = socket.game
