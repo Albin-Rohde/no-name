@@ -4,40 +4,56 @@ import { addPlayerToGame, handlePlayCard, startGame } from './services'
 import { getUserWithRelation } from '../user/services'
 
 const socketEventHandler = async (socket: Socket, io: Server, next: any) => {
-	try {
-		socket.on('join', (key: string) => joinGameEvent(io, socket, key))
-		socket.on('start', () => startGameEvent(io, socket))
-		socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
-		next()
-	} catch (error) {
-		console.log(error)
-		socket.emit('connection_error', error.message)
-	}
+	socket.on('join', (key: string) => joinGameEvent(io, socket, key))
+	socket.on('start', () => startGameEvent(io, socket))
+	socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
+	socket.on('get-game', () => getGameEvent(io, socket))
+	next()
 }
 
 const joinGameEvent = async (io: Server, socket: Socket, key: string) => {
-	const user = await getUserWithRelation(socket.request.session.user.id)
-	await addPlayerToGame(user, key)
-	socket.join(key)
-	io.in(user.game.key).emit('update', await makeGameResponse(user))
+	try {
+		const user = await getUserWithRelation(socket.request.session.user.id)
+		await addPlayerToGame(user, key)
+		socket.join(key)
+		io.in(user.game.key).emit('update', await makeGameResponse(user))
+	} catch(err) {
+		console.error(err)
+		socket.emit('connection_error', err.message)
+	}
 }
 
 const startGameEvent = async (io: Server, socket: Socket) => {
-	const user = await getUserWithRelation(socket.request.session.user.id)
-	await startGame(user.game)
-	io.in(user.game.key).emit('update', await makeGameResponse(user))
+	try {
+		const user = await getUserWithRelation(socket.request.session.user.id)
+		await startGame(user.game)
+		io.in(user.game.key).emit('update', await makeGameResponse(user))
+	} catch(err) {
+		console.error(err)
+		socket.emit('connection_error', err.message)
+	}
 }
 
 const playCardEvent = async(io: Server, socket: Socket, cardId: number) => {
-	const user = await getUserWithRelation(socket.request.session.user.id)
-	await handlePlayCard(user, cardId)
-	io.in(user.game.key).emit('update', await makeGameResponse(user))
+	try {
+		const user = await getUserWithRelation(socket.request.session.user.id)
+		await handlePlayCard(user, cardId)
+		io.in(user.game.key).emit('update', await makeGameResponse(user))
+	} catch(err) {
+		console.error(err)
+		socket.emit('connection_error', err.message)
+	}
 }
 
 const getGameEvent = async(io: Server, socket: Socket) => {
-	const user = await getUserWithRelation(socket.request.session.user.id)
-	if(user.game) {
-		socket.emit('update', await makeGameResponse(user))
+	try {
+		const user = await getUserWithRelation(socket.request.session.user.id)
+		if (user.game) {
+			socket.emit('update', await makeGameResponse(user))
+		}
+	} catch(err) {
+		console.error(err)
+		socket.emit('connection_error', err.message)
 	}
 }
 
