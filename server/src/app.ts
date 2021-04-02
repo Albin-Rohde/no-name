@@ -42,8 +42,9 @@ createConnection().then(async () => {
       origin: "http://localhost:3000",
       methods: ["GET", "POST"],
       allowedHeaders: ["http://localhost:3000", "user"],
-      credentials: true
-    }
+      credentials: true,
+    },
+    transports: ['websocket']
   })
   
   app.use(bodyParser.urlencoded({extended: false}))
@@ -75,13 +76,13 @@ createConnection().then(async () => {
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
   
-  io.on('connection', async () => {
+  io.once('connection', async () => {
     io.use(authSocketUser)
 		io.use((socket: Socket, next: any) => socketEventHandler(socket, io, next))
 	})
 
 	// Set up db
-	addWhiteCardsToDb()
+	await addWhiteCardsToDb()
   // Start server
   server.listen(5000, () => console.log(`Server started on port: 5000 `))
 }).catch(error => console.log(error));

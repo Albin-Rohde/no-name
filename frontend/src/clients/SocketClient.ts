@@ -16,6 +16,8 @@ export default class InGameClient {
   connect = async (rerenderCb: CallableFunction) => {
     this.socket = io(this.baseUrl, {
       withCredentials: true,
+      transports: ['websocket'],
+      upgrade: false,
     })
     // socket event listeners
     this.socket.on('update', (game: GameSocketResponse) => {
@@ -24,7 +26,6 @@ export default class InGameClient {
       }
     })
     this.socket.on('disconnect', () => {
-      console.log('disconnected')
       rerenderCb('disconnect')
     })
     this.socket.on('connection_error', (err: string) => {
@@ -45,7 +46,6 @@ export default class InGameClient {
 
   startGame = () => {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
-    console.log('starting game')
     this.socket.emit('start')
   }
 
