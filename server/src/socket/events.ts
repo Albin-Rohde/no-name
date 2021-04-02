@@ -34,4 +34,11 @@ const playCardEvent = async(io: Server, socket: Socket, cardId: number) => {
 	io.in(user.game.key).emit('update', await makeGameResponse(user))
 }
 
+const getGameEvent = async(io: Server, socket: Socket) => {
+	const user = await getUserWithRelation(socket.request.session.user.id)
+	if(user.game) {
+		socket.emit('update', await makeGameResponse(user))
+	}
+}
+
 export {socketEventHandler}
