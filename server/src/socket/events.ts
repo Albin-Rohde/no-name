@@ -26,7 +26,7 @@ const joinGameEvent = async (io: Server, socket: Socket, key: string) => {
 const startGameEvent = async (io: Server, socket: Socket) => {
 	try {
 		const user = await getUserWithRelation(socket.request.session.user.id)
-		await startGame(user.game)
+		await startGame(user)
 		io.in(user.game.key).emit('update', await makeGameResponse(user))
 	} catch(err) {
 		console.error(err)

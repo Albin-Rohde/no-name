@@ -27,13 +27,13 @@ const getUniqueCard = async(count: number, game_key: string): Promise<PlayerCard
 }
 
 
-const getUniqueCards = async (card_amount: number, game_key: string): Promise<PlayerCard[]> => {
+const getUniqueCards = async (card_amount: number, game_key: string, user: User): Promise<PlayerCard[]> => {
 	try {
 		const entityManager = getManager()
 		const [{count}] = await entityManager.query(`SELECT COUNT(*) FROM white_card`)
 		const cards: Promise<PlayerCard>[] = []
 		for(let i = 0; i < card_amount; i++) {
-			cards.push(getUniqueCard(count, game_key))
+			cards.push(getUniquePlayCard(count, game_key, user))
 		}
 		return Promise.all(cards)
 	} catch(err) {

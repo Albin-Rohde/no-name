@@ -4,9 +4,9 @@ import { User } from '../user/models/User'
 import { Game } from '../game/models/Game'
 import { GameRound } from '../game/models/GameRound'
 
-const givePlayersCards = async (game: Game): Promise<void[]> => {
-	return Promise.all(game.users.map(async (user) => {
-		user.cards = await getUniqueCards(game.play_cards - user.cards.length, game.key)
+const givePlayersCards = async (user: User): Promise<void[]> => {
+	return Promise.all(user.game.users.map(async (u) => {
+		u.cards = await getUniqueCards(user.game.play_cards - u.cards.length, user.game.key, u)
 		return
 	}))
 }
@@ -40,12 +40,12 @@ const createRounds = async (game: Game): Promise<void> => {
 	}
 }
 
-const startGame = async (game: Game): Promise<void> => {
-	if(game.started) {
+const startGame = async (user: User): Promise<void> => {
+	if(user.game.started) {
 		throw new Error('Game already started')
 	} else {
-		await Promise.all([givePlayersCards(game), createRounds(game)])
-		game.started = true
+		await Promise.all([givePlayersCards(user), createRounds(user.game)])
+		user.game.started = true
 		return
 	}
 }
