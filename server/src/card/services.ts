@@ -3,14 +3,6 @@ import { PlayerCard } from './models/PlayerCard'
 import { WhiteCard } from './models/WhiteCard';
 import type { User } from '../user/models/User';
 
-const getCardById = async (id: number) => {
-	try {
-		const card = await PlayerCard.findOneOrFail(id)
-		return card
-	} catch(err) {
-		throw new Error('NOT_FOUND')
-	}
-}
 
 const getUniqueWhiteCard = async(count: number, gameKey: string) => {
 	const randomCardId = Math.floor(Math.random() * (count - 0)) + 1
@@ -48,4 +40,4 @@ const getUniqueCards = async (card_amount: number, game_key: string, user: User)
 	}
 }
 
-export {getCardById, getUniqueCards}
+export {getUniqueCards}
