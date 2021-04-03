@@ -28,16 +28,18 @@ const addPlayerToGame = async (user: User, gameKey: string): Promise<void> => {
 }
 
 const createRounds = async (game: Game): Promise<void> => {
-	if(game.users.length === 0) throw new Error('No users on game.')
-	let userIdx = 0
-	for(let r = 0; r < game.rounds; r++) {
-		if(userIdx > game.users.length-1) userIdx = 0
-		const round = new GameRound()
-		round.game_key = game.key
-		round.round_number = r+1
-		round.cardWizz = game.users[userIdx]
-		await round.save()
-		userIdx++
+	if(!game.current_round) {
+		if(game.users.length === 0) throw new Error('No users on game.')
+		let userIdx = 0
+		for(let r = 0; r < game.rounds; r++) {
+			if(userIdx > game.users.length-1) userIdx = 0
+			const round = new GameRound()
+			round.game_key = game.key
+			round.round_number = r+1
+			round.cardWizz = game.users[userIdx]
+			await round.save()
+			userIdx++
+		}
 	}
 }
 
