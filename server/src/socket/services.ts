@@ -3,6 +3,7 @@ import { getUniqueCards } from '../card/services'
 import { User } from '../user/models/User'
 import { Game } from '../game/models/Game'
 import { GameRound } from '../game/models/GameRound'
+import { getGameUser } from "../user/services";
 
 const givePlayersCards = async (user: User): Promise<void[]> => {
 	return Promise.all(user.game.users.map(async (u) => {
@@ -51,13 +52,15 @@ const startGame = async (user: User): Promise<void> => {
 }
 
 const handlePlayCard = async (user: User, cardId: number): Promise<void> => {
-		const card = user.cards.filter(card => card.id == cardId)[0]
+		const gameUser = getGameUser(user)
+		const card = gameUser.cards.find(card => card.id == cardId)
 		if(card) {
 			if(card.state === CardState.PLAYED_HIDDEN) throw new Error('Card has already been played.')
 			else if(user.has_played)  throw new Error('User has already played a card this round.')
 		 	else {
 				card.state = CardState.PLAYED_HIDDEN
 				user.has_played = true
+				await card.save()
 				return
 			}
 		} else {
