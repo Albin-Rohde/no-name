@@ -59,5 +59,11 @@ const getUserWithRelation = async (userId: number, relations: Array<string> | un
 	}
 }
 
+const getGameUser = (user: User): User => {
+  const gameUser = user.game.users.find(u => u.id = user.id)
+  if(!gameUser) throw new Error('User not on requested game')
+  return gameUser
+}
 
-export {login, create, getUserWithRelation}
+
+export {login, create, getUserWithRelation, getGameUser}
