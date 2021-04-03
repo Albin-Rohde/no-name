@@ -44,7 +44,7 @@ const deleteGame = async (user: User): Promise<void> => {
 	const {game} = await User.findOneOrFail(user.id, {relations: ['game']})
 	await getManager().query(`
 		UPDATE player
-		SET game_fk=NULL
+		SET game_fk=NULL, has_played=false
 		WHERE game_fk = '${game.key}';
 	`)
 	await getManager().query(`
