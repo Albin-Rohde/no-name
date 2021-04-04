@@ -31,7 +31,7 @@ export class User extends BaseEntity {
 
   @OneToMany(type => PlayerCard, card => card.user)
   @JoinColumn({name: 'user_game_session_key'})
-  cards: PlayerCard[]
+  player_cards: PlayerCard[]
 
 	@Column({nullable: false, name: 'has_played', default: false})
 	has_played: boolean
@@ -41,4 +41,38 @@ export class User extends BaseEntity {
 
   @DeleteDateColumn()
   deleted_at: string
+
+  getGameUser = (user: User): User => {
+    const gameUser = user.game.users.find(u => u.id = user.id)
+    if(!gameUser) throw new Error('User not on requested game')
+    return gameUser
+  }
+
+  set played(played: boolean) {
+    this.has_played = played
+    if(this.game) {
+      this.getGameUser(this).has_played = played
+    }
+  }
+
+  get played(): boolean {
+    if(!this.game) {
+      return this.has_played
+    }
+    return this.getGameUser(this).has_played
+  }
+
+  set cards(cards: PlayerCard[]) {
+    this.player_cards = cards
+    if(this.game) {
+      this.getGameUser(this).player_cards = cards
+    }
+  }
+
+  get cards(): PlayerCard[] {
+    if(!this.game) {
+      return this.player_cards
+    }
+    return this.getGameUser(this).player_cards
+  }
 }
