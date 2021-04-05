@@ -76,8 +76,9 @@ createConnection().then(async () => {
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
   
-  io.once('connection', async () => {
+  io.once('connection', async (socket) => {
     io.use(authSocketUser)
+    socket.emit('connected')
 		io.use((socket: Socket, next: any) => socketEventHandler(socket, io, next))
 	})
 

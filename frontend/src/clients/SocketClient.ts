@@ -31,6 +31,11 @@ export default class InGameClient {
     this.socket.on('connection_error', (err: string) => {
       console.error(err)
     })
+    return new Promise(resolve => {
+      this.socket.on('connected', () => {
+        resolve()
+      })
+    })
   }
 
   getGame = () => {
