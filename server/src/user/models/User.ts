@@ -1,4 +1,17 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn, Unique, BaseEntity, ManyToOne, JoinColumn, OneToMany, Index} from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Unique,
+  BaseEntity,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+  Index,
+  SaveOptions
+} from "typeorm"
 import { PlayerCard } from "../../card/models/PlayerCard";
 import { Game } from '../../game/models/Game'
 
@@ -42,7 +55,7 @@ export class User extends BaseEntity {
   @DeleteDateColumn()
   deleted_at: string
 
-  getGameUser = (user: User): User => {
+  private getGameUser = (user: User): User => {
     const gameUser = user.game.users.find(u => u.id = user.id)
     if(!gameUser) throw new Error('User not on requested game')
     return gameUser
@@ -74,5 +87,13 @@ export class User extends BaseEntity {
       return this.player_cards
     }
     return this.getGameUser(this).player_cards
+  }
+
+  public syncAndSave = async (opt?: SaveOptions) => {
+    if(this.game) {
+      this.has_played = this.played
+      this.player_cards = this.cards
+    }
+    return this.save(opt)
   }
 }

@@ -49,6 +49,7 @@ const getUserWithRelation = async (userId: number, relations: Array<string> | un
 	try {
 		return User.findOneOrFail(userId, {
 			relations: relations ? relations : [
+			  'player_cards',
 				'game',
 				'game.users',
 				'game.users.player_cards',

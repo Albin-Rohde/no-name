@@ -67,7 +67,7 @@ const normalizeCardResponse = (card: PlayerCard): CardResponse => {
 }
 
 export const makeGameResponse = async (user: User): Promise<GameResponse> => {
-	await user.save()
+	await user.syncAndSave()
 	const currentRound = await GameRound.findOne({game_key: user.game.key, round_number: user.game.current_round})
 	return normalizeGameResponse(user.game, currentRound)
 }
