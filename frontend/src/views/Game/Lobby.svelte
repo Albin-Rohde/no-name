@@ -15,7 +15,7 @@
   <PlayerInfo gameData={gameData} />
   <div class="inner-grid">
     <div class="flex-center">
-      <p class="fs-3">Waiting for players ({gameData.users.length}/fix)</p>
+      <p class="fs-3">Waiting for players ({gameData.users.length}/{gameData.gameOptions.playerLimit})</p>
     </div>
     <div class="flex-center">
       <p class="fs-4">Invite players with the following key</p><br>
