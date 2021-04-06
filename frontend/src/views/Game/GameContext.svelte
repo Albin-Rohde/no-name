@@ -45,6 +45,8 @@
     }
     gameData = socket.game
     currentUser = socket.currentUser
+    console.log('after rerender')
+    console.log('User', currentUser)
   }
 
   const checkGameSession = async () => {
@@ -86,7 +88,7 @@
     <CreateGame
       on:navigate-lobby={() => navigate('lobby')}
       onGameCreated={onGameCreated}
-      on:abort={() => navigate('lobby')}
+      on:abort={() => navigate('dashboard')}
     />
   {/if}
     {#if view === 'lobby' && gameData?.key}
@@ -101,7 +103,6 @@
   {#if view === 'join'}
     <JoinGame
       socket={socket}
-      gameData={gameData}
       on:abort={deleteGame}
     />
   {/if}
