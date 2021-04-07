@@ -1,6 +1,5 @@
 import type { Server, Socket } from 'socket.io'
-import { makeGameResponse } from '../game/normalizeRespose'
-import { addPlayerToGame, handlePlayCard, startGame } from './services'
+import { makeGameResponse } from './normalizeRespose'
 import { getUserWithRelation } from '../user/services'
 import { getGameFromUser, getGameWithRelations } from "../game/services";
 
