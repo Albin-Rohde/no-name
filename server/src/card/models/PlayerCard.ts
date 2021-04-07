@@ -39,6 +39,6 @@ export class PlayerCard extends BaseEntity {
   @JoinColumn({name: 'user_id_fk'})
   user: User
 
-	@Column({name: 'user_id_fk', nullable: true})
+	@Column({name: 'user_id_fk', nullable: false})
 	user_id_fk: number
 }

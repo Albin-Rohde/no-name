@@ -4,26 +4,22 @@ import { User } from '../user/models/User'
 import { Game } from '../game/models/Game'
 import { GameRound } from '../game/models/GameRound'
 
-const givePlayersCards = async (user: User): Promise<void[]> => {
-	return Promise.all(user.game.users.map(async (u) => {
+const givePlayersCards = async (user: User): Promise<void> => {
+	for (const u of user.game.users) {
 		u.cards = await getUniqueCards(user.game.play_cards - u.cards.length, user.game.key, u)
-		return
-	}))
+	}
 }
 
-const addPlayerToGame = async (user: User, gameKey: string): Promise<void> => {
+const addPlayerToGame = async (user: User, gameKey: string): Promise<Game> => {
 	const game = await Game.findOneOrFail(gameKey, {relations: ['users']})
 	const existingUser = game.users.some(u => u.id === user.id)
-	if(existingUser) return
+	if(existingUser) return game
 	if(game.users.length === game.player_limit) {
 		throw new Error('Player limit reached.')
 	}
-	if(!game.users.some(u => u.id === user.id)) {
-		game.users = [...game.users, user]
-		await game.save()
-		user.game = game
-		return
-	}
+	game.users.push(user)
+	await game.save()
+	return game
 }
 
 const createRounds = async (game: Game): Promise<void> => {
