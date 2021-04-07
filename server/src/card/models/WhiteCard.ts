@@ -16,7 +16,7 @@ export class WhiteCard extends BaseEntity {
   @Column({name: 'text'})
   text: string
 
-	@OneToMany(type => PlayerCard, card => card.white_card)
-	@JoinColumn({name: 'player_cards'})
-	player_cards: PlayerCard[]
+  @OneToMany(type => PlayerCard, card => card.white_card)
+  @JoinColumn({name: 'player_cards'})
+  player_cards: PlayerCard[]
 }

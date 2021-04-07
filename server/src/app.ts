@@ -17,19 +17,19 @@ import addWhiteCardsToDb from "./scripts/populate"
 import {authSocketUser} from "./authenticate";
 
 declare module 'http' {
-	interface IncomingMessage {
-		session: {
-			user: User
-			id: string
-			cookie: Cookie
-			regenerate: ((err?: any) => void)
-			destroy: ((err?: any) => void)
-			reload: ((err?: any) => void)
-			resetMaxAge: () => void
-			save: ((err?: any) => void)
-			touch: () => void
-		}
-	}
+  interface IncomingMessage {
+    session: {
+      user: User
+      id: string
+      cookie: Cookie
+      regenerate: ((err?: any) => void)
+      destroy: ((err?: any) => void)
+      reload: ((err?: any) => void)
+      resetMaxAge: () => void
+      save: ((err?: any) => void)
+      touch: () => void
+    }
+  }
 }
 
 // Set up app
@@ -79,11 +79,11 @@ createConnection().then(async () => {
   io.once('connection', async (socket) => {
     io.use(authSocketUser)
     socket.emit('connected')
-		io.use((socket: Socket, next: any) => socketEventHandler(socket, io, next))
-	})
+    io.use((socket: Socket, next: any) => socketEventHandler(socket, io, next))
+  })
 
-	// Set up db
-	await addWhiteCardsToDb()
+  // Set up db
+  await addWhiteCardsToDb()
   // Start server
   server.listen(5000, () => console.log(`Server started on port: 5000 `))
-}).catch(error => console.log(error));
+}).catch(error => console.log(error))

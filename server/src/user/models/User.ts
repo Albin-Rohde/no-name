@@ -29,7 +29,7 @@ export class User extends BaseEntity {
   @Column()
   password: string
 
-	@Index('username_idx')
+  @Index('username_idx')
   @Column({name: "username"})
   username: string
 
@@ -39,15 +39,15 @@ export class User extends BaseEntity {
   @JoinColumn({name: 'game_fk'})
   game: Game
 
-	@Column({ nullable: true })
+  @Column({ nullable: true })
   game_fk: string | null
 
   @OneToMany(type => PlayerCard, card => card.user)
   @JoinColumn({name: 'user_game_session_key'})
   player_cards: PlayerCard[]
 
-	@Column({nullable: false, name: 'has_played', default: false})
-	has_played: boolean
+  @Column({nullable: false, name: 'has_played', default: false})
+  has_played: boolean
 
   @CreateDateColumn()
   created_at: string

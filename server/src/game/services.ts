@@ -41,18 +41,18 @@ const createNewGame = async (user: User, options: optionsShape) => {
 }
 
 const deleteGame = async (user: User): Promise<void> => {
-	const {game} = await User.findOneOrFail(user.id, {relations: ['game']})
-	await getManager().query(`
-		UPDATE player
-		SET game_fk=NULL, has_played=false
-		WHERE game_fk = '${game.key}';
-	`)
-	await getManager().query(`
-		DELETE FROM player_card_ref
-		WHERE game_key = '${game.key}';
-	`)
+  const {game} = await User.findOneOrFail(user.id, {relations: ['game']})
+  await getManager().query(`
+    UPDATE player
+    SET game_fk=NULL, has_played=false
+    WHERE game_fk = '${game.key}';
+  `)
+  await getManager().query(`
+    DELETE FROM player_card_ref
+    WHERE game_key = '${game.key}';
+  `)
   await game.remove()
-	return
+  return
 }
 
 export {createNewGame, deleteGame, getGameByKey}

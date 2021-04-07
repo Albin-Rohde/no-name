@@ -79,13 +79,13 @@ export default class UserClient {
     this.isActive = true
   }
 
-	getData = (): UserResponse => {
-		return {
-			id: this.id,
-			username: this.username,
-			cards: this.cards,
-		}
-	}
+  getData = (): UserResponse => {
+    return {
+      id: this.id,
+      username: this.username,
+      cards: this.cards,
+    }
+  }
 
   private makeRequest = async (url: string, method: 'put' | 'get' | 'post' | 'delete', data: object = {}) => {
     try {

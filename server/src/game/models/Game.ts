@@ -22,11 +22,11 @@ export class Game extends BaseEntity {
   @Column()
   player_limit: number
 
-	@Column({default: false})
-	started: boolean
+  @Column({default: false})
+  started: boolean
 
-	@Column({default: 1})
-	current_round: number
+  @Column({default: 1})
+  current_round: number
 
   @OneToMany(type => User, user => user.game, {
     onDelete: "CASCADE",
