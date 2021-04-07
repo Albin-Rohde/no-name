@@ -46,18 +46,18 @@ const create = async (body: registerRequestBody) => {
 }
 
 const getUserWithRelation = async (userId: number, relations: Array<string> | undefined = undefined) => {
-	try {
-		return User.findOneOrFail(userId, {
-			relations: relations ? relations : [
-			  'player_cards',
-				'game',
-				'game.users',
-				'game.users.player_cards',
-				'game.users.player_cards.white_card']
-		})
-	} catch(err) {
-		throw new Error('User not found')
-	}
+  try {
+    return User.findOneOrFail(userId, {
+      relations: relations ? relations : [
+        'player_cards',
+        'game',
+        'game.users',
+        'game.users.player_cards',
+        'game.users.player_cards.white_card']
+    })
+  } catch(err) {
+    throw new Error('User not found')
+  }
 }
 
 export {login, create, getUserWithRelation}
