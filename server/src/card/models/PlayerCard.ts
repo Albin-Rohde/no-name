@@ -33,12 +33,12 @@ export class PlayerCard extends BaseEntity {
 	@Column()
 	white_card_id_fk: number
 
-  @ManyToOne(type => User, user => user.cards, {
+  @ManyToOne(type => User, user => user.player_cards, {
     cascade: true,
   })
   @JoinColumn({name: 'user_id_fk'})
   user: User
 
-	@Column({name: 'user_id_fk', nullable: true})
+	@Column({name: 'user_id_fk', nullable: false})
 	user_id_fk: number
 }

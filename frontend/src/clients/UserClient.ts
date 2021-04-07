@@ -10,15 +10,15 @@ export default class UserClient {
   email: string
   password: string
   username: string
-	cards: CardResponse[] = []
+  cards: CardResponse[] = []
   isActive: boolean = false
   
   constructor(user: UserData | undefined = undefined) {
-		if(user) {
-			this.id = user.id
-			this.username = user.username
-			this.cards = user.cards
-		}
+    if(user) {
+      this.id = user.id
+      this.username = user.username
+      this.cards = user.cards
+    }
   }
   
   login = async (email: string = this.email, password: string = this.password) => {

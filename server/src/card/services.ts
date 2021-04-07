@@ -1,45 +1,46 @@
-import { getManager } from 'typeorm';
-import { PlayerCard } from './models/PlayerCard'
-import { WhiteCard } from './models/WhiteCard';
+import {getManager} from 'typeorm'
+import {CardState, PlayerCard} from './models/PlayerCard'
+import { WhiteCard } from './models/WhiteCard'
+import type {User} from '../user/models/User'
 
-const getCardById = async (id: number) => {
-	try {
-		const card = await PlayerCard.findOneOrFail(id)
-		return card
-	} catch(err) {
-		throw new Error('NOT_FOUND')
-	}
+const getRandomCardId = (count: number, usedCards: UsedCards[] = []): number => {
+	let randomCardId: number
+	do {
+		randomCardId = Math.floor(Math.random() * (count)) + 1
+	} while(usedCards.some((used) => used.id === randomCardId))
+	return randomCardId
 }
 
-
-const getUniqueCard = async(count: number, game_key: string): Promise<PlayerCard> => {
-	const randomCardId = Math.floor(Math.random() * (count - 0)) + 1
-	const whiteCard = await WhiteCard.findOneOrFail(randomCardId)
-	if(await PlayerCard.findOne({white_card_id_fk: whiteCard.id, game_key: game_key})) {
-		// Card is already in current game. retrieve a new one instead
-		return getUniqueCard(count, game_key)
-	}
-	const playerCard = new PlayerCard()
-	playerCard.white_card = whiteCard
-	playerCard.game_key = game_key
-	await playerCard.save()
-	return playerCard
+interface UsedCards {
+	id: number
 }
-
-
-const getUniqueCards = async (card_amount: number, game_key: string): Promise<PlayerCard[]> => {
+const getUniqueCards = async (card_amount: number, game_key: string, user: User): Promise<PlayerCard[]> => {
 	try {
 		const entityManager = getManager()
 		const [{count}] = await entityManager.query(`SELECT COUNT(*) FROM white_card`)
-		const cards: Promise<PlayerCard>[] = []
+		const usedCards: UsedCards[] = await entityManager.query(`
+			SELECT wc.id FROM white_card AS wc
+			JOIN player_card_ref AS pcr ON wc.id = pcr.white_card_id_fk
+			WHERE pcr.game_key = '${game_key}';
+		`)
+
+		const cards: PlayerCard[] = []
 		for(let i = 0; i < card_amount; i++) {
-			cards.push(getUniqueCard(count, game_key))
+			const whiteCard = await WhiteCard.findOneOrFail(getRandomCardId(count, usedCards))
+			usedCards.push({id: whiteCard.id})
+			const card = new PlayerCard()
+			card.user = user
+			card.game_key = game_key
+			card.state = CardState.HAND
+			card.white_card = whiteCard
+			cards.push(card)
 		}
-		return Promise.all(cards)
+
+		return Promise.all(cards.map(c => c.save()))
 	} catch(err) {
 		console.log(err)
 		throw new Error('Error assigning white cards to user')
 	}
 }
 
-export {getCardById, getUniqueCards}
+export {getUniqueCards}

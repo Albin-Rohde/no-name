@@ -1,6 +1,6 @@
 <script lang="typescript">
-  import type GameClientType from '../clients/GameClient'
-  export let gameClient: GameClientType
+  import type {GameResponse} from '../clients/ResponseTypes'
+  export let gameData: GameResponse
 </script>
 
 <div class="column">
@@ -15,13 +15,13 @@
   </div>
   <div class="players">
     <br>
-    {#each gameClient.users as user}
+    {#each gameData.users as user}
       <p class={user.cardWizz ? "fs-5 card-wizz" : "fs-5"}>{user.username}</p>
     {/each}
   </div>
   <div class="score">
     <br>
-    {#each gameClient.users as user}
+    {#each gameData.users as user}
       <p class="fs-5">0</p>
     {/each}
   </div>
@@ -79,7 +79,7 @@
     grid-column-start: 1;
     grid-column-end: 2;
   }
-	.card-wizz {
-		font-weight: 600;
-	}
+  .card-wizz {
+    font-weight: 600;
+  }
 </style>
