@@ -1,16 +1,15 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
+  BaseEntity,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
-  Unique,
-  BaseEntity,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
+  Entity,
   Index,
-  SaveOptions
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Unique
 } from "typeorm"
 import { PlayerCard } from "../../card/models/PlayerCard";
 import { Game } from '../../game/models/Game'
@@ -44,10 +43,10 @@ export class User extends BaseEntity {
 
   @OneToMany(type => PlayerCard, card => card.user)
   @JoinColumn({name: 'user_game_session_key'})
-  player_cards: PlayerCard[]
+  cards: PlayerCard[]
 
   @Column({nullable: false, name: 'has_played', default: false})
-  has_played: boolean
+  hasPlayed: boolean
 
   @CreateDateColumn()
   created_at: string
