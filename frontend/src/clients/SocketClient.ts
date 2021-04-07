@@ -13,7 +13,7 @@ export default class InGameClient {
     this.currentUser = user
   }
 
-  connect = async (rerenderCb: CallableFunction) => {
+  connect = async (rerenderCb: CallableFunction): Promise<void> => {
     this.socket = io(this.baseUrl, {
       withCredentials: true,
       transports: ['websocket'],
@@ -65,6 +65,7 @@ export default class InGameClient {
     console.log('got update')
     // a type of cache to not re-update the state if the new state is the same as current
     if(JSON.stringify(this.game) === JSON.stringify(game)) return false
+    console.log('game: ', game)
     this.currentUser = game.users.find(user => user.id === this.currentUser.id)
     this.game = game
     return true
