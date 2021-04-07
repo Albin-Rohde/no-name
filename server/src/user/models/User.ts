@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   Unique
 } from "typeorm"
-import { PlayerCard } from "../../card/models/PlayerCard";
+import { CardState, PlayerCard } from "../../card/models/PlayerCard";
 import { Game } from '../../game/models/Game'
 
 @Entity({name: "player"})
@@ -54,45 +54,10 @@ export class User extends BaseEntity {
   @DeleteDateColumn()
   deleted_at: string
 
-  private getGameUser = (user: User): User => {
-    const gameUser = user.game.users.find(u => u.id = user.id)
-    if(!gameUser) throw new Error('User not on requested game')
-    return gameUser
-  }
-
-  set played(played: boolean) {
-    this.has_played = played
-    if(this.game) {
-      this.getGameUser(this).has_played = played
-    }
-  }
-
-  get played(): boolean {
-    if(!this.game) {
-      return this.has_played
-    }
-    return this.getGameUser(this).has_played
-  }
-
-  set cards(cards: PlayerCard[]) {
-    this.player_cards = cards
-    if(this.game) {
-      this.getGameUser(this).player_cards = cards
-    }
-  }
-
-  get cards(): PlayerCard[] {
-    if(!this.game) {
-      return this.player_cards
-    }
-    return this.getGameUser(this).player_cards
-  }
-
-  public syncAndSave = async (opt?: SaveOptions) => {
-    if(this.game) {
-      this.has_played = this.played
-      this.player_cards = this.cards
-    }
-    return this.save(opt)
+  public playCard = (cardId: number): void => {
+    const card = this.cards.find(card => card.id === cardId)
+    if(!card) throw new Error('Card not found on user')
+    card.state = CardState.PLAYED_HIDDEN
+    this.hasPlayed = true
   }
 }
