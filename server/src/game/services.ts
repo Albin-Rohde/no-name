@@ -1,9 +1,6 @@
 import { getManager } from 'typeorm'
-import { CardState, PlayerCard } from '../card/models/PlayerCard'
-import { getUniqueCards } from '../card/services'
 import { User } from "../user/models/User"
 import { Game } from "./models/Game"
-import { GameRound } from './models/GameRound'
 
 interface optionsShape {
   playCards: number
@@ -12,12 +9,25 @@ interface optionsShape {
   private: boolean
 }
 
-const getGameByKey = async (key: string) => {
+const getGameWithRelations = async (key: string) => {
   try {
-    return await Game.findOneOrFail(key)
+    return await Game.findOneOrFail(key, {
+      relations: [
+        'users',
+        'users.cards',
+        'users.cards.white_card',
+      ]
+    })
   } catch {
     throw new Error('GAME_NOT_FOUND')
   }
+}
+
+const getGameFromUser = async (userId: number) => {
+  const user = await User.findOneOrFail(userId, {relations: ['game']})
+  const game = await getGameWithRelations(user.game.key)
+  game.currentUser = user
+  return game
 }
 
 const createNewGame = async (user: User, options: optionsShape) => {
@@ -55,4 +65,4 @@ const deleteGame = async (user: User): Promise<void> => {
   return
 }
 
-export {createNewGame, deleteGame, getGameByKey}
+export {createNewGame, deleteGame, getGameWithRelations, getGameFromUser}

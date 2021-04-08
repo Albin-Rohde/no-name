@@ -1,5 +1,5 @@
 import {getManager} from 'typeorm'
-import {CardState, PlayerCard} from './models/PlayerCard'
+import { PlayerCard} from './models/PlayerCard'
 import { WhiteCard } from './models/WhiteCard'
 import type {User} from '../user/models/User'
 
@@ -29,14 +29,10 @@ const getUniqueCards = async (card_amount: number, game_key: string, user: User)
       const whiteCard = await WhiteCard.findOneOrFail(getRandomCardId(count, usedCards))
       usedCards.push({id: whiteCard.id})
       const card = new PlayerCard()
-      card.user = user
-      card.game_key = game_key
-      card.state = CardState.HAND
       card.white_card = whiteCard
       cards.push(card)
     }
-
-    return Promise.all(cards.map(c => c.save()))
+    return cards
   } catch(err) {
     console.log(err)
     throw new Error('Error assigning white cards to user')
