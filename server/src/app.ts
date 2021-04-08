@@ -44,6 +44,7 @@ createConnection().then(async () => {
       allowedHeaders: ["http://localhost:3000", "user"],
       credentials: true,
     },
+    pingTimeout: 500,
     transports: ['websocket']
   })
   
