@@ -31,6 +31,11 @@
     navigate('dashboard')
   }
 
+  const leaveGame = () => {
+    socket.leaveGame()
+    navigate('dashboard')
+  }
+
   const rerender = (err: string | undefined = undefined) => {
     if(err) {
       console.log(err)
@@ -77,6 +82,7 @@
     gameActive={!!gameData?.key}
     on:logout={() => dispatch('logout')}
     on:delete-game={deleteGame}
+    on:leave-game={leaveGame}
   />
   {#if view === 'dashboard'}
     <Dashboard 

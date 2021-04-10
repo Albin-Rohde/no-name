@@ -30,6 +30,11 @@
           <p class="text-danger">Delete game</p>
         </DropdownItem>
         {/if}
+        {#if gameActive && !isHost}
+          <DropdownItem on:click={() => dispatch('leave-game')}>
+            <p class="text-danger">Leave game</p>
+          </DropdownItem>
+        {/if}
       </DropdownMenu>
     </Dropdown>
   </div>

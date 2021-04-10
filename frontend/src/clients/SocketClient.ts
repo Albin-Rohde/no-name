@@ -1,6 +1,13 @@
 import { io, Socket } from "socket.io-client";
 import type { CardResponse, GameSocketResponse, UserResponse, GameOptionsResponse } from "./ResponseTypes";
 
+enum Events {
+  GET_GAME = 'get-game',
+  JOIN = 'join',
+  START = 'start',
+  PLAY_CARD = 'play-card',
+  LEAVE_GAME = 'leave-game',
+}
 
 export class SocketClient {
   private baseUrl = 'http://localhost:5000'
@@ -42,25 +49,30 @@ export class SocketClient {
 
   getGame = () => {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
-    this.socket.emit('get-game')
+    this.socket.emit(Events.GET_GAME)
   }
 
   joinGame = (key: string = this.game.key) => {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     if(!key && !this.game.key) throw new Error('No gameKey specified.')
-    this.socket.emit('join', key)
+    this.socket.emit(Events.JOIN, key)
   }
 
   startGame = () => {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
-    this.socket.emit('start')
+    this.socket.emit(Events.START)
   }
 
   playCard = (card: CardResponse) => {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     if(!this.currentUser.hasPlayed) {
-      this.socket.emit('play-card', card.id)
+      this.socket.emit(Events.PLAY_CARD, card.id)
     }
+  }
+
+  leaveGame = () => {
+    if(!this.socket) throw new Error('InGameClient not connected to socket.')
+    this.socket.emit(Events.LEAVE_GAME)
   }
 
   private updateGameState = (game: GameSocketResponse) => {
