@@ -64,4 +64,8 @@ export class User extends BaseEntity {
   get isHost(): boolean {
     return this.id === this.game?.hostUserId
   }
+
+  get isCardWizz(): boolean {
+    return this.id === this.game?.round?.card_wizz_user_id_fk
+  }
 }

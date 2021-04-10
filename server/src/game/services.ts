@@ -16,10 +16,12 @@ const getGameWithRelations = async (key: string) => {
         'users',
         'users.cards',
         'users.cards.white_card',
-        'users.game'
+        'users.game',
+        'users.game.round'
       ]
     })
-  } catch {
+  } catch (err){
+    console.error(err)
     throw new Error('GAME_NOT_FOUND')
   }
 }

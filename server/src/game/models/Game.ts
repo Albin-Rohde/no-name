@@ -37,9 +37,15 @@ export class Game extends BaseEntity {
   @OneToMany(type => User, user => user.game, {
     onDelete: "CASCADE",
   })
-
   @JoinColumn({name: 'user_game_session_key'})
   users: User[]
+
+  @OneToOne(type => GameRound)
+  @JoinColumn([
+    {name: 'key', referencedColumnName: 'game_key'},
+    {name: 'current_round', referencedColumnName: 'round_number'},
+  ])
+  round: GameRound
 
   private currentUserId: number
 
