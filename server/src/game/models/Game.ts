@@ -60,6 +60,10 @@ export class Game extends BaseEntity {
     this.users.push(user)
   }
 
+  public removePlayer = (user: User): void => {
+    this.users = this.users.filter((u) => u.id !== user.id)
+  }
+
   public createRounds = async (): Promise<void> => {
     if(this.users.length === 0) throw new Error('No users on game')
     let userIdx = 0
