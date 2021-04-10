@@ -3,11 +3,30 @@ import { makeGameResponse } from './normalizeRespose'
 import { getUserWithRelation } from '../user/services'
 import { getGameFromUser, getGameWithRelations } from "../game/services";
 
+enum Events {
+  GET_GAME = 'get-game',
+  JOIN = 'join',
+  START = 'start',
+  PLAY_CARD = 'play-card',
+}
+
 const socketEventHandler = async (socket: Socket, io: Server) => {
-  socket.on('join', (key: string) => joinGameEvent(io, socket, key))
-  socket.on('start', () => startGameEvent(io, socket))
-  socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
-  socket.on('get-game', () => getGameEvent(io, socket))
+  socket.on(Events.GET_GAME, () => getGameEvent(io, socket))
+  socket.on(Events.JOIN, (key: string) => joinGameEvent(io, socket, key))
+  socket.on(Events.START, () => startGameEvent(io, socket))
+  socket.on(Events.PLAY_CARD, (cardId: number) => playCardEvent(io, socket, cardId))
+}
+
+const getGameEvent = async(io: Server, socket: Socket) => {
+  try {
+    const game = await getGameFromUser(socket.request.session.user.id)
+    if (game) {
+      socket.emit('update', await makeGameResponse(game))
+    }
+  } catch(err) {
+    console.error(err)
+    socket.emit('connection_error', err.message)
+  }
 }
 
 const joinGameEvent = async (io: Server, socket: Socket, key: string) => {
@@ -49,18 +68,6 @@ const playCardEvent = async(io: Server, socket: Socket, cardId: number) => {
     const game = await getGameFromUser(socket.request.session.user.id)
     await game.currentUser.playCard(cardId)
     io.in(game.key).emit('update', await makeGameResponse(game))
-  } catch(err) {
-    console.error(err)
-    socket.emit('connection_error', err.message)
-  }
-}
-
-const getGameEvent = async(io: Server, socket: Socket) => {
-  try {
-    const game = await getGameFromUser(socket.request.session.user.id)
-    if (game) {
-      socket.emit('update', await makeGameResponse(game))
-    }
   } catch(err) {
     console.error(err)
     socket.emit('connection_error', err.message)
