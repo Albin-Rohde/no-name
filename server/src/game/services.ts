@@ -23,8 +23,11 @@ const getGameWithRelations = async (key: string) => {
   }
 }
 
-const getGameFromUser = async (userId: number) => {
+const getGameFromUser = async (userId: number): Promise<Game> => {
   const user = await User.findOneOrFail(userId, {relations: ['game']})
+  if(!user.game) {
+    throw new Error('No Game on User')
+  }
   const game = await getGameWithRelations(user.game.key)
   game.currentUser = user
   return game
