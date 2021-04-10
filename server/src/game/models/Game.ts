@@ -31,10 +31,8 @@ export class Game extends BaseEntity {
   @Column({default: 1})
   current_round: number
 
-
-  @OneToOne(type => User)
-  @JoinColumn({name: 'host_user_id_fk'})
-  gameHost: User
+  @Column({name: 'host_user_id_fk'})
+  hostUserId: number
 
   @OneToMany(type => User, user => user.game, {
     onDelete: "CASCADE",

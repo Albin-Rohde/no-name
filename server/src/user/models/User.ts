@@ -62,6 +62,6 @@ export class User extends BaseEntity {
   }
 
   get isHost(): boolean {
-    return this.id === this.game.gameHost.id
+    return this.id === this.game?.hostUserId
   }
 }

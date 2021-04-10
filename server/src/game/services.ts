@@ -16,6 +16,7 @@ const getGameWithRelations = async (key: string) => {
         'users',
         'users.cards',
         'users.cards.white_card',
+        'users.game'
       ]
     })
   } catch {
@@ -44,6 +45,7 @@ const createNewGame = async (user: User, options: optionsShape) => {
     game.private_lobby = options.private
     game.rounds = options.rounds
     game.card_deck = 'default'
+    game.hostUserId = user.id
     user.game = game
     await user.save()
     return game
