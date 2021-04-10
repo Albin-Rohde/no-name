@@ -20,71 +20,46 @@ const socketEventHandler = async (socket: Socket, io: Server) => {
 }
 
 const getGameEvent = async(io: Server, socket: Socket) => {
-  try {
-    const game = await getGameFromUser(socket.request.session.user.id)
-    if (game) {
-      socket.emit('update', await makeGameResponse(game))
-    }
-  } catch(err) {
-    console.error(err)
-    socket.emit('connection_error', err.message)
+  const game = await getGameFromUser(socket.request.session.user.id)
+  if (game) {
+    socket.emit('update', await makeGameResponse(game))
   }
 }
 
 const joinGameEvent = async (io: Server, socket: Socket, key: string) => {
-  try {
-    const game = await getGameWithRelations(key)
-    const user = await getUserWithRelation(socket.request.session.user.id)
-    game.addPlayer(user)
-    socket.join(key)
-    io.in(key).emit('update', await makeGameResponse(game))
-  } catch(err) {
-    console.error(err)
-    socket.emit('connection_error', err.message)
-  }
+  const game = await getGameWithRelations(key)
+  const user = await getUserWithRelation(socket.request.session.user.id)
+  game.addPlayer(user)
+  socket.join(key)
+  io.in(key).emit('update', await makeGameResponse(game))
 }
 
 const startGameEvent = async (io: Server, socket: Socket) => {
-  try {
-    const game = await getGameFromUser(socket.request.session.user.id)
-    if(game.started) {
-      throw new Error('Game already started')
-    }
-    if(!game.currentUser.isHost) {
-      throw new Error('User is not host, only host can start game')
-    }
-    game.started = true
-    await Promise.all([
-      game.handOutCards(),
-      game.createRounds(),
-    ])
-    io.in(game.key).emit('update', await makeGameResponse(game))
-  } catch(err) {
-    console.error(err)
-    socket.emit('connection_error', err.message)
+  const game = await getGameFromUser(socket.request.session.user.id)
+  if(game.started) {
+    throw new Error('Game already started')
   }
+  if(!game.currentUser.isHost) {
+    throw new Error('User is not host, only host can start game')
+  }
+  game.started = true
+  await Promise.all([
+    game.handOutCards(),
+    game.createRounds(),
+  ])
+  io.in(game.key).emit('update', await makeGameResponse(game))
 }
 
 const playCardEvent = async(io: Server, socket: Socket, cardId: number) => {
-  try {
     const game = await getGameFromUser(socket.request.session.user.id)
     await game.currentUser.playCard(cardId)
     io.in(game.key).emit('update', await makeGameResponse(game))
-  } catch(err) {
-    console.error(err)
-    socket.emit('connection_error', err.message)
-  }
 }
 
 const leaveGameEvent = async(io: Server, socket: Socket) => {
-  try {
-    const game = await getGameFromUser(socket.request.session.user.id)
-    game.removePlayer(game.currentUser)
-    io.in(game.key).emit('update', await makeGameResponse(game))
-  } catch(err) {
-    console.error(err)
-    socket.emit('connection_error', err.message)
-  }
+  const game = await getGameFromUser(socket.request.session.user.id)
+  game.removePlayer(game.currentUser)
+  io.in(game.key).emit('update', await makeGameResponse(game))
 }
 
 export {socketEventHandler}
