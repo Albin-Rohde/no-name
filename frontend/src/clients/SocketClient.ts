@@ -17,7 +17,9 @@ export default class InGameClient {
     this.socket = io(this.baseUrl, {
       withCredentials: true,
       transports: ['websocket'],
-      upgrade: false,
+      timeout: 500,
+      reconnection: false,
+      upgrade: true,
     })
     // socket event listeners
     this.socket.on('update', (game: GameSocketResponse) => {

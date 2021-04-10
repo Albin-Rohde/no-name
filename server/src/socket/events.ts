@@ -3,12 +3,11 @@ import { makeGameResponse } from './normalizeRespose'
 import { getUserWithRelation } from '../user/services'
 import { getGameFromUser, getGameWithRelations } from "../game/services";
 
-const socketEventHandler = async (socket: Socket, io: Server, next: any) => {
+const socketEventHandler = async (socket: Socket, io: Server) => {
   socket.on('join', (key: string) => joinGameEvent(io, socket, key))
   socket.on('start', () => startGameEvent(io, socket))
   socket.on('play-card', (cardId: number) => playCardEvent(io, socket, cardId))
   socket.on('get-game', () => getGameEvent(io, socket))
-  next()
 }
 
 const joinGameEvent = async (io: Server, socket: Socket, key: string) => {

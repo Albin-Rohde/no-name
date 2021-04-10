@@ -44,6 +44,7 @@ createConnection().then(async () => {
       allowedHeaders: ["http://localhost:3000", "user"],
       credentials: true,
     },
+    pingTimeout: 500,
     transports: ['websocket']
   })
   
@@ -76,10 +77,10 @@ createConnection().then(async () => {
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
   
-  io.once('connection', async (socket) => {
-    io.use(authSocketUser)
+  io.on('connection', async (socket: Socket) => {
+    io.use((socket: Socket, next: any) => authSocketUser(socket, io, next))
+    await socketEventHandler(socket, io)
     socket.emit('connected')
-    io.use((socket: Socket, next: any) => socketEventHandler(socket, io, next))
   })
 
   // Set up db
