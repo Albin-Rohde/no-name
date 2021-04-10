@@ -1,8 +1,8 @@
-import { BaseEntity, Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm"
-import { User } from "../../user/models/User"
-import { GameRound } from "./GameRound"
-import { getUniqueCards } from "../../card/services";
-import { CardState } from "../../card/models/PlayerCard";
+import {BaseEntity, Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn} from "typeorm"
+import {User} from "../../user/models/User"
+import {GameRound} from "./GameRound"
+import { getUnusedWhiteCards } from "../../card/services";
+import {CardState, PlayerCard} from "../../card/models/PlayerCard";
 
 @Entity()
 export class Game extends BaseEntity {
@@ -72,17 +72,17 @@ export class Game extends BaseEntity {
 
   public handOutCards = async (): Promise<void> => {
     for(const user of this.users) {
-      const cards = await getUniqueCards(
-        this.play_cards - user.cards.length,
-        this.key,
-        user
-      )
-      user.cards = await Promise.all(cards.map((card) => {
-        card.state = CardState.HAND
-        card.game_key = this.key
-        card.user = user
-        card.user_id_fk = user.id
-        return card.save()
+      const cardAmount = this.play_cards - user.cards.length
+      const whiteCards = await getUnusedWhiteCards(this.key, cardAmount)
+      user.cards = await Promise.all(whiteCards.map(wc => {
+        const pc = new PlayerCard()
+        pc.user = user
+        pc.user_id_fk = user.id
+        pc.game_key = this.key
+        pc.state = CardState.HAND
+        pc.white_card = wc
+        pc.white_card_id_fk = wc.id
+        return pc.save()
       }))
     }
   }
