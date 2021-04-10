@@ -1,10 +1,11 @@
-import {BaseEntity, Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn} from "typeorm"
+import { BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import {User} from "../../user/models/User"
 import {GameRound} from "./GameRound"
 import { getUnusedWhiteCards } from "../../card/services";
 import {CardState, PlayerCard} from "../../card/models/PlayerCard";
 
 @Entity()
+
 export class Game extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   key: string
@@ -29,6 +30,11 @@ export class Game extends BaseEntity {
 
   @Column({default: 1})
   current_round: number
+
+
+  @OneToOne(type => User)
+  @JoinColumn({name: 'host_user_id_fk'})
+  gameHost: User
 
   @OneToMany(type => User, user => user.game, {
     onDelete: "CASCADE",
