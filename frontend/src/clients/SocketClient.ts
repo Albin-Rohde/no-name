@@ -18,7 +18,7 @@ export default class InGameClient {
       withCredentials: true,
       transports: ['websocket'],
       timeout: 500,
-
+      reconnection: false,
       upgrade: true,
     })
     // socket event listeners
