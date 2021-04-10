@@ -11,8 +11,8 @@ import {
   PrimaryGeneratedColumn,
   Unique
 } from "typeorm"
-import { CardState, PlayerCard } from "../../card/models/PlayerCard";
-import { Game } from '../../game/models/Game'
+import {CardState, PlayerCard} from "../../card/models/PlayerCard";
+import {Game} from '../../game/models/Game'
 
 @Entity({name: "player"})
 @Unique(["email"])
@@ -56,9 +56,19 @@ export class User extends BaseEntity {
 
   public playCard = (cardId: number): void => {
     const card = this.cards.find(card => card.id === cardId)
-    if(!card) throw new Error('Card not found on user')
+    if(!card) {
+      throw new Error('Card not found on user')
+    }
     card.state = CardState.PLAYED_HIDDEN
     this.hasPlayed = true
+  }
+
+  public flipCard = (cardId: number): void => {
+    const card = this.cards.find(card => card.id === cardId)
+    if(!card) {
+      throw new Error('Card not found on user')
+    }
+    card.state = CardState.PLAYED_SHOW
   }
 
   get isHost(): boolean {
