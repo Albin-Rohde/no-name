@@ -79,7 +79,10 @@ createConnection().then(async () => {
   
   io.on('connection', async (socket: Socket) => {
     io.use((socket: Socket, next: any) => authSocketUser(socket, io, next))
-    await socketEventHandler(socket, io)
+    await socketEventHandler(socket, io).catch((err: Error) => {
+      console.error(err)
+      socket.emit('connection_error', err.message)
+    })
     socket.emit('connected')
   })
 
