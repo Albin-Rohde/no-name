@@ -22,7 +22,7 @@
     <div class="btn-wrapper">
       <div class="btn-container">
         <button class="btn btn-danger" on:click={() => dispatch('abort')}>Abort</button>
-        <button class="btn btn-success" on:click={socket.joinGame(gameKey)}>Join game</button>
+        <button class="btn btn-success" on:click={() => socket.joinGame(gameKey)}>Join game</button>
       </div>
     </div>
   </div>

@@ -8,7 +8,7 @@
   import Navbar from '../../components/Navbar.svelte'
   import Ingame from './Ingame.svelte'
   import RestClient from '../../clients/RestClient'
-  import SocketClient from '../../clients/SocketClient'
+  import { SocketClient } from '../../clients/SocketClient'
   import type {GameSocketResponse, UserResponse} from "../../clients/ResponseTypes";
   const dispatch = createEventDispatcher()
 
@@ -73,6 +73,7 @@
 <div class="main-grid">
   <Navbar 
     username={currentUser.username}
+    isHost={currentUser.isHost}
     gameActive={!!gameData?.key}
     on:logout={() => dispatch('logout')}
     on:delete-game={deleteGame}
