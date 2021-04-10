@@ -16,6 +16,7 @@ const getGameWithRelations = async (key: string) => {
         'users',
         'users.cards',
         'users.cards.white_card',
+        'users.game'
       ]
     })
   } catch {
@@ -44,6 +45,7 @@ const createNewGame = async (user: User, options: optionsShape) => {
     game.private_lobby = options.private
     game.rounds = options.rounds
     game.card_deck = 'default'
+    game.hostUserId = user.id
     user.game = game
     await user.save()
     return game
@@ -54,6 +56,9 @@ const createNewGame = async (user: User, options: optionsShape) => {
 }
 
 const deleteGame = async (user: User): Promise<void> => {
+  if(!user.isHost) {
+    throw new Error('User is not host, Only host can delete game')
+  }
   const {game} = await User.findOneOrFail(user.id, {relations: ['game']})
   await getManager().query(`
     UPDATE player
@@ -63,6 +68,10 @@ const deleteGame = async (user: User): Promise<void> => {
   await getManager().query(`
     DELETE FROM player_card_ref
     WHERE game_key = '${game.key}';
+  `)
+  await getManager().query(`
+    DELETE FROM game_round
+    WHERE game_key_fk = '${game.key}';
   `)
   await game.remove()
   return

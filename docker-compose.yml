@@ -28,8 +28,8 @@ services:
       - POSTGRES_USER=nodus
       - POSTGRES_PASSWORD=pass
       - POSTGRES_DB=db_1
-    volumes:
-      - ./server/postgres-data:/var/lib/postgresql/data
+    #volumes:
+      #- ./server/postgres-data:/var/lib/postgresql/data
   frontend:
     container_name: frontend
     restart: always

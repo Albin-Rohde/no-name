@@ -23,14 +23,16 @@
     <div class="flex-center">
       <CopyTextField value={gameData.key} />
     </div>
-    <div class="button-grid">
-      <div class="form-container">
-        <div class="btn-container">
-          <button class="btn btn-danger" on:click={() => dispatch('abort')}>Delete</button>
-          <button class="btn btn-success" on:click={socket.startGame}> Start </button>
+    {#if socket.currentUser.isHost }
+      <div class="button-grid">
+        <div class="form-container">
+          <div class="btn-container">
+            <button class="btn btn-danger" on:click={() => dispatch('abort')}>Delete</button>
+            <button class="btn btn-success" on:click={socket.startGame}> Start </button>
+          </div>
         </div>
       </div>
-    </div>
+    {/if}
   </div>
 </div>
 

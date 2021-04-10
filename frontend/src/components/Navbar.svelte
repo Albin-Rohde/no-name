@@ -3,6 +3,7 @@
   import {createEventDispatcher} from 'svelte'
   export let username: string
   export let gameActive: boolean
+  export let isHost: boolean
 
   let dropdownOpen = false
   const dispatch = createEventDispatcher()
@@ -24,7 +25,7 @@
         <DropdownItem class="disabled">
           User settings
         </DropdownItem>
-        {#if gameActive}
+        {#if gameActive && isHost}
         <DropdownItem on:click={() => dispatch('delete-game')}>
           <p class="text-danger">Delete game</p>
         </DropdownItem>

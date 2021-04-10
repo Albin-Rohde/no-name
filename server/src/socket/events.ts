@@ -26,7 +26,12 @@ const joinGameEvent = async (io: Server, socket: Socket, key: string) => {
 const startGameEvent = async (io: Server, socket: Socket) => {
   try {
     const game = await getGameFromUser(socket.request.session.user.id)
-    if(game.started) throw new Error('Game already started')
+    if(game.started) {
+      throw new Error('Game already started')
+    }
+    if(!game.currentUser.isHost) {
+      throw new Error('User is not host, only host can start game')
+    }
     game.started = true
     await Promise.all([
       game.handOutCards(),

@@ -60,4 +60,8 @@ export class User extends BaseEntity {
     card.state = CardState.PLAYED_HIDDEN
     this.hasPlayed = true
   }
+
+  get isHost(): boolean {
+    return this.id === this.game?.hostUserId
+  }
 }

@@ -2,7 +2,7 @@ import { io, Socket } from "socket.io-client";
 import type { CardResponse, GameSocketResponse, UserResponse, GameOptionsResponse } from "./ResponseTypes";
 
 
-export default class InGameClient {
+export class SocketClient {
   private baseUrl = 'http://localhost:5000'
   socket: Socket
 
