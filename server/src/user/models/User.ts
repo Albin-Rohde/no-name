@@ -54,13 +54,14 @@ export class User extends BaseEntity {
   @DeleteDateColumn()
   deleted_at: string
 
-  public playCard = (cardId: number): void => {
+  public playCard = async (cardId: number): Promise<void> => {
     const card = this.cards.find(card => card.id === cardId)
     if(!card) {
       throw new Error('Card not found on user')
     }
     card.state = CardState.PLAYED_HIDDEN
     this.hasPlayed = true
+    await card.save()
   }
 
   get isHost(): boolean {
