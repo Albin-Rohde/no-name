@@ -22,7 +22,7 @@
   <div class="score">
     <br>
     {#each gameData.users as user}
-      <p class="fs-5">0</p>
+      <p class="fs-5">{user.score}</p>
     {/each}
   </div>
 </div>

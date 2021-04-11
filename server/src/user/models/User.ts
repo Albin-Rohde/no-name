@@ -48,6 +48,9 @@ export class User extends BaseEntity {
   @Column({nullable: false, name: 'has_played', default: false})
   hasPlayed: boolean
 
+  @Column({name: 'score', default: 0, nullable: false})
+  score: number
+
   @CreateDateColumn()
   created_at: string
 
