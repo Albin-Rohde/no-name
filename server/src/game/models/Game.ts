@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import {BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm"
 import {User} from "../../user/models/User"
 import {GameRound} from "./GameRound"
 import { getUnusedWhiteCards } from "../../card/services";
@@ -102,5 +102,17 @@ export class Game extends BaseEntity {
       await Promise.all(user.cards.map(c => c.save()))
       await user.save()
     }
+  }
+
+  public flipCard = async (cardId: number): Promise<void> => {
+    const card = this.users.flatMap(user => user.cards).find(card => card.id === cardId)
+    if(!card) {
+      throw new Error('Card not found on user')
+    }
+    if(card.state !== CardState.PLAYED_HIDDEN) {
+      throw new Error('Can only flip a hidden played card')
+    }
+    card.state = CardState.PLAYED_SHOW
+    await card.save()
   }
 }

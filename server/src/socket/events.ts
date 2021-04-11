@@ -66,7 +66,7 @@ const flipCardEvent = async(io: Server, socket: Socket, cardId: number) => {
   if(!game.currentUser.isCardWizz) {
     throw new Error('Only card wizz can flip card')
   }
-  game.currentUser.flipCard(cardId)
+  game.flipCard(cardId)
   io.in(game.key).emit('update', await makeGameResponse(game))
 }
 

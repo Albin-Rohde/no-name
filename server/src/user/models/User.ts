@@ -63,14 +63,6 @@ export class User extends BaseEntity {
     this.hasPlayed = true
   }
 
-  public flipCard = (cardId: number): void => {
-    const card = this.cards.find(card => card.id === cardId)
-    if(!card) {
-      throw new Error('Card not found on user')
-    }
-    card.state = CardState.PLAYED_SHOW
-  }
-
   get isHost(): boolean {
     return this.id === this.game?.hostUserId
   }
