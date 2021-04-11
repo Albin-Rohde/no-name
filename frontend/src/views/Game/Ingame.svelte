@@ -28,7 +28,7 @@
         {#each gameData.users as user}
           {#each user.cards as card}
             {#if card.state === CardState.PLAYED_HIDDEN || card.state === CardState.PLAYED_SHOW}
-              <div class="white-card">
+              <div class="white-card" on:click={() => socket.flipCard(card)}>
                 <WhiteCard text={card.text} cardState={card.state}/>
               </div>
             {/if}
