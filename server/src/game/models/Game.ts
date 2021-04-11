@@ -89,7 +89,7 @@ export class Game extends BaseEntity {
     for(const user of this.users) {
       const cardAmount = this.play_cards - user.cards.length
       const whiteCards = await getUnusedWhiteCards(this.key, cardAmount)
-      user.cards = await Promise.all(whiteCards.map(wc => {
+      user.cards = whiteCards.map(wc => {
         const pc = new PlayerCard()
         pc.user = user
         pc.user_id_fk = user.id
@@ -97,8 +97,10 @@ export class Game extends BaseEntity {
         pc.state = CardState.HAND
         pc.white_card = wc
         pc.white_card_id_fk = wc.id
-        return pc.save()
-      }))
+        return pc
+      })
+      await Promise.all(user.cards.map(c => c.save()))
+      await user.save()
     }
   }
 }
