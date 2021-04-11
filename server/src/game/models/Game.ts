@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import {BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm"
 import {User} from "../../user/models/User"
 import {GameRound} from "./GameRound"
 import { getUnusedWhiteCards } from "../../card/services";
@@ -37,9 +37,15 @@ export class Game extends BaseEntity {
   @OneToMany(type => User, user => user.game, {
     onDelete: "CASCADE",
   })
-
   @JoinColumn({name: 'user_game_session_key'})
   users: User[]
+
+  @OneToOne(type => GameRound)
+  @JoinColumn([
+    {name: 'key', referencedColumnName: 'game_key'},
+    {name: 'current_round', referencedColumnName: 'round_number'},
+  ])
+  round: GameRound
 
   private currentUserId: number
 
@@ -64,25 +70,26 @@ export class Game extends BaseEntity {
     this.users = this.users.filter((u) => u.id !== user.id)
   }
 
-  public createRounds = async (): Promise<void> => {
-    if(this.users.length === 0) throw new Error('No users on game')
+  public assingCardWizz = async (): Promise<void> => {
+    const rounds = await GameRound.find({game_key: this.key})
     let userIdx = 0
-    for(let r = 0; r < this.rounds; r++) {
-      if(userIdx > this.users.length - 1) userIdx = 0
-      const round = new GameRound()
-      round.game_key = this.key
-      round.round_number = r + 1
+    const saveRounds = rounds.map(round => {
+      if(userIdx == this.users.length) {
+        userIdx = 0
+      }
       round.cardWizz = this.users[userIdx]
-      await round.save()
+      round.card_wizz_user_id_fk = this.users[userIdx].id
       userIdx++
-    }
+      return round.save()
+    })
+    await Promise.all(saveRounds)
   }
 
   public handOutCards = async (): Promise<void> => {
     for(const user of this.users) {
       const cardAmount = this.play_cards - user.cards.length
       const whiteCards = await getUnusedWhiteCards(this.key, cardAmount)
-      user.cards = await Promise.all(whiteCards.map(wc => {
+      user.cards = whiteCards.map(wc => {
         const pc = new PlayerCard()
         pc.user = user
         pc.user_id_fk = user.id
@@ -90,8 +97,22 @@ export class Game extends BaseEntity {
         pc.state = CardState.HAND
         pc.white_card = wc
         pc.white_card_id_fk = wc.id
-        return pc.save()
-      }))
+        return pc
+      })
+      await Promise.all(user.cards.map(c => c.save()))
+      await user.save()
     }
+  }
+
+  public flipCard = async (cardId: number): Promise<void> => {
+    const card = this.users.flatMap(user => user.cards).find(card => card.id === cardId)
+    if(!card) {
+      throw new Error('Card not found on user')
+    }
+    if(card.state !== CardState.PLAYED_HIDDEN) {
+      throw new Error('Can only flip a hidden played card')
+    }
+    card.state = CardState.PLAYED_SHOW
+    await card.save()
   }
 }

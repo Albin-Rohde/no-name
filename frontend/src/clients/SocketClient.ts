@@ -1,11 +1,13 @@
-import { io, Socket } from "socket.io-client";
-import type { CardResponse, GameSocketResponse, UserResponse, GameOptionsResponse } from "./ResponseTypes";
+import {io, Socket} from "socket.io-client";
+import type {CardResponse, GameSocketResponse, UserResponse} from "./ResponseTypes";
+import {CardState} from "./ResponseTypes";
 
 enum Events {
   GET_GAME = 'get-game',
   JOIN = 'join',
   START = 'start',
   PLAY_CARD = 'play-card',
+  FLIP_CARD = 'flip-card',
   LEAVE_GAME = 'leave-game',
 }
 
@@ -68,6 +70,12 @@ export class SocketClient {
     if(!this.currentUser.hasPlayed) {
       this.socket.emit(Events.PLAY_CARD, card.id)
     }
+  }
+
+  flipCard = (card: CardResponse) => {
+    if(!this.socket) throw new Error('InGameClient not connected to socket.')
+    if(card.state === CardState.PLAYED_SHOW) throw new Error('Card is already flipped')
+    this.socket.emit(Events.FLIP_CARD, card.id)
   }
 
   leaveGame = () => {
