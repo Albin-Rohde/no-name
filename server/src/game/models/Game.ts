@@ -115,4 +115,25 @@ export class Game extends BaseEntity {
     card.state = CardState.PLAYED_SHOW
     await card.save()
   }
+
+  public voteCard = async (cardId: number): Promise<void> => {
+    const allCards = this.users.flatMap(user => user.cards)
+    if(allCards.some(card => card.state === CardState.PLAYED_SHOW)) {
+      throw new Error('All cards must be flipped before vote')
+    }
+    const card = allCards.find(card => card.id ===cardId)
+    if(!card) {
+      throw new Error('Card not found on user')
+    }
+    if(card.state !== CardState.PLAYED_SHOW) {
+      throw new Error('Can only vote for a shown played card')
+    }
+    const winningUser = this.users.find(user => user.id === card.user_id_fk)
+    if(!winningUser) {
+      throw new Error('Card not found on user')
+    }
+    winningUser.score++
+    card.state = CardState.WINNER
+    await card.save()
+  }
 }
