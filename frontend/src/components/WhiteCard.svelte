@@ -1,11 +1,18 @@
 <script lang="typescript">
+  import { CardState } from "../clients/ResponseTypes";
+
   export let text: string = ''
   export let disabled: boolean = false
+  export let cardState: CardState
 </script>
 
 
 <div class={disabled ? "card-disabled" : "card"}>
-  <p class={disabled ? "disabled" : "active"}>{text}</p>
+  <p class={disabled ? "disabled" : "active"}>
+    {#if cardState !== CardState.PLAYED_HIDDEN}
+      {text}
+    {/if}
+  </p>
 </div>
 
 

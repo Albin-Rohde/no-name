@@ -4,7 +4,7 @@
   import BlackCard from '../../components/BlackCard.svelte'
   import PlayerInfo from '../../components/PlayerInfo.svelte'
   import WhiteCard from '../../components/WhiteCard.svelte'
-  import type SocketClient from '../../clients/SocketClient'
+  import type { SocketClient } from '../../clients/SocketClient'
 
   export let socket: SocketClient
   export let gameData: GameSocketResponse
@@ -27,9 +27,9 @@
         <BlackCard text="I am a black card, select a card to fill in the _ blank."/>
         {#each gameData.users as user}
           {#each user.cards as card}
-            {#if card.state === CardState.PLAYED_HIDDEN}
+            {#if card.state === CardState.PLAYED_HIDDEN || card.state === CardState.PLAYED_SHOW}
               <div class="white-card">
-                <WhiteCard text={card.text}/>
+                <WhiteCard text={card.text} cardState={card.state}/>
               </div>
             {/if}
           {/each}
@@ -41,7 +41,7 @@
     {#each currentUser.cards as card}
       {#if card.state === CardState.HAND}
         <div class="white-card" on:click={() => playCard(card)}>
-          <WhiteCard text={card.text} disabled={currentUser.cardWizz}/>
+          <WhiteCard text={card.text} disabled={currentUser.cardWizz} cardState={card.state}/>
         </div>
       {/if}
     {/each}
