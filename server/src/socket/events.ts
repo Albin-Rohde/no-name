@@ -13,12 +13,17 @@ enum Events {
 }
 
 const socketEventHandler = async (socket: Socket, io: Server) => {
-  socket.on(Events.GET_GAME, () => getGameEvent(io, socket))
-  socket.on(Events.JOIN, (key: string) => joinGameEvent(io, socket, key))
-  socket.on(Events.START, () => startGameEvent(io, socket))
-  socket.on(Events.PLAY_CARD, (cardId: number) => playCardEvent(io, socket, cardId))
-  socket.on(Events.FLIP_CARD, (cardId: number) => flipCardEvent(io, socket, cardId))
-  socket.on(Events.LEAVE_GAME, () => leaveGameEvent(io, socket))
+    socket.on(Events.GET_GAME, () => getGameEvent(io, socket).catch(err => handleError(socket, err)))
+    socket.on(Events.JOIN, (key: string) => joinGameEvent(io, socket, key).catch(err => handleError(socket, err)))
+    socket.on(Events.START, () => startGameEvent(io, socket).catch(err => handleError(socket, err)))
+    socket.on(Events.PLAY_CARD, (cardId: number) => playCardEvent(io, socket, cardId).catch(err => handleError(socket, err)))
+    socket.on(Events.FLIP_CARD, (cardId: number) => flipCardEvent(io, socket, cardId).catch(err => handleError(socket, err)))
+    socket.on(Events.LEAVE_GAME, () => leaveGameEvent(io, socket).catch(err => handleError(socket, err)))
+}
+
+const handleError = (socket: Socket, err: Error) => {
+  console.error(err)
+  socket.emit('connection_error', err.message)
 }
 
 const getGameEvent = async(io: Server, socket: Socket) => {
