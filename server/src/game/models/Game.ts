@@ -70,18 +70,19 @@ export class Game extends BaseEntity {
     this.users = this.users.filter((u) => u.id !== user.id)
   }
 
-  public createRounds = async (): Promise<void> => {
-    if(this.users.length === 0) throw new Error('No users on game')
+  public assingCardWizz = async (): Promise<void> => {
+    const rounds = await GameRound.find({game_key: this.key})
     let userIdx = 0
-    for(let r = 0; r < this.rounds; r++) {
-      if(userIdx > this.users.length - 1) userIdx = 0
-      const round = new GameRound()
-      round.game_key = this.key
-      round.round_number = r + 1
+    const saveRounds = rounds.map(round => {
+      if(userIdx == this.users.length) {
+        userIdx = 0
+      }
       round.cardWizz = this.users[userIdx]
-      await round.save()
+      round.card_wizz_user_id_fk = this.users[userIdx].id
       userIdx++
-    }
+      return round.save()
+    })
+    await Promise.all(saveRounds)
   }
 
   public handOutCards = async (): Promise<void> => {

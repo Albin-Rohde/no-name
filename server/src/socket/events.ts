@@ -47,7 +47,7 @@ const startGameEvent = async (io: Server, socket: Socket) => {
   game.started = true
   await Promise.all([
     game.handOutCards(),
-    game.createRounds(),
+    game.assingCardWizz(),
   ])
   io.in(game.key).emit('update', await makeGameResponse(game))
 }

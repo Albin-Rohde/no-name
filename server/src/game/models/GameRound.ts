@@ -18,6 +18,6 @@ export class GameRound extends BaseEntity {
   @JoinColumn({name: 'card_wizz_user_id_fk'})
   cardWizz: User
 
-  @Column({name: 'card_wizz_user_id_fk', nullable: false})
+  @Column({name: 'card_wizz_user_id_fk', nullable: true})
   card_wizz_user_id_fk: number
 }
