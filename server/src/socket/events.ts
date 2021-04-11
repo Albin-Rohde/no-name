@@ -45,10 +45,8 @@ const startGameEvent = async (io: Server, socket: Socket) => {
     throw new Error('User is not host, only host can start game')
   }
   game.started = true
-  await Promise.all([
-    game.handOutCards(),
-    game.assingCardWizz(),
-  ])
+  await game.handOutCards()
+  await game.assingCardWizz()
   io.in(game.key).emit('update', await makeGameResponse(game))
 }
 
