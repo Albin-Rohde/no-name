@@ -49,7 +49,7 @@ export class Game extends BaseEntity {
 
   private currentUserId: number
 
-  get currentUser(): User {
+  public get currentUser(): User {
     const user = this.users.find(user => user.id === this.currentUserId)
     if(!user) {
       throw new Error('CurrentUser does not exist on game')
@@ -57,8 +57,12 @@ export class Game extends BaseEntity {
     return user
   }
 
-  set currentUser(user: User) {
+  public set currentUser(user: User) {
     this.currentUserId = user.id
+  }
+
+  private get allUsersHasPlayed() {
+    return this.users.every(user => user.hasPlayed)
   }
 
   public addPlayer = (user: User): void => {
@@ -105,6 +109,9 @@ export class Game extends BaseEntity {
   }
 
   public flipCard = async (cardId: number): Promise<void> => {
+    if(!this.allUsersHasPlayed) {
+      throw new Error('All users must play before flipping')
+    }
     const card = this.users.flatMap(user => user.cards).find(card => card.id === cardId)
     if(!card) {
       throw new Error('Card not found on user')
@@ -117,20 +124,23 @@ export class Game extends BaseEntity {
   }
 
   public voteCard = async (cardId: number): Promise<void> => {
+    if(!this.allUsersHasPlayed) {
+      throw new Error('All users must play before voting')
+    }
     const allCards = this.users.flatMap(user => user.cards)
     if(allCards.some(card => card.state === CardState.PLAYED_SHOW)) {
       throw new Error('All cards must be flipped before vote')
     }
     const card = allCards.find(card => card.id ===cardId)
     if(!card) {
-      throw new Error('Card not found on user')
+      throw new Error('Card not found in game')
     }
     if(card.state !== CardState.PLAYED_SHOW) {
       throw new Error('Can only vote for a shown played card')
     }
     const winningUser = this.users.find(user => user.id === card.user_id_fk)
     if(!winningUser) {
-      throw new Error('Card not found on user')
+      throw new Error('No user found on winning card')
     }
     winningUser.score++
     card.state = CardState.WINNER
