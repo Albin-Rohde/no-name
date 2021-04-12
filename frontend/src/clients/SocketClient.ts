@@ -8,6 +8,7 @@ enum Events {
   START = 'start',
   PLAY_CARD = 'play-card',
   FLIP_CARD = 'flip-card',
+  VOTE_CARD = 'vote-card',
   LEAVE_GAME = 'leave-game',
 }
 
@@ -22,7 +23,7 @@ export class SocketClient {
     this.currentUser = user
   }
 
-  connect = async (rerenderCb: CallableFunction): Promise<void> => {
+  public connect = async (rerenderCb: CallableFunction): Promise<void> => {
     this.socket = io(this.baseUrl, {
       withCredentials: true,
       transports: ['websocket'],
@@ -49,43 +50,61 @@ export class SocketClient {
     })
   }
 
-  getGame = () => {
+  private get allUsersPlayed() {
+    return this.game.users.every(user => user.hasPlayed)
+  }
+
+  public getGame = () => {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     this.socket.emit(Events.GET_GAME)
   }
 
-  joinGame = (key: string = this.game.key) => {
+  public joinGame = (key: string = this.game.key) => {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     if(!key && !this.game.key) throw new Error('No gameKey specified.')
     this.socket.emit(Events.JOIN, key)
   }
 
-  startGame = () => {
+  public startGame = () => {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     this.socket.emit(Events.START)
   }
 
-  playCard = (card: CardResponse) => {
+  public playCard = (card: CardResponse) => {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     if(!this.currentUser.hasPlayed) {
       this.socket.emit(Events.PLAY_CARD, card.id)
     }
   }
 
-  flipCard = (card: CardResponse) => {
+  public flipCard = (card: CardResponse) => {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     if(card.state === CardState.PLAYED_SHOW) throw new Error('Card is already flipped')
     this.socket.emit(Events.FLIP_CARD, card.id)
   }
 
-  leaveGame = () => {
+  public voteCard = (card: CardResponse) => {
+    if(!this.socket) throw new Error('InGameClient not connected to socket.')
+    if(!this.allUsersPlayed) {
+      throw new Error('All user must play before voting')
+    }
+    if(this.game.users
+      .flatMap(user => user.cards)
+      .some(card => card.state === CardState.PLAYED_SHOW)
+    ) {
+      throw new Error('All cards must be flipped before vote')
+    }
+    this.socket.emit(Events.VOTE_CARD, card.id)
+  }
+
+  public leaveGame = () => {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     this.socket.emit(Events.LEAVE_GAME)
   }
 
   private updateGameState = (game: GameSocketResponse) => {
-    console.log('got update')
     // a type of cache to not re-update the state if the new state is the same as current
+    // todo: This might not be needed anymore since we've fixed the issues with the socket
     if(JSON.stringify(this.game) === JSON.stringify(game)) return false
     console.log('game: ', game)
     this.currentUser = game.users.find(user => user.id === this.currentUser.id)
