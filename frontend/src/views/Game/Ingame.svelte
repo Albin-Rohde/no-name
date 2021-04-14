@@ -88,15 +88,40 @@
     <div class="left-coll">
       <PlayerInfo gameData={gameData}/>
     </div>
+    <div class="game-state-info">
+      <p class="fs-3">
+        {#if getGameState(gameData) === GameState.PLAYING}
+          {cardsPlayed(gameData)}/{getPlayers(gameData).length} Played
+        {/if}
+        {#if getGameState(gameData) === GameState.FLIPPING}
+          {cardsShown(gameData)}/{cardsPlayed(gameData)} Flipped
+        {/if}
+        {#if getGameState(gameData) === GameState.VOTING}
+          Waiting for card wizz to vote
+        {/if}
+        {#if getGameState(gameData) === GameState.DISPLAY_WINNER}
+          {getWinningPlayer(gameData).username} won this round
+        {/if}
+      </p>
+    </div>
     <div class="main-coll">
       <div class="top-cards">
         <BlackCard text="I am a black card, select a card to fill in the _ blank."/>
         {#each gameData.users as user}
           {#each user.cards as card}
-            {#if card.state === CardState.PLAYED_HIDDEN || card.state === CardState.PLAYED_SHOW}
-              <div class="white-card" on:click={() => socket.flipCard(card)}>
-                <WhiteCard text={card.text} cardState={card.state}/>
-              </div>
+            {#if getGameState(gameData) !== GameState.DISPLAY_WINNER}
+              {#if card.state === CardState.PLAYED_HIDDEN || card.state === CardState.PLAYED_SHOW}
+                <div class="white-card" on:click={() => handleCardClick(card)}>
+                  <WhiteCard text={card.text} cardState={card.state}/>
+                </div>
+              {/if}
+            {/if}
+            {#if getGameState(gameData) === GameState.DISPLAY_WINNER}
+              {#if card.state === CardState.WINNER}
+                <div class="white-card" on:click={() => handleCardClick(card)}>
+                  <WhiteCard text={card.text} cardState={card.state}/>
+                </div>
+              {/if}
             {/if}
           {/each}
         {/each}
@@ -106,7 +131,7 @@
   <div class="white-cards">
     {#each currentUser.cards as card}
       {#if card.state === CardState.HAND}
-        <div class="white-card" on:click={() => playCard(card)}>
+        <div class="white-card" on:click={() => handleCardClick(card)}>
           <WhiteCard text={card.text} disabled={currentUser.cardWizz} cardState={card.state}/>
         </div>
       {/if}
