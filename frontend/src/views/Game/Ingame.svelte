@@ -97,7 +97,11 @@
           {cardsShown(gameData)}/{cardsPlayed(gameData)} Flipped
         {/if}
         {#if getGameState(gameData) === GameState.VOTING}
-          Waiting for card wizz to vote
+          {#if socket.currentUser.cardWizz}
+            Select the winning card
+            {:else}
+            Waiting for card wizz to vote
+          {/if}
         {/if}
         {#if getGameState(gameData) === GameState.DISPLAY_WINNER}
           {getWinningPlayer(gameData).username} won this round
