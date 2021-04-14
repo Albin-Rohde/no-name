@@ -28,14 +28,14 @@ const handleError = (socket: Socket, err: Error) => {
   socket.emit('connection_error', err.message)
 }
 
-const getGameEvent = async(io: Server, socket: Socket) => {
+const getGameEvent = async(io: Server, socket: Socket): Promise<void> => {
   const game = await getGameFromUser(socket.request.session.user.id)
   if (game) {
     socket.emit('update', await makeGameResponse(game))
   }
 }
 
-const joinGameEvent = async (io: Server, socket: Socket, key: string) => {
+const joinGameEvent = async (io: Server, socket: Socket, key: string): Promise<void> => {
   const game = await getGameWithRelations(key)
   const user = await getUserWithRelation(socket.request.session.user.id)
   game.addPlayer(user)
@@ -43,7 +43,7 @@ const joinGameEvent = async (io: Server, socket: Socket, key: string) => {
   io.in(key).emit('update', await makeGameResponse(game))
 }
 
-const startGameEvent = async (io: Server, socket: Socket) => {
+const startGameEvent = async (io: Server, socket: Socket): Promise<void> => {
   const game = await getGameFromUser(socket.request.session.user.id)
   if(game.started) {
     throw new Error('Game already started')
@@ -57,13 +57,13 @@ const startGameEvent = async (io: Server, socket: Socket) => {
   io.in(game.key).emit('update', await makeGameResponse(game))
 }
 
-const playCardEvent = async(io: Server, socket: Socket, cardId: number) => {
+const playCardEvent = async(io: Server, socket: Socket, cardId: number): Promise<void> => {
     const game = await getGameFromUser(socket.request.session.user.id)
     await game.currentUser.playCard(cardId)
     io.in(game.key).emit('update', await makeGameResponse(game))
 }
 
-const flipCardEvent = async(io: Server, socket: Socket, cardId: number) => {
+const flipCardEvent = async(io: Server, socket: Socket, cardId: number): Promise<void> => {
   const game = await getGameFromUser(socket.request.session.user.id)
   if(!game.currentUser.isCardWizz) {
     throw new Error('Only card wizz can flip card')
@@ -81,7 +81,7 @@ const voteCardEvent = async(io: Server, socket: Socket, cardId: number) => {
   io.in(game.key).emit('update', await makeGameResponse(game))
 }
 
-const leaveGameEvent = async(io: Server, socket: Socket) => {
+const leaveGameEvent = async(io: Server, socket: Socket): Promise<void> => {
   const game = await getGameFromUser(socket.request.session.user.id)
   game.removePlayer(game.currentUser)
   io.in(game.key).emit('update', await makeGameResponse(game))
