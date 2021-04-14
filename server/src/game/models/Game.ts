@@ -61,8 +61,18 @@ export class Game extends BaseEntity {
     this.currentUserId = user.id
   }
 
-  private get allUsersHasPlayed() {
-    return this.users.every(user => user.hasPlayed)
+  /**
+   * Gets all players except the cardWizz
+   * @private
+   */
+  private get allPlayers() {
+    return this.users.filter(user => !user.isCardWizz)
+  }
+
+  private get allPlayersHasPlayed() {
+    return this.users
+      .filter(user => !user.isCardWizz)
+      .every(user => user.hasPlayed)
   }
 
   public addPlayer = (user: User): void => {
@@ -109,7 +119,7 @@ export class Game extends BaseEntity {
   }
 
   public flipCard = async (cardId: number): Promise<void> => {
-    if(!this.allUsersHasPlayed) {
+    if(!this.allPlayersHasPlayed) {
       throw new Error('All users must play before flipping')
     }
     const card = this.users.flatMap(user => user.cards).find(card => card.id === cardId)
@@ -124,11 +134,11 @@ export class Game extends BaseEntity {
   }
 
   public voteCard = async (cardId: number): Promise<void> => {
-    if(!this.allUsersHasPlayed) {
+    if(!this.allPlayersHasPlayed) {
       throw new Error('All users must play before voting')
     }
-    const allCards = this.users.flatMap(user => user.cards)
-    if(allCards.some(card => card.state === CardState.PLAYED_SHOW)) {
+    const allCards = this.allPlayers.flatMap(user => user.cards)
+    if(allCards.some(card => card.state === CardState.PLAYED_HIDDEN)) {
       throw new Error('All cards must be flipped before vote')
     }
     const card = allCards.find(card => card.id ===cardId)

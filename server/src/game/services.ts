@@ -77,7 +77,7 @@ const deleteGame = async (user: User): Promise<void> => {
   const gameKey = game.key
   await getManager().query(`
     UPDATE player
-    SET game_fk=NULL, has_played=false
+    SET game_fk=NULL, has_played=false, score=0
     WHERE game_fk = '${gameKey}';
   `)
   await getManager().query(`
