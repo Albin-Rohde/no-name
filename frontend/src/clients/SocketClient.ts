@@ -50,8 +50,12 @@ export class SocketClient {
     })
   }
 
+  private get allPlayers() {
+    return this.game.users.filter(user => !user.cardWizz)
+  }
+
   private get allUsersPlayed() {
-    return this.game.users.every(user => user.hasPlayed)
+    return this.allPlayers.every(user => user.hasPlayed)
   }
 
   public getGame = () => {
@@ -78,8 +82,15 @@ export class SocketClient {
   }
 
   public flipCard = (card: CardResponse) => {
-    if(!this.socket) throw new Error('InGameClient not connected to socket.')
-    if(card.state === CardState.PLAYED_SHOW) throw new Error('Card is already flipped')
+    if(!this.socket) {
+      throw new Error('InGameClient not connected to socket.')
+    }
+    if(card.state === CardState.PLAYED_SHOW) {
+      throw new Error('Card is already flipped')
+    }
+    if(!this.allUsersPlayed) {
+      throw new Error('All user must play before flipping')
+    }
     this.socket.emit(Events.FLIP_CARD, card.id)
   }
 
@@ -88,10 +99,9 @@ export class SocketClient {
     if(!this.allUsersPlayed) {
       throw new Error('All user must play before voting')
     }
-    if(this.game.users
-      .flatMap(user => user.cards)
-      .some(card => card.state === CardState.PLAYED_SHOW)
-    ) {
+    const allCards = this.allPlayers.flatMap(user => user.cards)
+    console.log(allCards.map(c => c.state))
+    if(allCards.some(card => card.state === CardState.PLAYED_HIDDEN)) {
       throw new Error('All cards must be flipped before vote')
     }
     this.socket.emit(Events.VOTE_CARD, card.id)
