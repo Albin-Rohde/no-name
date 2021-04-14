@@ -9,10 +9,76 @@
   export let socket: SocketClient
   export let gameData: GameSocketResponse
   export let currentUser: UserResponse
+  enum GameState {
+    PLAYING = 'playing',
+    FLIPPING = 'flipping',
+    VOTING = 'voting',
+    DISPLAY_WINNER = 'winner',
+  }
 
-  const playCard = (card: CardResponse) => {
-    if(!socket.currentUser.cardWizz) {
-      socket.playCard(card)
+  const getWinningPlayer = (game: GameSocketResponse): UserResponse => {
+    const winningPlayer = getPlayers(game).find(user => user.cards.some(c => c.state === CardState.WINNER))
+    if(!winningPlayer) {
+      throw new Error('Could not find winning player')
+    }
+    return winningPlayer
+  }
+
+  const getPlayers = (game: GameSocketResponse): UserResponse[] => {
+    return game.users.filter(user => !user.cardWizz)
+  }
+
+  const getPlayedCards = (game: GameSocketResponse): CardResponse[] => {
+    let allPlayedCards: CardResponse[] = []
+    for(const player of getPlayers(game)) {
+      allPlayedCards = [...allPlayedCards, ...player.cards.filter(card => card.state !== CardState.HAND)]
+    }
+    return allPlayedCards
+  }
+
+  const cardsPlayed = (game: GameSocketResponse): number => {
+    return getPlayedCards(game).length
+  }
+
+  const cardsHidden = (game: GameSocketResponse): number => {
+    return getPlayedCards(game).filter(card => card.state === CardState.PLAYED_HIDDEN).length
+  }
+
+  const cardsShown = (game: GameSocketResponse): number => {
+    return getPlayedCards(game).filter(card => card.state === CardState.PLAYED_SHOW).length
+  }
+
+  const getGameState = (game: GameSocketResponse): GameState  => {
+    const players = getPlayers(game)
+    const allHasPlayed = players.every(user => user.hasPlayed)
+    if(!allHasPlayed) {
+      return GameState.PLAYING
+    }
+    if(allHasPlayed) {
+      let playedCards = getPlayedCards(gameData)
+      if(playedCards.some(card => card.state === CardState.PLAYED_HIDDEN)) {
+        return GameState.FLIPPING
+      }
+      if(playedCards.every(card => card.state === CardState.PLAYED_SHOW)) {
+        return GameState.VOTING
+      }
+      if(playedCards.some(card => card.state === CardState.WINNER)) {
+        return GameState.DISPLAY_WINNER
+      }
+    }
+  }
+
+  const handleCardClick = (card: CardResponse): void => {
+    if(card.state === CardState.HAND) {
+      if(!socket.currentUser.cardWizz) {
+        return socket.playCard(card)
+      }
+    }
+    if(card.state === CardState.PLAYED_HIDDEN) {
+      return socket.flipCard(card)
+    }
+    if(card.state === CardState.PLAYED_SHOW) {
+      return socket.voteCard(card)
     }
   }
 </script>
