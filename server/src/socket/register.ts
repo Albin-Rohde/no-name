@@ -18,9 +18,10 @@ enum Events {
   GET_GAME = 'get-game',
   JOIN = 'join',
   START = 'start',
+  LEAVE_GAME = 'leave-game',
   PLAY_CARD = 'play-card',
   FLIP_CARD = 'flip-card',
-  LEAVE_GAME = 'leave-game',
+  VOTE_CARD = 'vote-card',
 }
 
 type EventFunction<T> = (io: Server, socket: Socket, ...args: T[]) => Promise<Game>
@@ -87,7 +88,7 @@ const registerSocketEvents = (io: Server, socket: Socket) => {
   addListener<never>(io, socket, Events.LEAVE_GAME, leaveGameEvent)
   addListener<number>(io, socket, Events.PLAY_CARD, playCardEvent)
   addListener<number>(io, socket, Events.FLIP_CARD, flipCardEvent)
-  addListener<number>(io, socket, Events.FLIP_CARD, voteCardEvent)
+  addListener<number>(io, socket, Events.VOTE_CARD, voteCardEvent)
 }
 
 export {registerSocketEvents}
