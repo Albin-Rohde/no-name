@@ -31,6 +31,7 @@
   const getPlayedCards = (game: GameSocketResponse): CardResponse[] => {
     let allPlayedCards: CardResponse[] = []
     for(const player of getPlayers(game)) {
+      // todo: remember that !== CardState.HAND will also return card with state USED
       allPlayedCards = [...allPlayedCards, ...player.cards.filter(card => card.state !== CardState.HAND)]
     }
     return allPlayedCards
