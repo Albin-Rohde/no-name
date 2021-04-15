@@ -12,7 +12,7 @@ import {User} from './user/models/User'
 
 import userRoute from './user/route'
 import gameRouter from "./game/route"
-import { registerSocketEvents } from "./socket/events"
+import { registerSocketEvents } from "./socket/register"
 import addWhiteCardsToDb from "./scripts/populate"
 import {authSocketUser} from "./authenticate";
 
