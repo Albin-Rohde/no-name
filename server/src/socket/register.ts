@@ -1,48 +1,27 @@
 import {Server, Socket} from "socket.io";
-import {
-  playCardEvent,
-  flipCardEvent,
-  voteCardEvent,
-} from './event-handler/card'
-import {
-  getGameEvent,
-  joinGameEvent,
-  startGameEvent,
-  leaveGameEvent,
-} from './event-handler/game'
+import * as cardHandler from './event-handler/card'
+import * as gameHandler from './event-handler/game'
+import { Events, EventFunction} from "./event-handler";
 import { Game } from "../game/models/Game";
 import { GameRound } from "../game/models/GameRound";
 import { normalizeGameResponse } from "./normalizeRespose";
 
-enum Events {
-  GET_GAME = 'get-game',
-  JOIN = 'join',
-  START = 'start',
-  LEAVE_GAME = 'leave-game',
-  PLAY_CARD = 'play-card',
-  FLIP_CARD = 'flip-card',
-  VOTE_CARD = 'vote-card',
-}
-
-type EventFunction<T> = (io: Server, socket: Socket, ...args: T[]) => Promise<Game>
-
 /**
- * Prints the error to stdout and emits
- * a connection_error event with the error message
+ * Register events to the socket
  *
+ * Handles any error the eventHandler might throw
+ *
+ * @param io Socket.io Server instance
  * @param socket Socket.io Socket
- * @param err Error to handle
  */
-const handleError = (socket: Socket, err: Error) => {
-  console.error(err)
-  socket.emit('connection_error', err.message)
-}
-
-const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
-  await Promise.all(game.users.map(u => u.save()))
-  await game.save()
-  const currentRound = await GameRound.findOne({game_key: game.key, round_number: game.current_round})
-  io.in(game.key).emit('update', normalizeGameResponse(game, currentRound))
+export const registerSocketEvents = (io: Server, socket: Socket) => {
+  addListener<never>(io, socket, Events.GET_GAME, gameHandler.getGameEvent)
+  addListener<string>(io, socket, Events.JOIN, gameHandler.joinGameEvent)
+  addListener<never>(io, socket, Events.START, gameHandler.startGameEvent)
+  addListener<never>(io, socket, Events.LEAVE_GAME, gameHandler.leaveGameEvent)
+  addListener<number>(io, socket, Events.PLAY_CARD, cardHandler.playCardEvent)
+  addListener<number>(io, socket, Events.FLIP_CARD, cardHandler.flipCardEvent)
+  addListener<number>(io, socket, Events.VOTE_CARD, cardHandler.voteCardEvent)
 }
 
 /**
@@ -74,21 +53,21 @@ const addListener = <T>(
 }
 
 /**
- * Register events to the socket
+ * Prints the error to stdout and emits
+ * a connection_error event with the error message
  *
- * Handles any error the eventHandler might throw
- *
- * @param io Socket.io Server instance
  * @param socket Socket.io Socket
+ * @param err Error to handle
  */
-const registerSocketEvents = (io: Server, socket: Socket) => {
-  addListener<never>(io, socket, Events.GET_GAME, getGameEvent)
-  addListener<string>(io, socket, Events.JOIN, joinGameEvent)
-  addListener<never>(io, socket, Events.START, startGameEvent)
-  addListener<never>(io, socket, Events.LEAVE_GAME, leaveGameEvent)
-  addListener<number>(io, socket, Events.PLAY_CARD, playCardEvent)
-  addListener<number>(io, socket, Events.FLIP_CARD, flipCardEvent)
-  addListener<number>(io, socket, Events.VOTE_CARD, voteCardEvent)
+const handleError = (socket: Socket, err: Error) => {
+  console.error(err)
+  socket.emit('connection_error', err.message)
 }
 
-export {registerSocketEvents}
+const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
+  await Promise.all(game.users.map(u => u.save()))
+  await game.save()
+  const currentRound = await GameRound.findOne({game_key: game.key, round_number: game.current_round})
+  io.in(game.key).emit('update', normalizeGameResponse(game, currentRound))
+}
+
