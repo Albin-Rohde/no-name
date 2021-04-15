@@ -1,13 +1,15 @@
 import {Server, Socket} from "socket.io";
 import {
+  playCardEvent,
+  flipCardEvent,
+  voteCardEvent,
+} from './event-handler/card'
+import {
   getGameEvent,
   joinGameEvent,
   startGameEvent,
   leaveGameEvent,
-  playCardEvent,
-  flipCardEvent,
-  voteCardEvent,
-} from './events'
+} from './event-handler/game'
 
 enum Events {
   GET_GAME = 'get-game',
@@ -53,7 +55,8 @@ const addListener = <T>(
   fn: EventFunction<T>,
 ): void => {
   const listenerCallback: (...args: T[]) => void = (...args: [T]) => {
-    fn(io, socket, ...args).catch(err => handleError(socket, err))
+    fn(io, socket, ...args)
+      .catch(err => handleError(socket, err))
   }
   socket.on(event, listenerCallback)
 }
