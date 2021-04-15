@@ -12,7 +12,7 @@ import {User} from './user/models/User'
 
 import userRoute from './user/route'
 import gameRouter from "./game/route"
-import { socketEventHandler } from "./socket/events"
+import { registerSocketEvents } from "./socket/events"
 import addWhiteCardsToDb from "./scripts/populate"
 import {authSocketUser} from "./authenticate";
 
@@ -79,10 +79,7 @@ createConnection().then(async () => {
   
   io.on('connection', async (socket: Socket) => {
     io.use((socket: Socket, next: any) => authSocketUser(socket, io, next))
-    await socketEventHandler(socket, io).catch((err: Error) => {
-      console.error(err)
-      socket.emit('connection_error', err.message)
-    })
+    registerSocketEvents(io, socket)
     socket.emit('connected')
   })
 
