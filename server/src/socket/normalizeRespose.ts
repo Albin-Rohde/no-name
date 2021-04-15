@@ -25,6 +25,7 @@ interface UserResponse {
   cardWizz: boolean
   hasPlayed: boolean
   isHost: boolean
+  score: number
 }
 
 interface CardResponse {
@@ -56,7 +57,8 @@ const normalizeUserResponse = (user: User, currentRound: GameRound | undefined):
     cards: user.cards ? [...user.cards.map(normalizeCardResponse)] : [],
     cardWizz: currentRound?.card_wizz_user_id_fk === user.id,
     hasPlayed: user.hasPlayed,
-    isHost: user.isHost
+    isHost: user.isHost,
+    score: user.score,
   }
 }
 

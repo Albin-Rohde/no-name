@@ -8,7 +8,8 @@ export enum CardState {
   HAND = 'hand',
   PLAYED_HIDDEN = 'played_hidden',
   PLAYED_SHOW = 'played_show',
-  USED = 'used'
+  WINNER = 'winner',
+  USED = 'used',
 }
 
 @Entity('player_card_ref')

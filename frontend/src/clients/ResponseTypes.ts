@@ -32,13 +32,15 @@ export interface UserResponse {
   cardWizz?: boolean
   hasPlayed?: boolean
   isHost?: boolean
+  score: number
 }
 
 export enum CardState {
   HAND = 'hand',
   PLAYED_HIDDEN = 'played_hidden',
   PLAYED_SHOW = 'played_show',
-  USED = 'used'
+  USED = 'used',
+  WINNER = 'winner',
 }
 
 export interface CardResponse {
