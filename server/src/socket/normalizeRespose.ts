@@ -34,8 +34,7 @@ interface CardResponse {
   state: CardState
 }
 
-
-const normalizeGameResponse = (game: Game, currentRound: GameRound | undefined): GameResponse => {
+export const normalizeGameResponse = (game: Game, currentRound: GameRound | undefined): GameResponse => {
   return {
     key: game.key,
     gameOptions: {
@@ -68,11 +67,4 @@ const normalizeCardResponse = (card: PlayerCard): CardResponse => {
     text: card.white_card.text,
     state: card.state
   }
-}
-
-export const makeGameResponse = async (game: Game): Promise<GameResponse> => {
-  await Promise.all(game.users.map(u => u.save()))
-  await game.save()
-  const currentRound = await GameRound.findOne({game_key: game.key, round_number: game.current_round})
-  return normalizeGameResponse(game, currentRound)
 }

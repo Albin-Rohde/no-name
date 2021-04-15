@@ -10,6 +10,9 @@ import {
   startGameEvent,
   leaveGameEvent,
 } from './event-handler/game'
+import { Game } from "../game/models/Game";
+import { GameRound } from "../game/models/GameRound";
+import { normalizeGameResponse } from "./normalizeRespose";
 
 enum Events {
   GET_GAME = 'get-game',
@@ -20,7 +23,7 @@ enum Events {
   LEAVE_GAME = 'leave-game',
 }
 
-type EventFunction<T> = (io: Server, socket: Socket, ...args: T[]) => Promise<void>
+type EventFunction<T> = (io: Server, socket: Socket, ...args: T[]) => Promise<Game>
 
 /**
  * Prints the error to stdout and emits
@@ -29,9 +32,16 @@ type EventFunction<T> = (io: Server, socket: Socket, ...args: T[]) => Promise<vo
  * @param socket Socket.io Socket
  * @param err Error to handle
  */
-export const handleError = (socket: Socket, err: Error) => {
+const handleError = (socket: Socket, err: Error) => {
   console.error(err)
   socket.emit('connection_error', err.message)
+}
+
+const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
+  await Promise.all(game.users.map(u => u.save()))
+  await game.save()
+  const currentRound = await GameRound.findOne({game_key: game.key, round_number: game.current_round})
+  io.in(game.key).emit('update', normalizeGameResponse(game, currentRound))
 }
 
 /**
@@ -54,8 +64,9 @@ const addListener = <T>(
   event: Events,
   fn: EventFunction<T>,
 ): void => {
-  const listenerCallback: (...args: T[]) => void = (...args: [T]) => {
+  const listenerCallback = function(...args: [T]) {
     fn(io, socket, ...args)
+      .then((game) => emitUpdateEvent(io, game))
       .catch(err => handleError(socket, err))
   }
   socket.on(event, listenerCallback)
