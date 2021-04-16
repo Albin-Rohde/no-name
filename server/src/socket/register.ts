@@ -1,10 +1,20 @@
 import {Server, Socket} from "socket.io";
-import * as cardHandler from './event-handler/card'
-import * as gameHandler from './event-handler/game'
-import { Events, EventFunction} from "./event-handler";
+import {
+  playCardEvent,
+  flipCardEvent,
+  voteCardEvent,
+} from './event-handler/card'
+import {
+  getGameEvent,
+  joinGameEvent,
+  startGameEvent,
+  leaveGameEvent,
+} from './event-handler/game'
+import { Events, EventFunction, EventFunctionWithGame} from "./event-handler";
 import { Game } from "../game/models/Game";
 import { GameRound } from "../game/models/GameRound";
 import { normalizeGameResponse } from "./normalizeRespose";
+import { getGameFromUser } from "../game/services";
 
 /**
  * Register events to the socket
@@ -15,59 +25,90 @@ import { normalizeGameResponse } from "./normalizeRespose";
  * @param socket Socket.io Socket
  */
 export const registerSocketEvents = (io: Server, socket: Socket) => {
-  addListener<never>(io, socket, Events.GET_GAME, gameHandler.getGameEvent)
-  addListener<string>(io, socket, Events.JOIN, gameHandler.joinGameEvent)
-  addListener<never>(io, socket, Events.START, gameHandler.startGameEvent)
-  addListener<never>(io, socket, Events.LEAVE_GAME, gameHandler.leaveGameEvent)
-  addListener<number>(io, socket, Events.PLAY_CARD, cardHandler.playCardEvent)
-  addListener<number>(io, socket, Events.FLIP_CARD, cardHandler.flipCardEvent)
-  addListener<number>(io, socket, Events.VOTE_CARD, cardHandler.voteCardEvent)
+  addListener<string>(io, socket, Events.JOIN_GAME, joinGameEvent)
+  addListenerWithGame<never>(io, socket, Events.GET_GAME, getGameEvent)
+  addListenerWithGame<never>(io, socket, Events.START_GAME, startGameEvent)
+  addListenerWithGame<never>(io, socket, Events.LEAVE_GAME, leaveGameEvent)
+
+  addListenerWithGame<number>(io, socket, Events.PLAY_CARD, playCardEvent)
+  addListenerWithGame<number>(io, socket, Events.FLIP_CARD, flipCardEvent)
+  addListenerWithGame<number>(io, socket, Events.VOTE_CARD, voteCardEvent)
 }
 
 /**
- * The fn argument should be a eventHandler function
- * This function will wrap <fn> in a catch block and
- * register it on the socket as a eventListener on the given
- * event in the <event> argument.
+ * takes an eventFUnction wrap in in an error handler
+ * register the handler on the socket as an eventListener
  *
- * The type <T> given to this function will be the type of the
- * any additional argument to the eventFunction <fn>
+ * The response from the eventFunction <Game> will be sent
+ * to the client as an update event on every successfully event
+ *
+ * fetches a new Game instance on every event and send it in
+ * as argument to the EventFunction
  *
  * @param io Socket.io Server instance
  * @param socket Socket.io Socket
  * @param event event string to listen for
- * @param fn eventHandler to wrap error handler around
+ * @param eventFn eventHandlerFunction
+ */
+const addListenerWithGame = <T>(
+  io: Server,
+  socket: Socket,
+  event: Events,
+  eventFn: EventFunctionWithGame<T>,
+): void => {
+  async function eventCallback(...args: T[]) {
+    const game = await getGameFromUser(socket.request.session.user.id)
+    try {
+      eventFn(io, socket, game, ...args)
+        .then((game) => emitUpdateEvent(io, game))
+    } catch (err) {
+      console.error(err)
+      socket.emit('connection_error', err.message)
+    }
+  }
+  socket.on(event, eventCallback)
+}
+
+/**
+ * takes an eventFUnction wrap in in an error handler
+ * register the handler on the socket as an eventListener
+ *
+ * The response from the eventFunction <Game> will be sent
+ * to the client as an update event on every successfully event
+ *
+ * @param io Socket.io Server instance
+ * @param socket Socket.io Socket
+ * @param event event string to listen for
+ * @param eventFn eventHandlerFunction
  */
 const addListener = <T>(
   io: Server,
   socket: Socket,
   event: Events,
-  fn: EventFunction<T>,
+  eventFn: EventFunction<T>,
 ): void => {
-  const listenerCallback = function(...args: [T]) {
-    fn(io, socket, ...args)
-      .then((game) => emitUpdateEvent(io, game))
-      .catch(err => handleError(socket, err))
+  async function eventCallback(...args: T[]) {
+    try {
+      eventFn(io, socket, ...args)
+        .then((game) => emitUpdateEvent(io, game))
+    } catch (err) {
+      console.error(err)
+      socket.emit('connection_error', err.message)
+    }
   }
-  socket.on(event, listenerCallback)
+  socket.on(event, eventCallback)
 }
 
 /**
  * Prints the error to stdout and emits
  * a connection_error event with the error message
  *
- * @param socket Socket.io Socket
- * @param err Error to handle
+ * @param io
+ * @param game
  */
-const handleError = (socket: Socket, err: Error) => {
-  console.error(err)
-  socket.emit('connection_error', err.message)
-}
-
 const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
   await Promise.all(game.users.map(u => u.save()))
   await game.save()
   const currentRound = await GameRound.findOne({game_key: game.key, round_number: game.current_round})
   io.in(game.key).emit('update', normalizeGameResponse(game, currentRound))
 }
-

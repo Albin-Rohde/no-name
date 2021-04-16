@@ -1,23 +1,30 @@
 import {Server, Socket} from "socket.io";
-import {getGameFromUser, getGameWithRelations} from "../../game/services";
 import {getUserWithRelation} from "../../user/services";
 import {Game} from "../../game/models/Game";
-import {EventFunction} from "./index";
+import {EventFunction, EventFunctionWithGame} from "./index";
+import {getGameWithRelations} from "../../game/services";
 
-export const getGameEvent: EventFunction<never> = async(io: Server, socket: Socket): Promise<Game> => {
-  return getGameFromUser(socket.request.session.user.id)
-}
-
-export const joinGameEvent: EventFunction<string> = async (io: Server, socket: Socket, key: string): Promise<Game> => {
-  const game = await getGameWithRelations(key)
-  const user = await getUserWithRelation(socket.request.session.user.id)
-  game.addPlayer(user)
-  socket.join(key)
+export const getGameEvent: EventFunctionWithGame<never> = async(
+  io: Server,
+  socket: Socket,
+  game,
+): Promise<Game> => {
   return game
 }
 
-export const startGameEvent: EventFunction<never> = async (io: Server, socket: Socket): Promise<Game> => {
-  const game = await getGameFromUser(socket.request.session.user.id)
+export const joinGameEvent: EventFunction<string> = async (io: Server, socket: Socket, key): Promise<Game> => {
+  const game = await getGameWithRelations(key)
+  const user = await getUserWithRelation(socket.request.session.user.id)
+  game.addPlayer(user)
+  socket.join(game.key)
+  return game
+}
+
+export const startGameEvent: EventFunctionWithGame<never> = async (
+  io: Server,
+  socket: Socket,
+  game,
+): Promise<Game> => {
   if(game.started) {
     throw new Error('Game already started')
   }
@@ -30,8 +37,7 @@ export const startGameEvent: EventFunction<never> = async (io: Server, socket: S
   return game
 }
 
-export const leaveGameEvent: EventFunction<never> = async(io: Server, socket: Socket): Promise<Game> => {
-  const game = await getGameFromUser(socket.request.session.user.id)
+export const leaveGameEvent: EventFunctionWithGame<never> = async(io: Server, socket: Socket, game): Promise<Game> => {
   game.removePlayer(game.currentUser)
   return game
 }
