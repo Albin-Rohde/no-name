@@ -57,8 +57,8 @@ const addListenerWithGame = <T>(
   eventFn: EventFunctionWithGame<T>,
 ): void => {
   async function eventCallback(...args: T[]) {
-    const game = await getGameFromUser(socket.request.session.user.id)
     try {
+      const game = await getGameFromUser(socket.request.session.user.id)
       eventFn(io, socket, game, ...args)
         .then((game) => emitUpdateEvent(io, game))
     } catch (err) {
