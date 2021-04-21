@@ -48,7 +48,7 @@ export const authSocketUser = async (socket: Socket, io: Server, next: any) => {
   if(user) {
     socket.request.session.user = user
     socket.request.session.save()
-    next()
+    next();
   } else {
     throw new Error('Authentication for user failed.')
   }
