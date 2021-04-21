@@ -18,6 +18,7 @@ export default class UserClient {
 			this.id = user.id
 			this.username = user.username
 			this.cards = user.cards
+			this.email = user.email
 		}
   }
   
