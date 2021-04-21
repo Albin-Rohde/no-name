@@ -1,3 +1,4 @@
+/*
 import redis, { RedisClient } from 'redis'
 
 class Redis {
@@ -36,3 +37,4 @@ class Redis {
 }
 
 export default new Redis();
+*/

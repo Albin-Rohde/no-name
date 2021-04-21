@@ -3,6 +3,7 @@ import {User} from "../../user/models/User"
 import {GameRound} from "./GameRound"
 import { getUnusedWhiteCards } from "../../card/services";
 import {CardState, PlayerCard} from "../../card/models/PlayerCard";
+import { BlackCard } from "../../card/models/BlackCard";
 
 @Entity()
 
@@ -46,6 +47,17 @@ export class Game extends BaseEntity {
     {name: 'current_round', referencedColumnName: 'round_number'},
   ])
   round: GameRound
+
+	@OneToOne(type => BlackCard, {
+		onUpdate: "CASCADE",
+		onDelete: "CASCADE",
+		cascade: true,
+	})
+	@JoinColumn({name: 'black_card_id_fk'})
+	blackCard: BlackCard
+
+	@Column({name: 'used_black_card_ids'})
+	usedBlackCard: string[]
 
   private currentUserId: number
 
@@ -117,6 +129,10 @@ export class Game extends BaseEntity {
       await user.save()
     }
   }
+
+	public setBlackCards = async (): Promise<void> => {
+		
+	}
 
   public flipCard = async (cardId: number): Promise<void> => {
     if(!this.allPlayersHasPlayed) {

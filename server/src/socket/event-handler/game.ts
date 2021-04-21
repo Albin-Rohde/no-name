@@ -4,6 +4,7 @@ import {Game} from "../../game/models/Game";
 import {EventFunction, EventFunctionWithGame} from "./index";
 import {getGameWithRelations} from "../../game/services";
 
+// TODO: io and socket can be reomved from eventHandlers since they are not used anymore.
 export const getGameEvent: EventFunctionWithGame<never> = async(
   io: Server,
   socket: Socket,
