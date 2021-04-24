@@ -13,4 +13,4 @@ export enum Events {
 
 export type EventFunction<T> = (io: Server, socket: Socket, ...args: T[]) => Promise<Game>
 
-export type EventFunctionWithGame<T> = (io: Server, socket: Socket, game: Game, ...args: T[]) => Promise<Game>
+export type EventFunctionWithGame<T> = (game: Game, ...args: T[]) => Promise<Game>

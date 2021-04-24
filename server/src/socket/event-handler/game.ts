@@ -4,11 +4,7 @@ import {Game} from "../../game/models/Game";
 import {EventFunction, EventFunctionWithGame} from "./index";
 import {getGameWithRelations} from "../../game/services";
 
-export const getGameEvent: EventFunctionWithGame<never> = async(
-  io: Server,
-  socket: Socket,
-  game,
-): Promise<Game> => {
+export const getGameEvent: EventFunctionWithGame<never> = async(game): Promise<Game> => {
   return game
 }
 
@@ -20,11 +16,7 @@ export const joinGameEvent: EventFunction<string> = async (io: Server, socket: S
   return game
 }
 
-export const startGameEvent: EventFunctionWithGame<never> = async (
-  io: Server,
-  socket: Socket,
-  game,
-): Promise<Game> => {
+export const startGameEvent: EventFunctionWithGame<never> = async (game): Promise<Game> => {
   if(game.started) {
     throw new Error('Game already started')
   }
@@ -37,7 +29,7 @@ export const startGameEvent: EventFunctionWithGame<never> = async (
   return game
 }
 
-export const leaveGameEvent: EventFunctionWithGame<never> = async(io: Server, socket: Socket, game): Promise<Game> => {
+export const leaveGameEvent: EventFunctionWithGame<never> = async(game): Promise<Game> => {
   game.removePlayer(game.currentUser)
   return game
 }
