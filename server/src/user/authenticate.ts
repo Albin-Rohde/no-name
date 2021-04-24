@@ -1,7 +1,7 @@
 import { Socket, Server } from 'socket.io'
 import { NextFunction, Request, Response } from 'express'
-import { User } from './user/models/User'
-import { getUserWithRelation } from './user/services'
+import { User } from './models/User'
+import { getUserWithRelation } from './services'
 
 const authUser = async (sessionUser: User) => {
   if(!sessionUser) {

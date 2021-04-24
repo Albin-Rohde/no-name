@@ -1,5 +1,5 @@
 import {Router, Request, Response} from 'express'
-import { loginRequired } from '../authenticate'
+import { loginRequired } from './authenticate'
 import { User } from './models/User'
 import { create, login } from './services'
 

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express'
-import { loginRequired, gameRequired } from '../authenticate'
+import { loginRequired, gameRequired } from '../user/authenticate'
 import { createNewGame, deleteGame } from './services'
 
 const gameRouter = Router()
