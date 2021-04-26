@@ -1,6 +1,6 @@
 import fs from 'fs'
 import {getConnection} from 'typeorm'
-import {WhiteCard} from '../card/models/WhiteCard'
+import {WhiteCard} from '../db/card/models/WhiteCard'
 
 
 async function addWhiteCardsToDb() {

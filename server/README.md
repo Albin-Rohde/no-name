@@ -1,11 +1,22 @@
 # SERVER
 
 ## Tech
-The server is using express as its rest api and socket.io as websocket server. app.ts is the entrypoint where these two instances are created. The stages before a game is created and started is mainly handeled by express in restfull endpoints. These can be found in each domains `route` file. E.g `src/user/route.ts`. The actual logic mostly lives in the domains `services` file i.e `src/user/service.ts`.
+The backend consists of two parts, a websocket server and an express rest server. The entry point for the backend is `app.ts`.
+The entrypoint to the rest server is `src/rest/server.ts`. Currently the rest server has 2 routes, game and user, 
+which can be located under `src/rest/game/route.ts` and `src/rest/user/route.ts`. Both directories have a `services.ts`
+file handling some of the logic for each request.
 
-The server is using `express-session` to keep track of sessions and who is doing each request. On top of that there are a few middlewares localted in `src/authenticate.ts` responisble of checking if the user is properly logged in; before allowing them to continue with there action. In the authenticate middleware we also make sure to replace the json representation of a user with a typeorm instance of the user, making it possible to to database actions on the user later on in the request.
+The entrypoint to the socket server is `src/socket/server.ts`. The server instance will register event-handlers that
+will listen for events sent by the client and respond accordingly. The events are registered in `src/socket/events/register.ts`
+and the event handlers are located inside the `src/socket/events/event-handler` directory. Most events will send a 
+response back to the client, these responses are normalized and typed in `src/socket/events/response.ts`.
 
-All responses from the websocket events are normalized in `src/game/normalieResponse.ts`. Making it easy for frontend to understand the data.
+The app relies heavy on postgres for storing of game data. Database related logic is located in `src/db`. 
+Models are located in `src/db/<domain>/models/<model>.ts` for example `src/db/game/models/Game.ts`.
+Each model is a class and will act as an instance of a row in db. The class also contains some custom database layer logic.
+Other database logic that can not live on a row instance are located in the domains `service.ts` file. For example 
+`src/db/game/service.ts`. These functions are mostly related to getting/querying for data.
 
-The server uses `typeorm` as orm mapper, each data model can be found in each domains `models` dir. i.e `/src/user/models/User.ts`.
+Both the rest server and socket server are using sessions for authentication, authentication middlewares can be found in
+`src/rest/authenticate.ts` and `src/socket/authenticate.ts`.
 

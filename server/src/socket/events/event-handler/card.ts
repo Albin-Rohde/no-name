@@ -1,4 +1,4 @@
-import {Game} from "../../game/models/Game";
+import {Game} from "../../../db/game/models/Game";
 import {EventFunctionWithGame} from "./index";
 
 export const playCardEvent: EventFunctionWithGame<number> = async(game, cardId: number): Promise<Game> => {

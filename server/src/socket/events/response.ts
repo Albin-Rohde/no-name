@@ -1,7 +1,7 @@
-import { CardState, PlayerCard } from '../card/models/PlayerCard'
-import { User } from '../user/models/User'
-import { Game } from '../game/models/Game'
-import { GameRound } from '../game/models/GameRound'
+import { CardState, PlayerCard } from '../../db/card/models/PlayerCard'
+import { User } from '../../db/user/models/User'
+import { Game } from '../../db/game/models/Game'
+import { GameRound } from '../../db/game/models/GameRound'
 
 interface GameResponse {
   key: string

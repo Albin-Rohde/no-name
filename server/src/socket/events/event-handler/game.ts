@@ -1,8 +1,8 @@
 import {Server, Socket} from "socket.io";
-import {getUserWithRelation} from "../../user/services";
-import {Game} from "../../game/models/Game";
+import {getUserWithRelation} from "../../../db/user/services";
+import {Game} from "../../../db/game/models/Game";
 import {EventFunction, EventFunctionWithGame} from "./index";
-import {getGameWithRelations} from "../../game/services";
+import {getGameWithRelations} from "../../../db/game/services";
 
 export const getGameEvent: EventFunctionWithGame<never> = async(game): Promise<Game> => {
   return game

@@ -1,7 +1,5 @@
-import { Socket, Server } from 'socket.io'
-import { NextFunction, Request, Response } from 'express'
-import { User } from './models/User'
-import { getUserWithRelation } from './services'
+import {User} from "../db/user/models/User";
+import {NextFunction, Request, Response} from "express";
 
 const authUser = async (sessionUser: User) => {
   if(!sessionUser) {
@@ -38,18 +36,4 @@ export const gameRequired = async (req: Request, res: Response, next: NextFuncti
     req.session.save()
     return next()
   } catch(err) {}
-}
-
-export const authSocketUser = async (socket: Socket, io: Server, next: any) => {
-  if(!socket.request.session.user) {
-    throw new Error('User required on session')
-  }
-  const user = await getUserWithRelation(socket.request.session.user.id)
-  if(user) {
-    socket.request.session.user = user
-    socket.request.session.save()
-    next()
-  } else {
-    throw new Error('Authentication for user failed.')
-  }
 }

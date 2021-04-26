@@ -19,7 +19,10 @@ This project consists of two parts; A Frontend and a Backend. These are called [
 
 The frontend is developed with typescript using svelte. The frontend aims to be very minimalistic using bootstrap and very simple html components with straigh forward css.
 
-The backend is also developed in typescript. The backend uses an `express` server along with a `socket.io` server to handle websockets. The backend server acts both as a rest api (`express`) and a websocket server (`socket.io`). Since the game relies on live actions between multiple players, websocket where the obvious desicion. The backend use `postgres` as its database, and `typeorm` as orm mapper.
+The backend is also developed in typescript. The backend uses an `express` server along with a `socket.io` server 
+to handle websockets. The backend server acts both as a rest api (`express`) and a websocket server (`socket.io`). 
+Since the game relies on live actions between multiple players, websocket where the obvious desicion. 
+The backend use `postgres` as its database, and `typeorm` as orm mapper. Read more about the server [here](./server/README.md).
 
 
 ## How to start the project

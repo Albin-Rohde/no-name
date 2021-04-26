@@ -2,9 +2,11 @@ import express, {Application} from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import session, {Cookie} from "express-session";
-import {User} from "../user/models/User";
-import {ServerOptions} from "./server";
+import session, { Cookie } from "express-session";
+import { User } from "../db/user/models/User";
+import { ServerOptions } from "../app";
+import userRoute from "./user/route";
+import gameRouter from "./game/route";
 
 declare module 'http' {
   interface IncomingMessage {
@@ -35,7 +37,12 @@ export const userSession = session({
   }
 })
 
-export function configuredApp(options: ServerOptions) {
+/**
+ * @param options Port and Host options to run rest server on
+ *
+ * Creates an Express rest server
+ */
+export function createRestServer(options: ServerOptions) {
   const hostUri = `${options.host}:${options.port}`
   const app: Application = express()
   app.use(bodyParser.urlencoded({extended: false}))
@@ -48,5 +55,11 @@ export function configuredApp(options: ServerOptions) {
     next()
   })
   app.use(userSession)
+
+  /**
+   * Register routes
+   */
+  app.use('/user', userRoute)
+  app.use('/game', gameRouter)
   return app
 }

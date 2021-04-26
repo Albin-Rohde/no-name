@@ -1,11 +1,10 @@
-import {Router, Request, Response} from 'express'
-import { loginRequired } from './authenticate'
-import { User } from './models/User'
-import { create, login } from './services'
+import { Router, Request, Response } from 'express'
+import { loginRequired } from '../authenticate'
+import { register, login } from './services'
 
 const userRouter = Router()
 
-userRouter.get('/get', loginRequired, (req: Request, res: Response) => {
+userRouter.get('/get', loginRequired, (req: Request, res: Response): Response => {
   if(req.session.user) {
     return res.json(req.session.user)
   }
@@ -26,13 +25,13 @@ userRouter.post('/login', async (req: Request, res: Response) => {
   }
 })
 
-userRouter.post('/logout', loginRequired, async (req: Request, res: Response) => {
+userRouter.post('/logout', loginRequired, async (req: Request, res: Response): Promise<void> => {
   return req.session.destroy(() => res.json())
 })
 
 userRouter.post('/register', async (req: Request, res: Response) => {
   try {
-    const user = await create(req.body)
+    const user = await register(req.body)
     req.session.user = user
     req.session.save()
     res.json(user)
