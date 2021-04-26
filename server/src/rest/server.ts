@@ -8,6 +8,8 @@ import { ServerOptions } from "../app";
 import userRoute from "./user/route";
 import gameRouter from "./game/route";
 
+// TODO: figure this out in a better way
+// NOTE: needed for typing of user on request.session
 declare module 'http' {
   interface IncomingMessage {
     session: {

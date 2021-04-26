@@ -4,14 +4,23 @@ import {v4 as uuidv4} from "uuid";
 import {GameRound} from "../../db/game/models/GameRound";
 import {getManager} from "typeorm";
 
-interface gameSettings {
+interface GameSettings {
   playCards: number
   rounds: number
   playerLimit: number
   private: boolean
 }
 
-export async function createNewGame (user: User, options: gameSettings): Promise<Game> {
+/**
+ * Creates a new game and store it to db for later use
+ *
+ * The user supplied to this function will also be attached to the game
+ *
+ * Returns the created game on success
+ * @param user User instance, User which is creating the game
+ * @param options GameSettings object, containing settings for the game
+ */
+export async function createNewGame (user: User, options: GameSettings): Promise<Game> {
   try {
     if(user.game) {
       await deleteGame(user)
@@ -42,6 +51,16 @@ export async function createNewGame (user: User, options: gameSettings): Promise
   }
 }
 
+
+/**
+ * Deletes the game on the user supplied to this function
+ *
+ * This will also reset any game data stored on any user attached to the deleted game
+ * Such as has_played score and their relation to a game.
+ *
+ * Will also delete any gameRound related to the deleted game.
+ * @param user
+ */
 export async function deleteGame (user: User): Promise<void> {
   if(!user.isHost) {
     throw new Error('User is not host, Only host can delete game')

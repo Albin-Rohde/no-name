@@ -1,6 +1,11 @@
 import { User } from "../user/models/User"
 import { Game } from "./models/Game"
 
+
+/**
+ * Get a game with all relations needed
+ * @param key
+ */
 const getGameWithRelations = async (key: string): Promise<Game> => {
   try {
     return await Game.findOneOrFail(key, {
@@ -18,6 +23,10 @@ const getGameWithRelations = async (key: string): Promise<Game> => {
   }
 }
 
+/**
+ * Get the Game instance with relations associated to a User
+ * @param userId
+ */
 const getGameFromUser = async (userId: number): Promise<Game> => {
   const user = await User.findOneOrFail(userId, {relations: ['game']})
   if(!user.game) {

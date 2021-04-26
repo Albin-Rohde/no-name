@@ -34,19 +34,6 @@ interface CardResponse {
   state: CardState
 }
 
-export const normalizeGameResponse = (game: Game, currentRound: GameRound | undefined): GameResponse => ({
-  key: game.key,
-  gameOptions: {
-    deck: game.card_deck,
-    cardLimit: game.play_cards,
-    playerLimit: game.player_limit,
-    privateLobby: game.private_lobby,
-    rounds: game.rounds
-  },
-  started: game.started,
-  users: game.users ? [...game.users.map(user => normalizeUserResponse(user, currentRound))] : []
-})
-
 const normalizeUserResponse = (user: User, currentRound: GameRound | undefined): UserResponse => ({
   id: user.id,
   username: user.username,
@@ -61,4 +48,24 @@ const normalizeCardResponse = (card: PlayerCard): CardResponse => ({
   id: card.id,
   text: card.white_card.text,
   state: card.state,
+})
+
+/**
+ * Takes a game and a currentRound and
+ * normalize the data into a format that
+ * the client will understand. <GameResponse>
+ * @param game
+ * @param currentRound
+ */
+export const normalizeGameResponse = (game: Game, currentRound: GameRound | undefined): GameResponse => ({
+  key: game.key,
+  gameOptions: {
+    deck: game.card_deck,
+    cardLimit: game.play_cards,
+    playerLimit: game.player_limit,
+    privateLobby: game.private_lobby,
+    rounds: game.rounds
+  },
+  started: game.started,
+  users: game.users ? [...game.users.map(user => normalizeUserResponse(user, currentRound))] : []
 })

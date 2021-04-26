@@ -57,6 +57,10 @@ export class User extends BaseEntity {
   @DeleteDateColumn()
   deleted_at: string
 
+  /**
+   * Plays a card, Sets the card to played state
+   * @param cardId
+   */
   public playCard = async (cardId: number): Promise<void> => {
     const card = this.cards.find(card => card.id === cardId)
     if(!card) {
@@ -67,10 +71,17 @@ export class User extends BaseEntity {
     await card.save()
   }
 
+  /**
+   * Hybrid property, boolean if the user is host over a geme
+   */
   get isHost(): boolean {
     return this.id === this.game?.hostUserId
   }
 
+  /**
+   * Hybrid property, boolean if the user is cardWizz for the
+   * current round in a game.
+   */
   get isCardWizz(): boolean {
     return this.id === this.game?.round?.card_wizz_user_id_fk
   }

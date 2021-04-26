@@ -5,6 +5,11 @@ import { ServerOptions } from "../app";
 import { authSocketUser } from "./authenticate";
 import { registerSocketEvents } from "./events/register";
 
+/**
+ * Creates a socket.io websocket server
+ * @param server - Server to register te socket-server on
+ * @param options - Port and Host options to run socket server on
+ */
 export function createSocketServer(server: http.Server, options: ServerOptions) {
   const hostUri = `${options.host}:${options.port}`
   const io = new Server(server, {

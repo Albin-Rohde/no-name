@@ -47,8 +47,20 @@ export class Game extends BaseEntity {
   ])
   round: GameRound
 
+  /**
+   * @private currentUserId
+   * Holds the id of what to be considered the currentUser
+   * of a game. The currentUser is the user amongst all the game's
+   * user's that will be considered the active user in a
+   * particular request.
+   *
+   * Needed
+   */
   private currentUserId: number
 
+  /**
+   * Returns the User instance for the currentUserId private
+   */
   public get currentUser(): User {
     const user = this.users.find(user => user.id === this.currentUserId)
     if(!user) {
@@ -57,6 +69,10 @@ export class Game extends BaseEntity {
     return user
   }
 
+  /**
+   * Set the currentUser for the Game instance
+   * @param user
+   */
   public set currentUser(user: User) {
     this.currentUserId = user.id
   }
@@ -65,25 +81,42 @@ export class Game extends BaseEntity {
    * Gets all players except the cardWizz
    * @private
    */
-  private get allPlayers() {
+  private get allPlayers(): User[] {
     return this.users.filter(user => !user.isCardWizz)
   }
 
-  private get allPlayersHasPlayed() {
+  /**
+   * returns a boolean `true` if all players except cardWizz has played
+   * since the cardWizz can not play cards.
+   * @private
+   */
+  private get allPlayersHasPlayed(): boolean {
     return this.users
       .filter(user => !user.isCardWizz)
       .every(user => user.hasPlayed)
   }
 
+  /**
+   * Add a User to the game
+   * @param user
+   */
   public addPlayer = (user: User): void => {
     if(this.users.some(u => u.id === user.id)) return
     this.users.push(user)
   }
 
+  /**
+   * Removes a user from the game
+   * @param user
+   */
   public removePlayer = (user: User): void => {
     this.users = this.users.filter((u) => u.id !== user.id)
   }
 
+  /**
+   * Assign a cardwizz for each round in the game
+   * Makes sure that there is a new cardwizz for every round.
+   */
   public assingCardWizz = async (): Promise<void> => {
     const rounds = await GameRound.find({game_key: this.key})
     let userIdx = 0
@@ -99,6 +132,12 @@ export class Game extends BaseEntity {
     await Promise.all(saveRounds)
   }
 
+  /**
+   * Assign new cards to all users in the game.
+   * Makes sure to assign that many cards so that
+   * each user has as many cards as the card limit
+   * allows.
+   */
   public handOutCards = async (): Promise<void> => {
     for(const user of this.users) {
       const cardAmount = this.play_cards - user.cards.length
@@ -118,6 +157,12 @@ export class Game extends BaseEntity {
     }
   }
 
+  /**
+   * Flip a card that exists in the game.
+   * Implements some additional logic to check that
+   * flipping the card is allowed according to game rules.
+   * @param cardId - Card to be flipped.
+   */
   public flipCard = async (cardId: number): Promise<void> => {
     if(!this.allPlayersHasPlayed) {
       throw new Error('All users must play before flipping')
@@ -133,6 +178,12 @@ export class Game extends BaseEntity {
     await card.save()
   }
 
+  /**
+   * Vote for a card that exists in the game.
+   * Implements some additional logic to check that
+   * Voting the card is allowed according to game rules.
+   * @param cardId - Card to be voted on.
+   */
   public voteCard = async (cardId: number): Promise<void> => {
     if(!this.allPlayersHasPlayed) {
       throw new Error('All users must play before voting')

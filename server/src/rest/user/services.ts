@@ -12,6 +12,14 @@ interface registerRequestBody {
   username: string
 }
 
+/**
+ * Login a user to the app
+ * will look at the password and email of the body argument
+ * and compare the password to the hashed password in database.
+ *
+ * Returns the authenticated user on success
+ * @param body
+ */
 export async function login (body: loginRequestBody) {
   if(!body.email || !body.password) {
     throw new Error('BAD_REQUEST')
@@ -26,6 +34,13 @@ export async function login (body: loginRequestBody) {
   return user
 }
 
+/**
+ * Registers a new user to the app
+ * Will register a user from the data of body arument.
+ *
+ * Returns the newly created user on success
+ * @param body
+ */
 export async function register (body: registerRequestBody) {
   const user = new User()
   if(!body.email || !body.password || !body.username) {
