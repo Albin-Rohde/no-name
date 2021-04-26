@@ -11,12 +11,11 @@ import { registerSocketEvents } from "./events/register";
  * @param options - Port and Host options to run socket server on
  */
 export function createSocketServer(server: http.Server, options: ServerOptions) {
-  const hostUri = `${options.host}:${options.port}`
   const io = new Server(server, {
     cors: {
-      origin: hostUri,
+      origin: options.clientUrl,
       methods: ["GET", "POST"],
-      allowedHeaders: [hostUri, "user"],
+      allowedHeaders: [options.clientUrl, "user"],
       credentials: true,
     },
     pingTimeout: 500,

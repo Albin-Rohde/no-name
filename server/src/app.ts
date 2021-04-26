@@ -6,6 +6,7 @@ import { createConnection } from "typeorm";
 export interface ServerOptions {
   host: string
   port: number
+  clientUrl: string
 }
 
 /**
@@ -14,14 +15,17 @@ export interface ServerOptions {
  * Will start one socket.io websocket server
  */
 function startServer() {
-  const options = {
+  const options: ServerOptions = {
     host: process.env.host || 'http://localhost',
     port: Number(process.env.port) || 5000,
+    clientUrl: process.env.clientUrl || 'http://localhost:3000',
   }
   createConnection().then(async () => {
     console.log('connected to db')
     const server = createServer(options)
-    server.listen(options.port, () => `server started on port ${options.port}`)
+    server.listen(options.port, () => {
+      console.log(`server started on port ${options.port}`)
+    })
   }).catch((err) => console.log(err))
 }
 

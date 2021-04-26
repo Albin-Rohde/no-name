@@ -17,8 +17,7 @@ const authUser = async (sessionUser: User) => {
 
 export const loginRequired = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await authUser(req.session.user)
-    req.session.user = user
+    req.session.user = await authUser(req.session.user)
     req.session.save()
     next()
   } catch(err) {

@@ -45,15 +45,14 @@ export const userSession = session({
  * Creates an Express rest server
  */
 export function createRestServer(options: ServerOptions) {
-  const hostUri = `${options.host}:${options.port}`
   const app: Application = express()
   app.use(bodyParser.urlencoded({extended: false}))
   app.use(bodyParser.json())
   app.use(cookieParser())
   app.set('trust proxy', true)
-  app.use(cors({origin: hostUri,credentials: true}))
+  app.use(cors({origin: options.clientUrl,credentials: true}))
   app.use((_req, res, next) => {
-    res.header({'Access-Control-Allow-Headers': hostUri})
+    res.header({'Access-Control-Allow-Headers': options.clientUrl})
     next()
   })
   app.use(userSession)
