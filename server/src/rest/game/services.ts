@@ -1,44 +1,26 @@
-import { getManager } from 'typeorm'
-import { User } from "../user/models/User"
-import { Game } from "./models/Game"
-import {GameRound} from "./models/GameRound"
-import {v4 as uuidv4} from 'uuid'
+import {User} from "../../db/user/models/User";
+import {Game} from "../../db/game/models/Game";
+import {v4 as uuidv4} from "uuid";
+import {GameRound} from "../../db/game/models/GameRound";
+import {getManager} from "typeorm";
 
-interface optionsShape {
+interface GameSettings {
   playCards: number
   rounds: number
   playerLimit: number
   private: boolean
 }
 
-const getGameWithRelations = async (key: string) => {
-  try {
-    return await Game.findOneOrFail(key, {
-      relations: [
-        'users',
-        'users.cards',
-        'users.cards.white_card',
-        'users.game',
-        'users.game.round',
-      ]
-    })
-  } catch (err){
-    console.error(err)
-    throw new Error('GAME_NOT_FOUND')
-  }
-}
-
-const getGameFromUser = async (userId: number): Promise<Game> => {
-  const user = await User.findOneOrFail(userId, {relations: ['game']})
-  if(!user.game) {
-    throw new Error('No Game on User')
-  }
-  const game = await getGameWithRelations(user.game.key)
-  game.currentUser = user
-  return game
-}
-
-const createNewGame = async (user: User, options: optionsShape) => {
+/**
+ * Creates a new game and store it to db for later use
+ *
+ * The user supplied to this function will also be attached to the game
+ *
+ * Returns the created game on success
+ * @param user User instance, User which is creating the game
+ * @param options GameSettings object, containing settings for the game
+ */
+export async function createNewGame (user: User, options: GameSettings): Promise<Game> {
   try {
     if(user.game) {
       await deleteGame(user)
@@ -69,10 +51,21 @@ const createNewGame = async (user: User, options: optionsShape) => {
   }
 }
 
-const deleteGame = async (user: User): Promise<void> => {
+
+/**
+ * Deletes the game on the user supplied to this function
+ *
+ * This will also reset any game data stored on any user attached to the deleted game
+ * Such as has_played score and their relation to a game.
+ *
+ * Will also delete any gameRound related to the deleted game.
+ * @param user
+ */
+export async function deleteGame (user: User): Promise<void> {
   if(!user.isHost) {
     throw new Error('User is not host, Only host can delete game')
   }
+  // TODO: use querybuilder for this instead
   const {game} = await User.findOneOrFail(user.id, {relations: ['game']})
   const gameKey = game.key
   await getManager().query(`
@@ -91,5 +84,3 @@ const deleteGame = async (user: User): Promise<void> => {
   `)
   return
 }
-
-export {createNewGame, deleteGame, getGameWithRelations, getGameFromUser}

@@ -3,18 +3,16 @@ import {
   playCardEvent,
   flipCardEvent,
   voteCardEvent,
-} from './event-handler/card'
-import {
   getGameEvent,
   joinGameEvent,
   startGameEvent,
   leaveGameEvent,
-} from './event-handler/game'
+} from './event-handler'
 import { Events, EventFunction, EventFunctionWithGame} from "./event-handler";
-import { Game } from "../game/models/Game";
-import { GameRound } from "../game/models/GameRound";
-import { normalizeGameResponse } from "./normalizeRespose";
-import { getGameFromUser } from "../game/services";
+import { Game } from "../../db/game/models/Game";
+import { GameRound } from "../../db/game/models/GameRound";
+import { normalizeGameResponse } from "./response";
+import { getGameFromUser } from "../../db/game/services";
 
 /**
  * Register events to the socket
@@ -59,7 +57,7 @@ const addListenerWithGame = <T>(
   async function eventCallback(...args: T[]) {
     try {
       const game = await getGameFromUser(socket.request.session.user.id)
-      eventFn(io, socket, game, ...args)
+      eventFn(game, ...args)
         .then((game) => emitUpdateEvent(io, game))
     } catch (err) {
       console.error(err)

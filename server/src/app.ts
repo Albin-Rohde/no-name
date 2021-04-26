@@ -1,90 +1,52 @@
-import "reflect-metadata"
-import http from 'http'
-import { Socket, Server } from 'socket.io'
-import express, {Application} from 'express'
-import bodyParser from 'body-parser'
-import cors from 'cors'
-import cookieParser from 'cookie-parser'
-import session, {Cookie} from 'express-session'
-import {createConnection} from "typeorm";
+import http from "http";
+import { createSocketServer } from "./socket";
+import { createRestServer } from "./rest";
+import { createConnection } from "typeorm";
 
-import {User} from './user/models/User'
-
-import userRoute from './user/route'
-import gameRouter from "./game/route"
-import { registerSocketEvents } from "./socket/register"
-import addWhiteCardsToDb from "./scripts/populate"
-import {authSocketUser} from "./authenticate";
-
-declare module 'http' {
-  interface IncomingMessage {
-    session: {
-      user: User
-      id: string
-      cookie: Cookie
-      regenerate: ((err?: any) => void)
-      destroy: ((err?: any) => void)
-      reload: ((err?: any) => void)
-      resetMaxAge: () => void
-      save: ((err?: any) => void)
-      touch: () => void
-    }
-  }
+export interface ServerOptions {
+  host: string
+  port: number
+  clientUrl: string
 }
 
-// Set up app
-createConnection().then(async () => {
-  console.log('connection to db established')
-  const app: Application = express()
+/**
+ * Start the web server
+ * Will start one express rest server
+ * Will start one socket.io websocket server
+ */
+function startServer() {
+  const options: ServerOptions = {
+    host: process.env.host || 'http://localhost',
+    port: Number(process.env.port) || 5000,
+    clientUrl: process.env.clientUrl || 'http://localhost:3000',
+  }
+  createConnection().then(async () => {
+    console.log('connected to db')
+    const server = createServer(options)
+    server.listen(options.port, () => {
+      console.log(`server started on port ${options.port}`)
+    })
+  }).catch((err) => console.log(err))
+}
+
+/**
+ * Returns a configured server instance to run
+ * an express rest app and a socket io
+ * websocket server
+ */
+function createServer(options: ServerOptions): http.Server {
+  /**
+   * app: Configured express app for rest
+   * server: http server that will run everything
+   * io: websocket server
+   */
+  const app = createRestServer(options)
   const server = http.createServer(app)
-  const io = new Server(server, {
-    cors: {
-      origin: "http://localhost:3000",
-      methods: ["GET", "POST"],
-      allowedHeaders: ["http://localhost:3000", "user"],
-      credentials: true,
-    },
-    pingTimeout: 500,
-    transports: ['websocket']
-  })
-  
-  app.use(bodyParser.urlencoded({extended: false}))
-  app.use(bodyParser.json())
-  app.use(cookieParser())
-  app.set('trust proxy', true)
-  app.use(cors({origin: 'http://localhost:3000',credentials: true}))
-  app.use((_req, res, next) => {
-    res.header({'Access-Control-Allow-Headers': 'http://localhost:3000'})
-    next()
-  })
-  const userSession = session({
-    name: 'sid',
-    secret: 'keyboard cat',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false,
-      maxAge: 864000,
-      httpOnly: false,
-      sameSite: false,
-    }
-  })
-  app.use(userSession)
+  createSocketServer(server, options)
+  return server
+}
 
-  io.use((socket: any, next: any) => userSession(socket.request, {} as any, next))
-
-  // Routes
-  app.use('/user', userRoute)
-  app.use('/game', gameRouter)
-  
-  io.on('connection', async (socket: Socket) => {
-    io.use((socket: Socket, next: any) => authSocketUser(socket, io, next))
-    registerSocketEvents(io, socket)
-    socket.emit('connected')
-  })
-
-  // Set up db
-  await addWhiteCardsToDb()
-  // Start server
-  server.listen(5000, () => console.log(`Server started on port: 5000 `))
-}).catch(error => console.log(error))
+/**
+ * Run to start app
+ */
+startServer()
