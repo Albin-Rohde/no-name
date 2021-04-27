@@ -27,11 +27,11 @@ export async function createNewGame (user: User, options: GameSettings): Promise
     }
     const game = new Game()
     game.key = uuidv4()
-    game.play_cards = options.playCards
-    game.player_limit = options.playerLimit
-    game.private_lobby = options.private
+    game.playCards = options.playCards
+    game.playerLimit = options.playerLimit
+    game.privateLobby = options.private
     game.rounds = options.rounds
-    game.card_deck = 'default'
+    game.cardDeck = 'default'
     game.hostUserId = user.id
     user.game = game
 

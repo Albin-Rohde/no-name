@@ -1,5 +1,5 @@
 import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinColumn, ManyToOne, Unique, OneToMany} from "typeorm"
-import { PlayerCard } from "./PlayerCard"
+import { WhiteCardRef } from "./WhiteCardRef"
 
 @Entity('white_card')
 
@@ -16,7 +16,7 @@ export class WhiteCard extends BaseEntity {
   @Column({name: 'text'})
   text: string
 
-  @OneToMany(type => PlayerCard, card => card.white_card)
+  @OneToMany(type => WhiteCardRef, card => card.white_card)
   @JoinColumn({name: 'player_cards'})
-  player_cards: PlayerCard[]
+  player_cards: WhiteCardRef[]
 }

@@ -1,8 +1,9 @@
-import {BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm"
+import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm"
 import {User} from "../../user/models/User"
 import {GameRound} from "./GameRound"
 import { getUnusedWhiteCards } from "../../card/services";
-import {CardState, PlayerCard} from "../../card/models/PlayerCard";
+import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
+import {BlackCard} from "../../card/models/BlackCard";
 
 @Entity()
 
@@ -10,20 +11,20 @@ export class Game extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   key: string
 
-  @Column()
-  play_cards: number
+  @Column({name: 'play_cards'})
+  playCards: number
 
   @Column()
   rounds: number
 
-  @Column()
-  card_deck: string
+  @Column({name: 'card_deck'})
+  cardDeck: string
 
-  @Column()
-  private_lobby: boolean
+  @Column({name: 'private_lobby'})
+  privateLobby: boolean
 
-  @Column()
-  player_limit: number
+  @Column({name: 'player_limit'})
+  playerLimit: number
 
   @Column({default: false})
   started: boolean
@@ -46,6 +47,10 @@ export class Game extends BaseEntity {
     {name: 'current_round', referencedColumnName: 'round_number'},
   ])
   round: GameRound
+
+  @ManyToOne(type => BlackCard)
+  @JoinColumn({name: 'black_card_id_fk'})
+  blackCard: BlackCard
 
   /**
    * @private currentUserId
@@ -140,10 +145,10 @@ export class Game extends BaseEntity {
    */
   public handOutCards = async (): Promise<void> => {
     for(const user of this.users) {
-      const cardAmount = this.play_cards - user.cards.length
+      const cardAmount = this.playCards - user.cards.length
       const whiteCards = await getUnusedWhiteCards(this.key, cardAmount)
       user.cards = whiteCards.map(wc => {
-        const pc = new PlayerCard()
+        const pc = new WhiteCardRef()
         pc.user = user
         pc.user_id_fk = user.id
         pc.game_key = this.key

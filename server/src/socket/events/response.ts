@@ -1,4 +1,4 @@
-import { CardState, PlayerCard } from '../../db/card/models/PlayerCard'
+import { CardState, WhiteCardRef } from '../../db/card/models/WhiteCardRef'
 import { User } from '../../db/user/models/User'
 import { Game } from '../../db/game/models/Game'
 import { GameRound } from '../../db/game/models/GameRound'
@@ -44,7 +44,7 @@ const normalizeUserResponse = (user: User, currentRound: GameRound | undefined):
   score: user.score,
 })
 
-const normalizeCardResponse = (card: PlayerCard): CardResponse => ({
+const normalizeCardResponse = (card: WhiteCardRef): CardResponse => ({
   id: card.id,
   text: card.white_card.text,
   state: card.state,
@@ -60,10 +60,10 @@ const normalizeCardResponse = (card: PlayerCard): CardResponse => ({
 export const normalizeGameResponse = (game: Game, currentRound: GameRound | undefined): GameResponse => ({
   key: game.key,
   gameOptions: {
-    deck: game.card_deck,
-    cardLimit: game.play_cards,
-    playerLimit: game.player_limit,
-    privateLobby: game.private_lobby,
+    deck: game.cardDeck,
+    cardLimit: game.playCards,
+    playerLimit: game.playerLimit,
+    privateLobby: game.privateLobby,
     rounds: game.rounds
   },
   started: game.started,

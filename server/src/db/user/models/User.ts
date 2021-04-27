@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   Unique
 } from "typeorm"
-import {CardState, PlayerCard} from "../../card/models/PlayerCard";
+import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {Game} from '../../game/models/Game'
 
 @Entity({name: "player"})
@@ -41,9 +41,9 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   game_fk: string | null
 
-  @OneToMany(type => PlayerCard, card => card.user)
+  @OneToMany(type => WhiteCardRef, card => card.user)
   @JoinColumn({name: 'user_game_session_key'})
-  cards: PlayerCard[]
+  cards: WhiteCardRef[]
 
   @Column({nullable: false, name: 'has_played', default: false})
   hasPlayed: boolean
