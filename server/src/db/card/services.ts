@@ -1,5 +1,7 @@
 import { WhiteCard } from './models/WhiteCard'
 import { WhiteCardRef } from './models/WhiteCardRef'
+import {BlackCard} from "./models/BlackCard";
+import {Game} from "../game/models/Game";
 
 /**
  * Get a set of random WhiteCards that is not yet
@@ -18,4 +20,17 @@ const getUnusedWhiteCards = async (gameKey: string, limit: number): Promise<Whit
     .getMany()
 }
 
-export { getUnusedWhiteCards }
+/**
+ * Get a BlackCard that does not exist on the game
+ *
+ * @param gameKey
+ */
+const getUnusedBlackCard = async (gameKey: string): Promise<BlackCard> => {
+  return await BlackCard.createQueryBuilder('bc')
+    .leftJoin(Game, 'g', 'g.black_card_id_fk = bc.id')
+    .where('g.key != :gameKey', {gameKey})
+    .orderBy('random()')
+    .getOneOrFail()
+}
+
+export { getUnusedWhiteCards, getUnusedBlackCard }

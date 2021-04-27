@@ -1,7 +1,7 @@
 import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm"
 import {User} from "../../user/models/User"
 import {GameRound} from "./GameRound"
-import { getUnusedWhiteCards } from "../../card/services";
+import {getUnusedBlackCard, getUnusedWhiteCards} from "../../card/services";
 import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {BlackCard} from "../../card/models/BlackCard";
 
@@ -160,6 +160,13 @@ export class Game extends BaseEntity {
       await Promise.all(user.cards.map(c => c.save()))
       await user.save()
     }
+  }
+
+  /**
+   * Retrieves and sets a new black card for the Game
+   */
+  public newBlackCard = async (): Promise<void> => {
+    this.blackCard = await getUnusedBlackCard(this.key)
   }
 
   /**
