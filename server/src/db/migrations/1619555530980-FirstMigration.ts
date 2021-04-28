@@ -20,6 +20,10 @@ export class FirstMigration1619555530980 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "player" ADD CONSTRAINT "FK_46393e0d6dc5b13e2b676fe0a71" FOREIGN KEY ("game_fk") REFERENCES "game"("key") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "white_card_ref" ADD CONSTRAINT "FK_adb7ad5c006d20a99bba00828a0" FOREIGN KEY ("white_card_id_fk") REFERENCES "white_card"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "white_card_ref" ADD CONSTRAINT "FK_c81211623ae6ad27251a1e8da0a" FOREIGN KEY ("user_id_fk") REFERENCES "player"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`COMMENT ON COLUMN "black_card"."deck" IS NULL`);
+        await queryRunner.query(`ALTER TABLE "black_card" ALTER COLUMN "deck" SET DEFAULT null`);
+        await queryRunner.query(`COMMENT ON COLUMN "white_card"."deck" IS NULL`);
+        await queryRunner.query(`ALTER TABLE "white_card" ALTER COLUMN "deck" SET DEFAULT null`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -39,6 +43,10 @@ export class FirstMigration1619555530980 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX "game_key_idx"`);
         await queryRunner.query(`DROP TABLE "game_round"`);
         await queryRunner.query(`DROP TABLE "black_card"`);
+        await queryRunner.query(`ALTER TABLE "white_card" ALTER COLUMN "deck" DROP DEFAULT`);
+        await queryRunner.query(`COMMENT ON COLUMN "white_card"."deck" IS NULL`);
+        await queryRunner.query(`ALTER TABLE "black_card" ALTER COLUMN "deck" DROP DEFAULT`);
+        await queryRunner.query(`COMMENT ON COLUMN "black_card"."deck" IS NULL`);
     }
 
 }
