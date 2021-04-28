@@ -9,10 +9,10 @@ export interface GameResponse {
   users?: UserResponse[]
 }
 
-
 export interface GameSocketResponse {
   key: string
   gameOptions: GameOptionsResponse
+  blackCard?: BlackCardResponse
   started: boolean
   users: UserResponse[]
 }
@@ -47,6 +47,11 @@ export interface CardResponse {
   id: number
   text: string
   state: CardState
+}
+
+export interface BlackCardResponse {
+  id: number
+  text: string
 }
 
 export interface UserData {
