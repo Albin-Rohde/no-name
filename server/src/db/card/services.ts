@@ -13,7 +13,7 @@ import {Game} from "../game/models/Game";
 const getUnusedWhiteCards = async (gameKey: string, limit: number): Promise<WhiteCard[]> => {
   return await WhiteCard.createQueryBuilder('wc')
     .leftJoin(WhiteCardRef, 'wcr', 'wcr.id = wc.id')
-    .where('wcr.game_key != :gameKey', {gameKey})
+    .where('wcr.game_key != :gameKey or wcr.game_key is null', {gameKey})
     .orWhere('wcr.game_key is null')
     .orderBy('random()')
     .limit(limit)
@@ -28,7 +28,7 @@ const getUnusedWhiteCards = async (gameKey: string, limit: number): Promise<Whit
 const getUnusedBlackCard = async (gameKey: string): Promise<BlackCard> => {
   return await BlackCard.createQueryBuilder('bc')
     .leftJoin(Game, 'g', 'g.black_card_id_fk = bc.id')
-    .where('g.key != :gameKey', {gameKey})
+    .where('g.key != :gameKey or g.key is null', {gameKey})
     .orderBy('random()')
     .getOneOrFail()
 }

@@ -33,7 +33,7 @@ export const joinGameEvent: EventFunction<string> = async (io: Server, socket: S
  * Only the gameHost can do this action.
  * @param game
  */
-export const startGameEvent: EventFunctionWithGame<never> = async (game): Promise<Game> => {
+export const startGameEvent: EventFunctionWithGame<never> = async (game: Game): Promise<Game> => {
   if(game.started) {
     throw new Error('Game already started')
   }
@@ -41,8 +41,11 @@ export const startGameEvent: EventFunctionWithGame<never> = async (game): Promis
     throw new Error('User is not host, only host can start game')
   }
   game.started = true
-  await game.handOutCards()
-  await game.assingCardWizz()
+  await Promise.all([
+    game.handOutCards(),
+    game.assingCardWizz(),
+    game.newBlackCard(),
+  ])
   return game
 }
 
