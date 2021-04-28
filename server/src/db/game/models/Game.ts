@@ -52,6 +52,9 @@ export class Game extends BaseEntity {
   @JoinColumn({name: 'black_card_id_fk'})
   blackCard: BlackCard
 
+  @Column({nullable: true})
+  black_card_id_fk: number
+
   /**
    * @private currentUserId
    * Holds the id of what to be considered the currentUser
