@@ -74,7 +74,7 @@ export async function deleteGame (user: User): Promise<void> {
     WHERE game_fk = '${gameKey}';
   `)
   await getManager().query(`
-    DELETE FROM player_card_ref
+    DELETE FROM white_card_ref
     WHERE game_key = '${gameKey}';
   `)
   await game.remove()
