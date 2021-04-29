@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinColumn, ManyToOne, Unique, ManyToMany, OneToOne} from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinColumn, ManyToOne, Unique, ManyToMany, OneToOne } from "typeorm"
 import { User } from "../../user/models/User"
 import { WhiteCard } from "./WhiteCard"
 
@@ -12,8 +12,8 @@ export enum CardState {
   USED = 'used',
 }
 
-@Entity('player_card_ref')
-export class PlayerCard extends BaseEntity {
+@Entity('white_card_ref')
+export class WhiteCardRef extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
 

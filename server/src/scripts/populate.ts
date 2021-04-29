@@ -1,28 +1,28 @@
 import fs from 'fs'
-import {getConnection} from 'typeorm'
-import {WhiteCard} from '../db/card/models/WhiteCard'
 
-
-async function addWhiteCardsToDb() {
-  try {
-    getConnection()
-    fs.readFile('./src/scripts/cards.json', 'utf-8', async (err, rawData) => {
-      const cards = JSON.parse(rawData.toString()).white
-      const keys = Object.keys(cards)
-      for(let i = 0; i < keys.length; i++) {
-        const key = keys[i]
-        const text = cards[key].content
-        const existingCard = await WhiteCard.findOne({text: text})
-        if(!existingCard) {
-          const card = new WhiteCard()
-          card.text = text
-          await card.save()
-        }
-      }
-      console.log('added all cards')
+async function getCardsArrayFromJson(type: 'black' | 'white'): Promise<any[]> {
+  return new Promise(resolve => {
+    fs.readFile('./src/scripts/cards.json', 'utf-8', (err, rawData) => {
+      resolve(JSON.parse(rawData.toString())[type])
     })
-  } catch(err) {
-    console.error(err)
-  }
+  })
 }
-export default addWhiteCardsToDb
+
+export async function addCardsToDb(type: 'black' | 'white'): Promise<string> {
+  const cards = await getCardsArrayFromJson(type)
+  const keys = Object.keys(cards)
+  let sql = `INSERT INTO ${type}_card (deck, text) VALUES`
+  let values = ''
+  for(let i = 0; i < keys.length; i++) {
+    const key = keys[i]
+    if (!key) continue
+    // @ts-ignore
+    const jsonCard = cards[key]
+    if (!values) {
+      values = `('yobots', '${jsonCard.content}')`
+    } else {
+      values += `,('yobots', '${jsonCard.content}')`
+    }
+  }
+  return sql + values
+}

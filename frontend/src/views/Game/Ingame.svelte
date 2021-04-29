@@ -111,7 +111,7 @@
     </div>
     <div class="main-coll">
       <div class="top-cards">
-        <BlackCard text="I am a black card, select a card to fill in the _ blank."/>
+        <BlackCard text={gameData.blackCard.text}/>
         {#each gameData.users as user}
           {#each user.cards as card}
             {#if getGameState(gameData) !== GameState.DISPLAY_WINNER}
@@ -125,6 +125,7 @@
               {#if card.state === CardState.WINNER}
                 <div class="white-card" on:click={() => handleCardClick(card)}>
                   <WhiteCard text={card.text} cardState={card.state}/>
+
                 </div>
               {/if}
             {/if}

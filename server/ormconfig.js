@@ -5,13 +5,13 @@ module.exports = {
   "username": process.env.PGUSER,
   "password": process.env.PGPASSWORD,
   "database": process.env.PGDATABASE,
-  "synchronize": true,
+  "synchronize": false,
   "logging": false,
   "entities": [
-     "src/**/*.ts"
+     "src/db/**/models/*.ts"
   ],
   "migrations": [
-     "src/migration/**/*.ts"
+     "src/db/migrations/*.ts"
   ],
   "subscribers": [
      "src/subscriber/**/*.ts"

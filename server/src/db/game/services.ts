@@ -15,6 +15,7 @@ const getGameWithRelations = async (key: string): Promise<Game> => {
         'users.cards.white_card',
         'users.game',
         'users.game.round',
+        'blackCard',
       ]
     })
   } catch (err){
