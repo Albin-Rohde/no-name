@@ -25,14 +25,14 @@ Since the game relies on live actions between multiple players, websocket where 
 The backend use `postgres` as its database, and `typeorm` as orm mapper. Read more about the server [here](./server/README.md).
 
 
-## How to start the project
-- clone repo
-- run `docker-compose build`
-- run `docker-compose up`
+## How to start the app
+- git clone <rep_url> - clones the repo
+- run `docker-compose up` - builds and starts the containers
+- run `docker-compose run --rm server sh` - enters shell of server container
+- while in shell run `npm run typeorm migration:run` - runs all migrations
+- Done. The app is now up.
 
 The server will be started on localhost:5000, the frontend on localhost:3000 and postgres can be accessed at localhost:5432
-
-To contribute and add code, running npm i in `/server` and `/frontend` directories is recomended.
 
 
 ## How to play
