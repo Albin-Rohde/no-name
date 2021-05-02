@@ -32,7 +32,7 @@ export interface UserResponse {
   cardWizz?: boolean
   hasPlayed?: boolean
   isHost?: boolean
-  score: number
+  score?: number
 }
 
 export enum CardState {

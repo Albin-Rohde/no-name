@@ -117,15 +117,20 @@
             {#if getGameState(gameData) !== GameState.DISPLAY_WINNER}
               {#if card.state === CardState.PLAYED_HIDDEN || card.state === CardState.PLAYED_SHOW}
                 <div class="white-card" on:click={() => handleCardClick(card)}>
-                  <WhiteCard text={card.text} cardState={card.state}/>
+                  <WhiteCard
+                    text={card.text}
+                    blackCardText={gameData.blackCard.text}
+                    cardState={card.state}/>
                 </div>
               {/if}
             {/if}
             {#if getGameState(gameData) === GameState.DISPLAY_WINNER}
               {#if card.state === CardState.WINNER}
                 <div class="white-card" on:click={() => handleCardClick(card)}>
-                  <WhiteCard text={card.text} cardState={card.state}/>
-
+                  <WhiteCard
+                    text={card.text}
+                    blackCardText={gameData.blackCard.text}
+                    cardState={card.state}/>
                 </div>
               {/if}
             {/if}

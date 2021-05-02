@@ -18,6 +18,9 @@ export async function addCardsToDb(type: 'black' | 'white'): Promise<string> {
     if (!key) continue
     // @ts-ignore
     const jsonCard = cards[key]
+    if (type === 'black' && jsonCard.content.match(/_/g)?.length !== 1) {
+      continue
+    }
     if (!values) {
       values = `('yobots', '${jsonCard.content}')`
     } else {
