@@ -1,5 +1,6 @@
 import { User } from "../user/models/User"
 import { Game } from "./models/Game"
+import {NotFoundError} from "../../error";
 
 
 /**
@@ -29,11 +30,11 @@ const getGameWithRelations = async (key: string): Promise<Game> => {
  * @param userId
  */
 const getGameFromUser = async (userId: number): Promise<Game> => {
-  const user = await User.findOneOrFail(userId, {relations: ['game']})
-  if(!user.game) {
-    throw new Error('No Game on User')
+  const user = await User.findOneOrFail(userId)
+  if(!user.game_fk) {
+    throw new NotFoundError('Game', `<User>${userId} -> game_fk null`)
   }
-  const game = await getGameWithRelations(user.game.key)
+  const game = await getGameWithRelations(user.game_fk)
   game.currentUser = user
   return game
 }

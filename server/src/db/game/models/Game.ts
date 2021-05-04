@@ -4,6 +4,7 @@ import {GameRound} from "./GameRound"
 import {getUnusedBlackCard, getUnusedWhiteCards} from "../../card/services";
 import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {BlackCard} from "../../card/models/BlackCard";
+import {NotFoundError} from "../../error";
 
 @Entity()
 
@@ -67,6 +68,14 @@ export class Game extends BaseEntity {
   private currentUserId: number
 
   /**
+   * Set the currentUser for the Game instance
+   * @param user
+   */
+  public set currentUser(user: User) {
+    this.currentUserId = user.id
+  }
+
+  /**
    * Returns the User instance for the currentUserId private
    */
   public get currentUser(): User {
@@ -78,30 +87,45 @@ export class Game extends BaseEntity {
   }
 
   /**
-   * Set the currentUser for the Game instance
-   * @param user
-   */
-  public set currentUser(user: User) {
-    this.currentUserId = user.id
-  }
-
-  /**
    * Gets all players except the cardWizz
-   * @private
    */
-  private get allPlayers(): User[] {
+  public get allPlayers(): User[] {
     return this.users.filter(user => !user.isCardWizz)
   }
 
   /**
-   * returns a boolean `true` if all players except cardWizz has played
-   * since the cardWizz can not play cards.
-   * @private
+   * Gets all cards from all players except cardWizz
    */
-  private get allPlayersHasPlayed(): boolean {
-    return this.users
-      .filter(user => !user.isCardWizz)
-      .every(user => user.hasPlayed)
+  public get allPlayerCards(): WhiteCardRef[] {
+    return this.allPlayers.flatMap(user => user.cards)
+  }
+
+  /**
+   * Find card on game that match supplied cardId
+   *
+   * Returns a WhiteCardRef on success
+   * @param cardId
+   */
+  public findCard = (cardId: number): WhiteCardRef => {
+    const card = this.users.flatMap(user => user.cards).find(card => card.id === cardId)
+    if (!card) {
+      throw new NotFoundError('WhiteCardRef', cardId)
+    }
+    return card
+  }
+
+  /**
+   * Find user on game that match supplied userId
+   *
+   * Returns a User on success
+   * @param userId
+   */
+  public findUser = (userId: number): User => {
+    const user = this.users.find(user => user.id === userId)
+    if (!user) {
+      throw new NotFoundError('User', userId)
+    }
+    return user
   }
 
   /**
@@ -170,56 +194,5 @@ export class Game extends BaseEntity {
    */
   public newBlackCard = async (): Promise<void> => {
     this.blackCard = await getUnusedBlackCard(this.key)
-  }
-
-  /**
-   * Flip a card that exists in the game.
-   * Implements some additional logic to check that
-   * flipping the card is allowed according to game rules.
-   * @param cardId - Card to be flipped.
-   */
-  public flipCard = async (cardId: number): Promise<void> => {
-    if(!this.allPlayersHasPlayed) {
-      throw new Error('All users must play before flipping')
-    }
-    const card = this.users.flatMap(user => user.cards).find(card => card.id === cardId)
-    if(!card) {
-      throw new Error('Card not found on user')
-    }
-    if(card.state !== CardState.PLAYED_HIDDEN) {
-      throw new Error('Can only flip a hidden played card')
-    }
-    card.state = CardState.PLAYED_SHOW
-    await card.save()
-  }
-
-  /**
-   * Vote for a card that exists in the game.
-   * Implements some additional logic to check that
-   * Voting the card is allowed according to game rules.
-   * @param cardId - Card to be voted on.
-   */
-  public voteCard = async (cardId: number): Promise<void> => {
-    if(!this.allPlayersHasPlayed) {
-      throw new Error('All users must play before voting')
-    }
-    const allCards = this.allPlayers.flatMap(user => user.cards)
-    if(allCards.some(card => card.state === CardState.PLAYED_HIDDEN)) {
-      throw new Error('All cards must be flipped before vote')
-    }
-    const card = allCards.find(card => card.id ===cardId)
-    if(!card) {
-      throw new Error('Card not found in game')
-    }
-    if(card.state !== CardState.PLAYED_SHOW) {
-      throw new Error('Can only vote for a shown played card')
-    }
-    const winningUser = this.users.find(user => user.id === card.user_id_fk)
-    if(!winningUser) {
-      throw new Error('No user found on winning card')
-    }
-    winningUser.score++
-    card.state = CardState.WINNER
-    await card.save()
   }
 }
