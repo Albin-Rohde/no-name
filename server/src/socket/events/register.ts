@@ -35,14 +35,14 @@ export const registerSocketEvents = (io: Server, socket: Socket) => {
 }
 
 /**
- * takes an eventFUnction wrap in in an error handler
+ * takes an eventFunction wrap in in an error handler
  * register the handler on the socket as an eventListener
  *
  * The response from the eventFunction <Game> will be sent
  * to the client as an update event on every successfully event
  *
  * fetches a new Game instance on every event and send it in
- * as argument to the EventFunction
+ * as argument to the eventFunction
  *
  * @param io Socket.io Server instance
  * @param socket Socket.io Socket
@@ -68,7 +68,7 @@ const addListenerWithGame = <T>(
 }
 
 /**
- * takes an eventFUnction wrap in in an error handler
+ * takes an eventFunction wrap in in an error handler
  * register the handler on the socket as an eventListener
  *
  * The response from the eventFunction <Game> will be sent
@@ -97,8 +97,8 @@ const addListener = <T>(
 }
 
 /**
- * Prints the error to stdout and emits
- * a connection_error event with the error message
+ * Emits a update event with the game supplied
+ * Saves the updated game to db before exit.
  *
  * @param io
  * @param game
