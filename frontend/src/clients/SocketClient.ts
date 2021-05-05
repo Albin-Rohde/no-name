@@ -1,6 +1,7 @@
 import {io, Socket} from "socket.io-client";
 import type {CardResponse, GameSocketResponse, UserResponse} from "./ResponseTypes";
 import {CardState} from "./ResponseTypes";
+import { HandleError } from "../utils/decorator";
 
 enum Events {
   GET_GAME = 'get-game',
@@ -64,30 +65,45 @@ export class SocketClient {
     return this.allPlayers.every(user => user.hasPlayed)
   }
 
-  public getGame = () => {
+  private updateGameState = (game: GameSocketResponse) => {
+    // a type of cache to not re-update the state if the new state is the same as current
+    // todo: This might not be needed anymore since we've fixed the issues with the socket
+    if(JSON.stringify(this.game) === JSON.stringify(game)) return false
+    console.log('game: ', game)
+    this.currentUser = game.users.find(user => user.id === this.currentUser.id)
+    this.game = game
+    return true
+  }
+
+  @HandleError
+  public getGame() {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     this.socket.emit(Events.GET_GAME)
   }
 
-  public joinGame = (key: string = this.game.key) => {
+  @HandleError
+  public joinGame(key: string = this.game.key) {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     if(!key && !this.game.key) throw new Error('No gameKey specified.')
     this.socket.emit(Events.JOIN, key)
   }
 
-  public startGame = () => {
+  @HandleError
+  public startGame() {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     this.socket.emit(Events.START)
   }
 
-  public playCard = (card: CardResponse) => {
+  @HandleError
+  public playCard(card: CardResponse) {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     if(!this.currentUser.hasPlayed) {
       this.socket.emit(Events.PLAY_CARD, card.id)
     }
   }
 
-  public flipCard = (card: CardResponse) => {
+  @HandleError
+  public flipCard(card: CardResponse) {
     if(!this.socket) {
       throw new Error('InGameClient not connected to socket.')
     }
@@ -100,7 +116,8 @@ export class SocketClient {
     this.socket.emit(Events.FLIP_CARD, card.id)
   }
 
-  public voteCard = (card: CardResponse) => {
+  @HandleError
+  public voteCard(card: CardResponse) {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     if(!this.allUsersPlayed) {
       throw new Error('All user must play before voting')
@@ -113,18 +130,9 @@ export class SocketClient {
     this.socket.emit(Events.VOTE_CARD, card.id)
   }
 
-  public leaveGame = () => {
+  @HandleError
+  public leaveGame() {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     this.socket.emit(Events.LEAVE_GAME)
-  }
-
-  private updateGameState = (game: GameSocketResponse) => {
-    // a type of cache to not re-update the state if the new state is the same as current
-    // todo: This might not be needed anymore since we've fixed the issues with the socket
-    if(JSON.stringify(this.game) === JSON.stringify(game)) return false
-    console.log('game: ', game)
-    this.currentUser = game.users.find(user => user.id === this.currentUser.id)
-    this.game = game
-    return true
   }
 }
