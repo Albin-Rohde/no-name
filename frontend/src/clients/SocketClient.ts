@@ -41,7 +41,13 @@ export class SocketClient {
       rerenderCb('disconnect')
     })
     this.socket.on('connection_error', (err: string) => {
-      console.error(err)
+      console.error('connection error: ', err)
+    })
+    this.socket.on('server_error', (err: string) => {
+      console.error('server_error: ', err)
+    })
+    this.socket.on('rule_error', (err: string) => {
+      console.error('rule_error', err)
     })
     return new Promise(resolve => {
       this.socket.on('connected', () => {
