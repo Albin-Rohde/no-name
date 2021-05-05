@@ -13,6 +13,7 @@ import {CardState} from "../../../db/card/models/WhiteCardRef";
 export const playCardEvent: EventFunctionWithGame<number> = async(game, cardId: number): Promise<Game> => {
   const card = game.currentUser.findCard(cardId)
   await card.play()
+  game.currentUser.hasPlayed = true
   return game
 }
 
