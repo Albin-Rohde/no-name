@@ -1,6 +1,6 @@
 import { User } from "../user/models/User"
 import { Game } from "./models/Game"
-import {NotFoundError} from "../../error";
+import { NotFoundError } from "../error";
 
 
 /**
