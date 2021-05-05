@@ -38,7 +38,7 @@
 
   const rerender = (err: string | undefined = undefined) => {
     if(err) {
-      console.log(err)
+      console.error(err)
       view = 'dashboard'
       return
     }
@@ -50,8 +50,6 @@
     }
     gameData = socket.game
     currentUser = socket.currentUser
-    console.log('after rerender')
-    console.log('User', currentUser)
   }
 
   const checkGameSession = async () => {
@@ -68,7 +66,7 @@
   } else {
     checkGameSession()
   }
-  
+
   const onGameCreated = async (key: string) => {
     socket.joinGame(key)
   }
@@ -76,7 +74,7 @@
 </script>
 
 <div class="main-grid">
-  <Navbar 
+  <Navbar
     username={currentUser.username}
     isHost={currentUser.isHost}
     gameActive={!!gameData?.key}
@@ -85,7 +83,7 @@
     on:leave-game={leaveGame}
   />
   {#if view === 'dashboard'}
-    <Dashboard 
+    <Dashboard
       on:logout={() => dispatch('logout')}
       on:create={() => navigate('create')}
       on:join={() => navigate('join')}
@@ -99,7 +97,7 @@
     />
   {/if}
     {#if view === 'lobby' && gameData?.key}
-    <Lobby 
+    <Lobby
       gameData={gameData}
       socket={socket}
       on:logout={() => dispatch('logout')}

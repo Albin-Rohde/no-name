@@ -2,6 +2,7 @@ import {io, Socket} from "socket.io-client";
 import type {CardResponse, GameSocketResponse, UserResponse} from "./ResponseTypes";
 import {CardState} from "./ResponseTypes";
 import { HandleError } from "../utils/decorator";
+import autoBind from "auto-bind";
 
 enum Events {
   GET_GAME = 'get-game',
@@ -22,6 +23,7 @@ export class SocketClient {
 
   constructor(user: UserResponse) {
     this.currentUser = user
+    autoBind(this)
   }
 
   public connect = async (rerenderCb: CallableFunction): Promise<void> => {
@@ -48,7 +50,7 @@ export class SocketClient {
       console.error('server_error: ', err)
     })
     this.socket.on('rule_error', (err: string) => {
-      console.error('rule_error', err)
+      console.error('rule_error: ', err)
     })
     return new Promise(resolve => {
       this.socket.on('connected', () => {
@@ -69,7 +71,6 @@ export class SocketClient {
     // a type of cache to not re-update the state if the new state is the same as current
     // todo: This might not be needed anymore since we've fixed the issues with the socket
     if(JSON.stringify(this.game) === JSON.stringify(game)) return false
-    console.log('game: ', game)
     this.currentUser = game.users.find(user => user.id === this.currentUser.id)
     this.game = game
     return true
@@ -123,7 +124,6 @@ export class SocketClient {
       throw new Error('All user must play before voting')
     }
     const allCards = this.allPlayers.flatMap(user => user.cards)
-    console.log(allCards.map(c => c.state))
     if(allCards.some(card => card.state === CardState.PLAYED_HIDDEN)) {
       throw new Error('All cards must be flipped before vote')
     }
