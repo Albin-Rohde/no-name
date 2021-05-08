@@ -1,7 +1,8 @@
-import {Server, Socket} from "socket.io";
+import {Server} from "socket.io";
 import {getUserWithRelation} from "../db/user/services";
+import {SocketWithSession} from "./index";
 
-export const authSocketUser = async (socket: Socket, io: Server, next: any) => {
+export const authSocketUser = async (socket: SocketWithSession, io: Server, next: any) => {
   if(!socket.request.session.user) {
     throw new Error('User required on session')
   }

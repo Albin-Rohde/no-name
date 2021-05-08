@@ -1,9 +1,10 @@
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { userSession } from "../rest/server";
 import http from "http";
 import { ServerOptions } from "../app";
 import { authSocketUser } from "./authenticate";
 import { registerSocketEvents } from "./events/register";
+import {SocketWithSession} from "./index";
 
 /**
  * Creates a socket.io websocket server
@@ -22,8 +23,8 @@ export function createSocketServer(server: http.Server, options: ServerOptions) 
     transports: ['websocket']
   })
   io.use((socket: any, next: any) => userSession(socket.request, {} as any, next))
-  io.on('connection', async (socket: Socket) => {
-    io.use((socket: Socket, next: any) => authSocketUser(socket, io, next))
+  io.on('connection', async (socket: SocketWithSession) => {
+    io.use((socket: any, next: any) => authSocketUser(socket, io, next))
     registerSocketEvents(io, socket)
     socket.emit('connected')
   })

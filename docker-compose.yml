@@ -13,6 +13,9 @@ services:
       - PGUSER=nodus
       - PGPASSWORD=pass
       - PGDATABASE=db_1
+      - HOST=0.0.0.0
+      - PORT=5000
+      - CLIENT_URL=http://192.168.1.249
     links:
       - db
       - redis
@@ -22,14 +25,12 @@ services:
     container_name: pg_db
     image: postgres
     restart: always
-    ports: 
+    ports:
       - '5432:5432'
     environment:
       - POSTGRES_USER=nodus
       - POSTGRES_PASSWORD=pass
       - POSTGRES_DB=db_1
-    #volumes:
-      #- ./server/postgres-data:/var/lib/postgresql/data
   frontend:
     container_name: frontend
     restart: always

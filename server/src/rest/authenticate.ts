@@ -18,7 +18,7 @@ const authUser = async (sessionUser: User) => {
 export const loginRequired = async (req: Request, res: Response, next: NextFunction) => {
   try {
     req.session.user = await authUser(req.session.user)
-    req.session.save()
+    req.session.save(() => null)
     next()
   } catch(err) {
     res.status(401).json(err)
@@ -32,7 +32,7 @@ export const gameRequired = async (req: Request, res: Response, next: NextFuncti
       return res.status(401).json('GAME_REQUIRED')
     }
     req.session.user = user
-    req.session.save()
+    req.session.save(() => null)
     return next()
   } catch(err) {}
 }

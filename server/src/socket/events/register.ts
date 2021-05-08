@@ -1,4 +1,4 @@
-import {Server, Socket} from "socket.io";
+import {Server} from "socket.io";
 import {
   playCardEvent,
   flipCardEvent,
@@ -14,6 +14,7 @@ import { GameRound } from "../../db/game/models/GameRound";
 import { normalizeGameResponse } from "./response";
 import { getGameFromUser } from "../../db/game/services";
 import { GameRuleError } from "../error";
+import {SocketWithSession} from "../index";
 
 /**
  * Register events to the socket
@@ -23,7 +24,7 @@ import { GameRuleError } from "../error";
  * @param io Socket.io Server instance
  * @param socket Socket.io Socket
  */
-export const registerSocketEvents = (io: Server, socket: Socket) => {
+export const registerSocketEvents = (io: Server, socket: SocketWithSession) => {
   addListener<string>(io, socket, Events.JOIN_GAME, joinGameEvent)
   addListenerWithGame<never>(io, socket, Events.GET_GAME, getGameEvent)
   addListenerWithGame<never>(io, socket, Events.START_GAME, startGameEvent)
@@ -51,12 +52,13 @@ export const registerSocketEvents = (io: Server, socket: Socket) => {
  */
 const addListenerWithGame = <T>(
   io: Server,
-  socket: Socket,
+  socket: SocketWithSession,
   event: Events,
   eventFn: EventFunctionWithGame<T>,
 ): void => {
   async function eventCallback(...args: T[]) {
     try {
+      // @ts-ignore
       const game = await getGameFromUser(socket.request.session.user.id)
       await eventFn(game, ...args)
         .then((game) => emitUpdateEvent(io, game))
@@ -81,7 +83,7 @@ const addListenerWithGame = <T>(
  */
 const addListener = <T>(
   io: Server,
-  socket: Socket,
+  socket: SocketWithSession,
   event: Events,
   eventFn: EventFunction<T>,
 ): void => {
@@ -115,7 +117,7 @@ const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
  * @param err
  * @param socket
  */
-const handleError = (err: Error, socket: Socket) => {
+const handleError = (err: Error, socket: SocketWithSession) => {
   if (err instanceof GameRuleError) {
     socket.emit('rule_error', err.message)
   } else {

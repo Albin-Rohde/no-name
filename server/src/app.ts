@@ -1,7 +1,11 @@
-import http from "http";
+import * as http from "http";
+import "reflect-metadata";
+import dotenv from 'dotenv'
 import { createSocketServer } from "./socket";
 import { createRestServer } from "./rest";
 import { createConnection } from "typeorm";
+
+dotenv.config()
 
 export interface ServerOptions {
   host: string
@@ -16,12 +20,13 @@ export interface ServerOptions {
  */
 function startServer() {
   const options: ServerOptions = {
-    host: process.env.host || 'http://localhost',
-    port: Number(process.env.port) || 5000,
-    clientUrl: process.env.clientUrl || 'http://localhost:3000',
+    host: process.env.HOST,
+    port: Number(process.env.PORT),
+    clientUrl: process.env.CLIENT_URL,
   }
   createConnection().then(async () => {
     console.log('connected to db')
+    console.log(options)
     const server = createServer(options)
     server.listen(options.port, () => {
       console.log(`server started on port ${options.port}`)

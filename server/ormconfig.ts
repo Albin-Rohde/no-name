@@ -8,12 +8,12 @@ module.exports = {
   "synchronize": false,
   "logging": false,
   "entities": [
-     "src/db/**/models/*.ts"
+    "build/src/db/**/models/*.js"
   ],
   "migrations": [
-     "src/db/migrations/*.ts"
+    "build/src/db/migrations/*.js"
   ],
   "subscribers": [
-     "src/subscriber/**/*.ts"
+    "build/src/subscriber/**/*.js"
   ]
 }
