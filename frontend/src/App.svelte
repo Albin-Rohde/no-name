@@ -4,11 +4,12 @@
   import UserClient from './clients/UserClient';
   import GameContext from './views/Game/GameContext.svelte';
   import type {UserData} from './clients/ResponseTypes'
+  import * as process from "process";
 
   let view = 'login'
   let errorMsg = ''
-  const userClient: UserClient = new UserClient()
-
+  console.log(process.env.API_URL)
+  const userClient: UserClient = new UserClient(process.env.API_URL)
   const navigate = location => {
     errorMsg = ''
     view = location
@@ -32,7 +33,7 @@
       await userClient.login(detail.email, detail.password)
       navigate('game')
     } catch(error) {
-      if(error.message = 'AUTHENTICATION_FAILED') {
+      if(error.message == 'AUTHENTICATION_FAILED') {
         errorMsg = 'Wrong password or email.'
       }
     }

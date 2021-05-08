@@ -15,13 +15,14 @@ enum Events {
 }
 
 export class SocketClient {
-  private baseUrl = 'http://localhost:5000'
+  private baseUrl: string
   socket: Socket
 
   game: GameSocketResponse
   currentUser: UserResponse
 
-  constructor(user: UserResponse) {
+  constructor(url: string, user: UserResponse) {
+    this.baseUrl = url
     this.currentUser = user
     autoBind(this)
   }

@@ -1,5 +1,6 @@
-import {Server, Socket} from "socket.io";
+import {Server} from "socket.io";
 import {Game} from "../../../db/game/models/Game";
+import {SocketWithSession} from "../../index";
 
 export enum Events {
   GET_GAME = 'get-game',
@@ -11,7 +12,7 @@ export enum Events {
   VOTE_CARD = 'vote-card',
 }
 
-export type EventFunction<T> = (io: Server, socket: Socket, ...args: T[]) => Promise<Game>
+export type EventFunction<T> = (io: Server, socket: SocketWithSession, ...args: T[]) => Promise<Game>
 
 export type EventFunctionWithGame<T> = (game: Game, ...args: T[]) => Promise<Game>
 

@@ -1,26 +1,26 @@
 import axios from 'axios'
-
 import type { UserData, UserResponse, CardResponse } from './ResponseTypes'
 
 export default class UserClient {
-  private baseUrl = 'http://localhost:5000'
+  private readonly baseUrl: string
   private route = '/user'
-  
+
   id: number
   email: string
   password: string
   username: string
   cards: CardResponse[] = []
   isActive: boolean = false
-  
-  constructor(user: UserData | undefined = undefined) {
+
+  constructor(url: string, user: UserData | undefined = undefined) {
+    this.baseUrl = url
     if(user) {
       this.id = user.id
       this.username = user.username
       this.cards = user.cards
     }
   }
-  
+
   login = async (email: string = this.email, password: string = this.password) => {
     this.email = email
     this.password = password
@@ -89,13 +89,14 @@ export default class UserClient {
 
   private makeRequest = async (url: string, method: 'put' | 'get' | 'post' | 'delete', data: object = {}) => {
     try {
+      console.log('make request with url: ', url)
       const res: UserData = await axios({
         withCredentials: true,
         url,
         method,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "http://localhost:5000",
+          "Access-Control-Allow-Origin": this.baseUrl,
         },
         data: data
       }).then(r => r.data)
