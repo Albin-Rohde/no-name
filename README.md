@@ -26,13 +26,23 @@ The backend use `postgres` as its database, and `typeorm` as orm mapper. Read mo
 
 
 ## How to start the app
-- git clone <rep_url> - clones the repo
-- run `docker-compose up` - builds and starts the containers
-- will start app in production mode on port 80
-- run docker-compose up -d redis db followed by npm run dev in both server and frontend
-to run app in dev mode.
+To start in production
+- `docker-compose build`
+- `docker-compose up`
 
-The server will be started on localhost:5000, the frontend on localhost:3000 and postgres can be accessed at localhost:5432
+frontend will start on 0.0.0.0:80
+backend will start on localhost:5000
+
+To start in dev
+- `docker-compose up db redis`
+- From frontend root:
+  - `npm run dev`
+- From server root:
+  - `npm run typeorm migration:run`
+  - `npm run dev`
+
+frontend will start on localhost:3000
+backend will start on localhost:5000
 
 
 ## How to play
