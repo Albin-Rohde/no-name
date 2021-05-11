@@ -5,6 +5,8 @@ services:
     container_name: server
     restart: always
     build: ./server
+    networks:
+      - local
     ports:
       - '5000:5000'
     links:
@@ -12,30 +14,61 @@ services:
       - redis
     volumes:
       - './server/src:/usr/src/server/src'
+
   db:
     container_name: pg_db
     image: postgres
     restart: always
+    networks:
+      - local
     ports:
       - '5432:5432'
-    environment:
-      - POSTGRES_USER=nodus
-      - POSTGRES_PASSWORD=pass
-      - POSTGRES_DB=db_1
+    env_file:
+      - '.env'
+
   frontend:
     container_name: frontend
     restart: always
     build: ./frontend
+    networks:
+      - local
     ports:
       - '3000:5000'
     expose:
       - '5000'
     volumes:
       - './frontend/src:/usr/src/frontend/src'
+
   redis:
     image: "redis:alpine"
     command: redis-server
+    networks:
+      - local
     ports:
       - '6379:6379'
     environment:
       - REDIS_REPLICATION_MODE=master
+
+  nginx:
+    image: nginx:latest
+    container_name: production_nginx
+    depends_on:
+      - db
+      - redis
+      - frontend
+      - server
+    networks:
+      - local
+      - public
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      #- '/etc/letsencrypt/:/etc/letsencrypt/'
+
+networks:
+  local:
+    driver: bridge
+  public:
+    driver: bridge
