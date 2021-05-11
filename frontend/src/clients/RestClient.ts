@@ -1,16 +1,16 @@
 import axios from 'axios'
 import type {GameResponse} from "./ResponseTypes";
+// @ts-ignore
+import * as process from "process";
 
 type routes = '/game' | '/user'
 type httpMethods = 'put' | 'get' | 'post' | 'delete'
 
 export default class RestClient {
-  private readonly baseUrl: string
+  private readonly baseUrl = `${process.env.API_BASE_URL}${process.env.API_EXTENSION || ''}`
   private readonly route: routes
 
-  constructor(url: string, route: routes) {
-    console.log('constructor: ', url, route)
-    this.baseUrl = url
+  constructor(route: routes) {
     this.route = route
   }
   makeRequest = async (method: httpMethods, data: object = {}, uri: string = ''): Promise<GameResponse> => {

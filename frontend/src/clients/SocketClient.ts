@@ -3,6 +3,8 @@ import type {CardResponse, GameSocketResponse, UserResponse} from "./ResponseTyp
 import {CardState} from "./ResponseTypes";
 import { HandleError } from "../utils/decorator";
 import autoBind from "auto-bind";
+// @ts-ignore
+import * as process from "process";
 
 enum Events {
   GET_GAME = 'get-game',
@@ -15,14 +17,13 @@ enum Events {
 }
 
 export class SocketClient {
-  private baseUrl: string
+  private readonly baseUrl: string = process.env.API_BASE_URL
   socket: Socket
 
   game: GameSocketResponse
   currentUser: UserResponse
 
-  constructor(url: string, user: UserResponse) {
-    this.baseUrl = url
+  constructor(user: UserResponse) {
     this.currentUser = user
     autoBind(this)
   }

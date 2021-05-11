@@ -16,7 +16,7 @@
   let view: views = 'dashboard'
 
   export let userClient: UserClientType
-  const socket = new SocketClient(process.env.API_URL, userClient.getData())
+  const socket = new SocketClient(userClient.getData())
 
   let gameData: GameSocketResponse
   let currentUser: UserResponse = userClient.getData()
@@ -26,8 +26,7 @@
   }
 
   const deleteGame = () => {
-    console.log('del game', process.env.API_URL)
-    const gameRestClient = new RestClient(process.env.API_URL, '/game')
+    const gameRestClient = new RestClient('/game')
     gameRestClient.makeRequest('delete')
     navigate('dashboard')
   }

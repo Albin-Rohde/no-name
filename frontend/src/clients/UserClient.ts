@@ -1,8 +1,10 @@
 import axios from 'axios'
 import type { UserData, UserResponse, CardResponse } from './ResponseTypes'
+// @ts-ignore
+import * as process from "process";
 
 export default class UserClient {
-  private readonly baseUrl: string
+  private readonly baseUrl = `${process.env.API_BASE_URL}${process.env.API_EXTENSION || ''}`
   private route = '/user'
 
   id: number
@@ -12,8 +14,7 @@ export default class UserClient {
   cards: CardResponse[] = []
   isActive: boolean = false
 
-  constructor(url: string, user: UserData | undefined = undefined) {
-    this.baseUrl = url
+  constructor(user: UserData | undefined = undefined) {
     if(user) {
       this.id = user.id
       this.username = user.username
@@ -89,7 +90,6 @@ export default class UserClient {
 
   private makeRequest = async (url: string, method: 'put' | 'get' | 'post' | 'delete', data: object = {}) => {
     try {
-      console.log('make request with url: ', url)
       const res: UserData = await axios({
         withCredentials: true,
         url,

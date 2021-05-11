@@ -23,7 +23,7 @@
   }
 
   const createGame = async () => {
-    const rest = new RestClient(process.env.API_URL, '/game')
+    const rest = new RestClient('/game')
     const gameData: GameResponse = await rest.makeRequest('post', gameSettings)
     onGameCreated(gameData.key)
   }
