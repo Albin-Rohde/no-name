@@ -8,7 +8,6 @@ import { createConnection } from "typeorm";
 dotenv.config()
 
 export interface ServerOptions {
-  host: string
   port: number
   clientUrl: string
 }
@@ -20,7 +19,6 @@ export interface ServerOptions {
  */
 function startServer() {
   const options: ServerOptions = {
-    host: process.env.HOST,
     port: Number(process.env.PORT),
     clientUrl: process.env.CLIENT_URL,
   }

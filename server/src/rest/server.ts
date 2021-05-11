@@ -40,7 +40,7 @@ export function createRestServer(options: ServerOptions) {
   app.use(bodyParser.json())
   app.use(cookieParser())
   app.set('trust proxy', true)
-  app.use(cors({origin: options.clientUrl,credentials: true}))
+  app.use(cors({origin: options.clientUrl, credentials: true}))
   app.use((_req, res, next) => {
     res.header({'Access-Control-Allow-Headers': options.clientUrl})
     next()
