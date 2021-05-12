@@ -3,7 +3,6 @@ import { User } from "../../user/models/User"
 import { WhiteCard } from "./WhiteCard"
 
 
-
 export enum CardState {
   HAND = 'hand',
   PLAYED_HIDDEN = 'played_hidden',
@@ -42,4 +41,28 @@ export class WhiteCardRef extends BaseEntity {
 
   @Column({name: 'user_id_fk', nullable: false})
   user_id_fk: number
+
+  /**
+   * Set self to state PLAYED_HIDDEN
+   */
+  public play = async () => {
+    this.state = CardState.PLAYED_HIDDEN
+    await this.save()
+  }
+
+  /**
+   * Set self to state PLAYED_SHOW
+   */
+  public flip = async () => {
+    this.state = CardState.PLAYED_SHOW
+    await this.save()
+  }
+
+  /**
+   * Set self to state WINNER
+   */
+  public winner = async () => {
+    this.state = CardState.WINNER
+    await this.save()
+  }
 }

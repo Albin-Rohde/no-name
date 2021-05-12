@@ -13,6 +13,7 @@ import { Game } from "../../db/game/models/Game";
 import { GameRound } from "../../db/game/models/GameRound";
 import { normalizeGameResponse } from "./response";
 import { getGameFromUser } from "../../db/game/services";
+import { GameRuleError } from "../error";
 
 /**
  * Register events to the socket
@@ -34,14 +35,14 @@ export const registerSocketEvents = (io: Server, socket: Socket) => {
 }
 
 /**
- * takes an eventFUnction wrap in in an error handler
+ * takes an eventFunction wrap in in an error handler
  * register the handler on the socket as an eventListener
  *
  * The response from the eventFunction <Game> will be sent
  * to the client as an update event on every successfully event
  *
  * fetches a new Game instance on every event and send it in
- * as argument to the EventFunction
+ * as argument to the eventFunction
  *
  * @param io Socket.io Server instance
  * @param socket Socket.io Socket
@@ -60,15 +61,14 @@ const addListenerWithGame = <T>(
       await eventFn(game, ...args)
         .then((game) => emitUpdateEvent(io, game))
     } catch (err) {
-      console.error(err)
-      socket.emit('connection_error', err.message)
+      handleError(err, socket)
     }
   }
   socket.on(event, eventCallback)
 }
 
 /**
- * takes an eventFUnction wrap in in an error handler
+ * takes an eventFunction wrap in in an error handler
  * register the handler on the socket as an eventListener
  *
  * The response from the eventFunction <Game> will be sent
@@ -90,16 +90,15 @@ const addListener = <T>(
       eventFn(io, socket, ...args)
         .then((game) => emitUpdateEvent(io, game))
     } catch (err) {
-      console.error(err)
-      socket.emit('connection_error', err.message)
+      handleError(err, socket)
     }
   }
   socket.on(event, eventCallback)
 }
 
 /**
- * Prints the error to stdout and emits
- * a connection_error event with the error message
+ * Emits a update event with the game supplied
+ * Saves the updated game to db before exit.
  *
  * @param io
  * @param game
@@ -109,4 +108,18 @@ const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
   await game.save()
   const currentRound = await GameRound.findOne({game_key: game.key, round_number: game.current_round})
   io.in(game.key).emit('update', normalizeGameResponse(game, currentRound))
+}
+
+/**
+ * Error catcher for all errors thrown by socket eventHandlers
+ * @param err
+ * @param socket
+ */
+const handleError = (err: Error, socket: Socket) => {
+  if (err instanceof GameRuleError) {
+    socket.emit('rule_error', err.message)
+  } else {
+    console.error(err)
+    socket.emit('server_error', 'Internal Server Error')
+  }
 }

@@ -1,5 +1,7 @@
 import {Game} from "../../../db/game/models/Game";
 import {EventFunctionWithGame} from "./index";
+import { NotAllowedError} from "../..";
+import {CardState} from "../../../db/card/models/WhiteCardRef";
 
 /**
  * Play card event
@@ -9,7 +11,9 @@ import {EventFunctionWithGame} from "./index";
  * @param cardId - Card to play
  */
 export const playCardEvent: EventFunctionWithGame<number> = async(game, cardId: number): Promise<Game> => {
-  await game.currentUser.playCard(cardId)
+  const card = game.currentUser.findCard(cardId)
+  await card.play()
+  game.currentUser.hasPlayed = true
   return game
 }
 
@@ -22,24 +26,39 @@ export const playCardEvent: EventFunctionWithGame<number> = async(game, cardId: 
  */
 export const flipCardEvent: EventFunctionWithGame<number> = async(game, cardId: number): Promise<Game> => {
   if(!game.currentUser.isCardWizz) {
-    throw new Error('Only card wizz can flip card')
+    throw new NotAllowedError('Only card wizz can flip card')
   }
-  await game.flipCard(cardId)
+  if (!game.allPlayers.every(user => user.hasPlayed)) {
+    throw new NotAllowedError('ALl user must play before any cards can be flipped')
+  }
+  const card = game.findCard(cardId)
+  await card.flip()
   return game
 }
 
 /**
  * Vote card event
- * Will vote for thr card on the game
- * that the user it attached to if allowed by game
- * rules.
+ * Will vote for a card in the game that the user it attached to
+ * if allowed by game rules.
  * @param game
  * @param cardId
  */
 export const voteCardEvent: EventFunctionWithGame<number> = async(game, cardId: number): Promise<Game> => {
   if(!game.currentUser.isCardWizz) {
-    throw new Error('Only card wizz can vote card')
+    throw new NotAllowedError('Only card wizz can vote card')
   }
-  await game.voteCard(cardId)
+  if (!game.allPlayers.every(user => user.hasPlayed)) {
+    throw new NotAllowedError('ALl user must play before voting')
+  }
+  if(game.allPlayerCards.some(card => card.state === CardState.PLAYED_HIDDEN)) {
+    throw new NotAllowedError('All cards must be flipped before voting')
+  }
+  const card = game.findCard(cardId)
+  if(card.state !== CardState.PLAYED_SHOW) {
+    throw new NotAllowedError('Can only vote for a shown played card')
+  }
+  const winningUser = game.findUser(card.user_id_fk)
+  winningUser.score += 1
+  await card.winner()
   return game
 }

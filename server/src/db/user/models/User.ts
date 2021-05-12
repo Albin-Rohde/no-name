@@ -11,8 +11,9 @@ import {
   PrimaryGeneratedColumn,
   Unique
 } from "typeorm"
-import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
+import {WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {Game} from '../../game/models/Game'
+import {NotFoundError} from "../../error";
 
 @Entity({name: "player"})
 @Unique(["email"])
@@ -58,20 +59,6 @@ export class User extends BaseEntity {
   deleted_at: string
 
   /**
-   * Plays a card, Sets the card to played state
-   * @param cardId
-   */
-  public playCard = async (cardId: number): Promise<void> => {
-    const card = this.cards.find(card => card.id === cardId)
-    if(!card) {
-      throw new Error('Card not found on user')
-    }
-    card.state = CardState.PLAYED_HIDDEN
-    this.hasPlayed = true
-    await card.save()
-  }
-
-  /**
    * Hybrid property, boolean if the user is host over a geme
    */
   get isHost(): boolean {
@@ -84,5 +71,19 @@ export class User extends BaseEntity {
    */
   get isCardWizz(): boolean {
     return this.id === this.game?.round?.card_wizz_user_id_fk
+  }
+
+  /**
+   * Find card on user that match supplied cardId
+   *
+   * Returns a WhiteCardRef on success
+   * @param cardId
+   */
+  public findCard = (cardId: number): WhiteCardRef => {
+    const card = this.cards.find(card => card.id === cardId)
+    if (!card) {
+      throw new NotFoundError('WhiteCardRef', cardId)
+    }
+    return card
   }
 }

@@ -3,6 +3,7 @@ import {getUserWithRelation} from "../../../db/user/services";
 import {Game} from "../../../db/game/models/Game";
 import {EventFunction, EventFunctionWithGame} from "./index";
 import {getGameWithRelations} from "../../../db/game/services";
+import {GameRuleError, GameStateError} from "../..";
 
 
 /**
@@ -34,11 +35,11 @@ export const joinGameEvent: EventFunction<string> = async (io: Server, socket: S
  * @param game
  */
 export const startGameEvent: EventFunctionWithGame<never> = async (game: Game): Promise<Game> => {
-  if(game.started) {
-    throw new Error('Game already started')
+  if (game.started) {
+    throw new GameStateError('Game already started')
   }
-  if(!game.currentUser.isHost) {
-    throw new Error('User is not host, only host can start game')
+  if (!game.currentUser.isHost) {
+    throw new GameRuleError('User is not host, only host can start game')
   }
   game.started = true
   await Promise.all([
