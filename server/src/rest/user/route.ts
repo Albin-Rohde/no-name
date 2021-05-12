@@ -18,7 +18,7 @@ userRouter.post('/login', async (req: Request, res: Response) => {
   try {
     const user = await login(req.body)
     req.session.user = user
-    req.session.save()
+    req.session.save(() => null)
     res.json(user)
   } catch(err) {
     return res.status(400).json(err.message)
@@ -26,14 +26,15 @@ userRouter.post('/login', async (req: Request, res: Response) => {
 })
 
 userRouter.post('/logout', loginRequired, async (req: Request, res: Response): Promise<void> => {
-  return req.session.destroy(() => res.json())
+  req.session.destroy(() => res.json())
+  return
 })
 
 userRouter.post('/register', async (req: Request, res: Response) => {
   try {
     const user = await register(req.body)
     req.session.user = user
-    req.session.save()
+    req.session.save(() => null)
     res.json(user)
   } catch(err) {
     return res.status(400).json(err.message)

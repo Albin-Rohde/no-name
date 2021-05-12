@@ -2,29 +2,11 @@ import express, {Application} from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import session, { Cookie } from "express-session";
-import { User } from "../db/user/models/User";
+import session from "express-session";
 import { ServerOptions } from "../app";
 import userRoute from "./user/route";
 import gameRouter from "./game/route";
-
-// TODO: figure this out in a better way
-// NOTE: needed for typing of user on request.session
-declare module 'http' {
-  interface IncomingMessage {
-    session: {
-      user: User
-      id: string
-      cookie: Cookie
-      regenerate: ((err?: any) => void)
-      destroy: ((err?: any) => void)
-      reload: ((err?: any) => void)
-      resetMaxAge: () => void
-      save: ((err?: any) => void)
-      touch: () => void
-    }
-  }
-}
+import {User} from "../db/user/models/User";
 
 export const userSession = session({
   name: 'sid',
@@ -39,6 +21,14 @@ export const userSession = session({
   }
 })
 
+declare module 'express-session' {
+  export interface SessionData {
+    user: User
+    destroy: () => void
+    save: () => void
+  }
+}
+
 /**
  * @param options Port and Host options to run rest server on
  *
@@ -50,7 +40,7 @@ export function createRestServer(options: ServerOptions) {
   app.use(bodyParser.json())
   app.use(cookieParser())
   app.set('trust proxy', true)
-  app.use(cors({origin: options.clientUrl,credentials: true}))
+  app.use(cors({origin: options.clientUrl, credentials: true}))
   app.use((_req, res, next) => {
     res.header({'Access-Control-Allow-Headers': options.clientUrl})
     next()

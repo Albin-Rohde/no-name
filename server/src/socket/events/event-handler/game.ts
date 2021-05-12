@@ -1,9 +1,9 @@
-import {Server, Socket} from "socket.io";
+import {Server} from "socket.io";
 import {getUserWithRelation} from "../../../db/user/services";
 import {Game} from "../../../db/game/models/Game";
 import {EventFunction, EventFunctionWithGame} from "./index";
 import {getGameWithRelations} from "../../../db/game/services";
-import {GameRuleError, GameStateError} from "../..";
+import {GameRuleError, GameStateError, SocketWithSession} from "../..";
 
 
 /**
@@ -21,7 +21,7 @@ export const getGameEvent: EventFunctionWithGame<never> = async(game): Promise<G
  * @param socket - live socket
  * @param key - gameKey refering to the game to join
  */
-export const joinGameEvent: EventFunction<string> = async (io: Server, socket: Socket, key): Promise<Game> => {
+export const joinGameEvent: EventFunction<string> = async (io: Server, socket: SocketWithSession, key): Promise<Game> => {
   const game = await getGameWithRelations(key)
   const user = await getUserWithRelation(socket.request.session.user.id)
   game.addPlayer(user)

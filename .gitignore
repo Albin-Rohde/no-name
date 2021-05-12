@@ -1,7 +1,7 @@
 # dotenv environment variables file
 *.env
 *.env.test
-
+*.env.docker
 # config
 *config
 

@@ -1,18 +1,19 @@
 import axios from 'axios'
-
 import type { UserData, UserResponse, CardResponse } from './ResponseTypes'
+// @ts-ignore
+import * as process from "process";
 
 export default class UserClient {
-  private baseUrl = 'http://localhost:5000'
+  private readonly baseUrl = `${process.env.API_BASE_URL}${process.env.API_EXTENSION || ''}`
   private route = '/user'
-  
+
   id: number
   email: string
   password: string
   username: string
   cards: CardResponse[] = []
   isActive: boolean = false
-  
+
   constructor(user: UserData | undefined = undefined) {
     if(user) {
       this.id = user.id
@@ -20,7 +21,7 @@ export default class UserClient {
       this.cards = user.cards
     }
   }
-  
+
   login = async (email: string = this.email, password: string = this.password) => {
     this.email = email
     this.password = password
@@ -95,7 +96,7 @@ export default class UserClient {
         method,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "http://localhost:5000",
+          "Access-Control-Allow-Origin": this.baseUrl,
         },
         data: data
       }).then(r => r.data)

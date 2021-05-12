@@ -8,7 +8,6 @@
   let view = 'login'
   let errorMsg = ''
   const userClient: UserClient = new UserClient()
-
   const navigate = location => {
     errorMsg = ''
     view = location
@@ -32,7 +31,7 @@
       await userClient.login(detail.email, detail.password)
       navigate('game')
     } catch(error) {
-      if(error.message = 'AUTHENTICATION_FAILED') {
+      if(error.message == 'AUTHENTICATION_FAILED') {
         errorMsg = 'Wrong password or email.'
       }
     }

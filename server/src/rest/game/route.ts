@@ -14,7 +14,7 @@ gameRouter.post('/', async (req: Request, res: Response) => {
   try{
     const game = await createNewGame(req.session.user, req.body)
     req.session.user.game = game
-    req.session.save()
+    req.session.save(() => null)
     res.json(game)
   } catch(err) {
     res.status(500).json(err)
@@ -24,7 +24,7 @@ gameRouter.post('/', async (req: Request, res: Response) => {
 gameRouter.delete('/', gameRequired, async (req: Request, res: Response) => {
   try {
     await deleteGame(req.session.user)
-    req.session.save()
+    req.session.save(() => null)
     res.json()
   } catch(err) {
     res.status(500).json(err)

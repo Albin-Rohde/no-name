@@ -1,12 +1,14 @@
 import axios from 'axios'
 import type {GameResponse} from "./ResponseTypes";
+// @ts-ignore
+import * as process from "process";
 
 type routes = '/game' | '/user'
 type httpMethods = 'put' | 'get' | 'post' | 'delete'
 
 export default class RestClient {
-  private baseUrl = 'http://localhost:5000'
-  private route: routes
+  private readonly baseUrl = `${process.env.API_BASE_URL}${process.env.API_EXTENSION || ''}`
+  private readonly route: routes
 
   constructor(route: routes) {
     this.route = route
@@ -24,6 +26,7 @@ export default class RestClient {
         data: data
       }).then(r => r.data)
     } catch(err) {
+      console.log(err)
       console.log('Rest request failed')
       console.error(err)
       throw Error(err)
