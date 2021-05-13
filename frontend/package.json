@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "rollup -c",
-    "dev": "sirv public --host 127.0.0.1 --port 3000 --API_URL hej123",
+    "dev": "sirv public --host 127.0.0.1 --port 3000",
     "predev": "npm run build",
     "start": "sirv public --host 0.0.0.0",
     "prestart": "npm run build",
