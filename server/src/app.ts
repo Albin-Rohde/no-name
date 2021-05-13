@@ -20,7 +20,7 @@ export interface ServerOptions {
 function startServer() {
   const options: ServerOptions = {
     port: Number(process.env.PORT),
-    clientUrl: process.env.CLIENT_URL,
+    clientUrl: process.env.CLIENT_URL!,
   }
   createConnection().then(async () => {
     console.log('connected to db')
