@@ -1,23 +1,23 @@
 import axios from 'axios'
-import type {GameResponse} from "./ResponseTypes";
+import type {RestResponse} from "./ResponseTypes";
 // @ts-ignore
 import * as process from "process";
 
-type routes = '/game' | '/user'
+type routes = 'game' | 'user'
 type httpMethods = 'put' | 'get' | 'post' | 'delete'
 
 export default class RestClient {
   private readonly baseUrl = `${process.env.API_BASE_URL}${process.env.API_EXTENSION || ''}`
-  private readonly route: routes
-
-  constructor(route: routes) {
-    this.route = route
-  }
-  makeRequest = async (method: httpMethods, data: object = {}, uri: string = ''): Promise<GameResponse> => {
+  public async makeRequest<T>(
+    method: httpMethods,
+    route: routes,
+    data: object = {},
+    action: string = '',
+  ): Promise<T> {
     try {
-      return await axios({
+      const res: RestResponse<T> = await axios({
         withCredentials: true,
-        url: `${this.baseUrl}${this.route}/${uri}`,
+        url: `${this.baseUrl}/${route}/${action}`,
         method,
         headers: {
           "Content-Type": "application/json",
@@ -25,11 +25,12 @@ export default class RestClient {
         },
         data: data
       }).then(r => r.data)
+      if (!res.ok) {
+        throw new Error(`Request failed with error type: ${res.err.name}`)
+      }
+      return res.data
     } catch(err) {
-      console.log(err)
-      console.log('Rest request failed')
       console.error(err)
-      throw Error(err)
     }
   }
 }

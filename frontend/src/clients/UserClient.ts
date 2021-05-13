@@ -1,69 +1,81 @@
-import axios from 'axios'
-import type { UserData, UserResponse, CardResponse } from './ResponseTypes'
+import type {UserData, UserResponse, CardResponse, RestResponse} from './ResponseTypes'
 // @ts-ignore
 import * as process from "process";
+import autoBind from "auto-bind";
+import {HandleError} from "../utils/decorator";
+import RestClient from "./RestClient";
 
-export default class UserClient {
-  private readonly baseUrl = `${process.env.API_BASE_URL}${process.env.API_EXTENSION || ''}`
-  private route = '/user'
+interface LoginRequest {
+  email: string,
+  password: string,
+}
 
-  id: number
-  email: string
-  password: string
-  username: string
-  cards: CardResponse[] = []
-  isActive: boolean = false
+export default class UserClient extends RestClient{
+  public id: number
+  public email: string
+  public password: string
+  public username: string
+  public cards: CardResponse[] = []
+  public isActive: boolean = false
 
   constructor(user: UserData | undefined = undefined) {
+    super()
     if(user) {
       this.id = user.id
       this.username = user.username
       this.cards = user.cards
+      autoBind(this)
     }
   }
 
-  login = async (email: string = this.email, password: string = this.password) => {
+  @HandleError
+  public async login(email: string = this.email, password: string = this.password) {
     this.email = email
     this.password = password
     if(!this.email || !this.password) {
       throw Error('<UserClient.email> and <UserClient.password> need to be set in order to login')
     }
-    try {
-      const userData: UserData = await this.makeRequest(
-        `${this.baseUrl}${this.route}/login`,
-        'post',
-        {email: this.email, password: this.password}
-      )
-      this.id = userData.id
-      this.email = userData.email
-      this.password = userData.password
-      this.username = userData.username
-      this.isActive = true
-    } catch(error) {
-      throw Error('AUTHENTICATION_FAILED')
-    }
+    const userData = await this.makeRequest<UserData>(
+      'post',
+      'user',
+      {email: this.email, password: this.password} as LoginRequest,
+      'login',
+    )
+    this.id = userData.id
+    this.email = userData.email
+    this.password = userData.password
+    this.username = userData.username
+    this.isActive = true
   }
 
-  register = async () => {
-    try {
-      const userData: UserData = await this.makeRequest(`${this.baseUrl}${this.route}/register`, 'post', {
+  @HandleError
+  public async register() {
+    const userData = await this.makeRequest<UserData>(
+      'post',
+      'user',
+      {
         email: this.email,
         password: this.password,
         username: this.username
-      })
-      if(userData) {
-        this.id = userData.id
-        this.email = userData.email
-        this.password = userData.password
-        this.isActive = true
-      }
-    } catch(error) {
-      throw Error('AUTHENTICATION_FAILED')
+      },
+      '',
+    )
+    if(userData) {
+      this.id = userData.id
+      this.email = userData.email
+      this.password = userData.password
+      this.isActive = true
     }
   }
 
-  logout = async () => {
-    await this.makeRequest(`${this.baseUrl}${this.route}/logout`, 'post', {})
+  @HandleError
+  public async logout() {
+    await this.makeRequest(
+      'post',
+      'user',
+      {},
+      'logout',
+    )
     this.id = undefined
     this.email = undefined
     this.password = undefined
@@ -71,8 +83,10 @@ export default class UserClient {
     this.isActive = false
   }
 
-  getSessionUser = async () => {
-    const userData: UserData = await this.makeRequest(`${this.baseUrl}${this.route}/get`, 'get')
+  @HandleError
+  public async getSessionUser() {
+    //TODO: make this endpoint more "restfull"
+    const userData = await this.makeRequest<UserData>('get', 'user', {}, 'get')
     this.id = userData.id
     this.email = userData.email
     this.password = userData.password
@@ -85,24 +99,6 @@ export default class UserClient {
       id: this.id,
       username: this.username,
       cards: this.cards,
-    }
-  }
-
-  private makeRequest = async (url: string, method: 'put' | 'get' | 'post' | 'delete', data: object = {}) => {
-    try {
-      const res: UserData = await axios({
-        withCredentials: true,
-        url,
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": this.baseUrl,
-        },
-        data: data
-      }).then(r => r.data)
-      return res
-    } catch(error) {
-      throw Error('AUTHENTICATION_FAILED')
     }
   }
 }
