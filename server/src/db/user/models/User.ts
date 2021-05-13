@@ -82,7 +82,7 @@ export class User extends BaseEntity {
   public findCard = (cardId: number): WhiteCardRef => {
     const card = this.cards.find(card => card.id === cardId)
     if (!card) {
-      throw new NotFoundError('WhiteCardRef', cardId)
+      throw new NotFoundError(`Could not find <WhiteCardRef> with id ${cardId}`)
     }
     return card
   }

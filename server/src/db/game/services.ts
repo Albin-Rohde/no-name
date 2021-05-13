@@ -21,7 +21,7 @@ const getGameWithRelations = async (key: string): Promise<Game> => {
     })
   } catch (err){
     console.error(err)
-    throw new Error('GAME_NOT_FOUND')
+    throw new NotFoundError(`Could not find <Game> with key ${key}`)
   }
 }
 
@@ -32,7 +32,7 @@ const getGameWithRelations = async (key: string): Promise<Game> => {
 const getGameFromUser = async (userId: number): Promise<Game> => {
   const user = await User.findOneOrFail(userId)
   if(!user.game_fk) {
-    throw new NotFoundError('Game', `<User>${userId} -> game_fk null`)
+    throw new NotFoundError(`could not find game on user <User ${user.id}>`)
   }
   const game = await getGameWithRelations(user.game_fk)
   game.currentUser = user

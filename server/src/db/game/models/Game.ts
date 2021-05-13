@@ -109,7 +109,7 @@ export class Game extends BaseEntity {
   public findCard = (cardId: number): WhiteCardRef => {
     const card = this.users.flatMap(user => user.cards).find(card => card.id === cardId)
     if (!card) {
-      throw new NotFoundError('WhiteCardRef', cardId)
+      throw new NotFoundError(`Could not find <WhiteCardRef> with id ${cardId}`)
     }
     return card
   }
@@ -123,7 +123,7 @@ export class Game extends BaseEntity {
   public findUser = (userId: number): User => {
     const user = this.users.find(user => user.id === userId)
     if (!user) {
-      throw new NotFoundError('User', userId)
+      throw new NotFoundError(`Could not find <User> with id ${userId}`)
     }
     return user
   }
