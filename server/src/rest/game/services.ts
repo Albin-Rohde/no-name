@@ -2,7 +2,8 @@ import {User} from "../../db/user/models/User";
 import {Game} from "../../db/game/models/Game";
 import {v4 as uuidv4} from "uuid";
 import {GameRound} from "../../db/game/models/GameRound";
-import {getManager} from "typeorm";
+import {GameRuleError} from "../../socket";
+import {WhiteCardRef} from "../../db/card/models/WhiteCardRef";
 
 interface GameSettings {
   playCards: number
@@ -46,7 +47,6 @@ export async function createNewGame (user: User, options: GameSettings): Promise
     await user.save()
     return game
   } catch(err) {
-    console.log(err)
     throw new Error(err)
   }
 }
@@ -63,24 +63,29 @@ export async function createNewGame (user: User, options: GameSettings): Promise
  */
 export async function deleteGame (user: User): Promise<void> {
   if(!user.isHost) {
-    throw new Error('User is not host, Only host can delete game')
+    throw new GameRuleError('User is not host, Only host can delete game')
   }
-  // TODO: use querybuilder for this instead
-  const {game} = await User.findOneOrFail(user.id, {relations: ['game']})
-  const gameKey = game.key
-  await getManager().query(`
-    UPDATE player
-    SET game_fk=NULL, has_played=false, score=0
-    WHERE game_fk = '${gameKey}';
-  `)
-  await getManager().query(`
-    DELETE FROM white_card_ref
-    WHERE game_key = '${gameKey}';
-  `)
-  await game.remove()
-  await getManager().query(`
-    DELETE FROM game_round
-    WHERE game_key_fk = '${gameKey}';
-  `)
+  const gameKey = user.game_fk
+  const updateUsers = User.createQueryBuilder('user')
+    .where('user.game_fk = :gameKey', {gameKey})
+    .update({
+      game_fk: null,
+      score: 0,
+      hasPlayed: false,
+    })
+    .execute()
+  const deleteWcr = WhiteCardRef.createQueryBuilder('wcr')
+    .where('wcr.game_key =:gameKey', {gameKey})
+    .delete()
+    .execute()
+  const deleteGame = Game.createQueryBuilder('game')
+    .where('game.id = :gameKey', {gameKey})
+    .delete()
+    .execute()
+  const deleteGameRound = GameRound.createQueryBuilder('gr')
+    .where('gr.game_key_fk = :gameKey', {gameKey})
+    .delete()
+    .execute()
+  await Promise.all([updateUsers, deleteWcr, deleteGame, deleteGameRound])
   return
 }
