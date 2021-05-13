@@ -3,6 +3,7 @@ import {NextFunction, Request, Response} from "express";
 import {AuthenticationError, ExpectedError, GameRequiredError} from "./error";
 import {NotFoundError} from "../db/error";
 import {RestResponse} from "./types";
+import {GameRuleError} from "../socket";
 
 const authUser = async (sessionUser: User) => {
   if(!sessionUser) {
@@ -48,7 +49,7 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
     err: err,
     data: null
   }
-  if (err instanceof ExpectedError) {
+  if (err instanceof ExpectedError || err instanceof GameRuleError) {
     return res.status(200).json(response);
   }
   // makes sure any unexpected error is not sent to client.

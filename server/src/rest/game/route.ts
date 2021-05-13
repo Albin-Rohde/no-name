@@ -1,13 +1,21 @@
 import { Router, Request, Response } from 'express'
 import {loginRequired, gameRequired, handleRestError} from '../authenticate'
 import { createNewGame, deleteGame } from './services'
+import {RestResponse} from "../types";
+import {Game} from "../../db/game/models/Game";
+import {User} from "../../db/user/models/User";
 
 const gameRouter = Router()
 
 gameRouter.use(loginRequired)
 
 gameRouter.get('/', gameRequired, async (req: Request, res: Response) => {
-  return res.json(req.session.user.game)
+  const response: RestResponse<Game> = {
+    ok: true,
+    err: null,
+    data: req.session.user.game
+  }
+  return res.json(response)
 })
 
 gameRouter.post('/', async (req: Request, res: Response) => {
@@ -16,6 +24,12 @@ gameRouter.post('/', async (req: Request, res: Response) => {
     req.session.user.game = game
     req.session.save(() => null)
     res.json(game)
+    const response: RestResponse<Game> = {
+      ok: true,
+      err: null,
+      data: game
+    }
+    return res.json(response)
   } catch(err) {
     handleRestError(req, res, err)
   }
@@ -32,7 +46,12 @@ gameRouter.delete('/', gameRequired, async (req: Request, res: Response) => {
 })
 
 gameRouter.get('/users', gameRequired, async (req: Request, res: Response) => {
-  return res.json(req.session.user.game.users)
+  const response: RestResponse<User[]> = {
+    ok: true,
+    err: null,
+    data: req.session.user.game.users
+  }
+  return res.json(response)
 })
 
 
