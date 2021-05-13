@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express'
-import { loginRequired, gameRequired } from '../authenticate'
+import {loginRequired, gameRequired, handleRestError} from '../authenticate'
 import { createNewGame, deleteGame } from './services'
 
 const gameRouter = Router()
@@ -17,7 +17,7 @@ gameRouter.post('/', async (req: Request, res: Response) => {
     req.session.save(() => null)
     res.json(game)
   } catch(err) {
-    res.status(500).json(err)
+    handleRestError(req, res, err)
   }
 })
 
@@ -27,7 +27,7 @@ gameRouter.delete('/', gameRequired, async (req: Request, res: Response) => {
     req.session.save(() => null)
     res.json()
   } catch(err) {
-    res.status(500).json(err)
+    handleRestError(req, res, err)
   }
 })
 
