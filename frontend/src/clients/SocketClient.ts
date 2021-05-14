@@ -10,12 +10,13 @@ type RerenderCallback = (disconnect?: boolean) => any
 
 enum Events {
   GET_GAME = 'get-game',
-  JOIN = 'join',
-  START = 'start',
+  JOIN = 'join-game',
+  START = 'start-game',
+  LEAVE_GAME = 'leave-game',
+  DELETE_GAME = 'delete-game',
   PLAY_CARD = 'play-card',
   FLIP_CARD = 'flip-card',
   VOTE_CARD = 'vote-card',
-  LEAVE_GAME = 'leave-game',
 }
 
 export class SocketClient {
@@ -42,6 +43,10 @@ export class SocketClient {
       this.game = game
       this.currentUser = game.users.find(user => user.id === this.currentUser.id)
       rerenderCb()
+    })
+    this.socket.on('removed', (gameKey: string) => {
+      console.log(`game with key ${gameKey} has been removed by host`)
+      this.socket.disconnect()
     })
     this.socket.on('disconnect', () => {
       this.socket = undefined
@@ -131,6 +136,13 @@ export class SocketClient {
   public leaveGame() {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     this.socket.emit(Events.LEAVE_GAME)
+    this.socket.disconnect()
+  }
+
+  @HandleError
+  public deleteGame() {
+    if(!this.socket) throw new Error('InGameClient not connected to socket.')
+    this.socket.emit(Events.DELETE_GAME)
     this.socket.disconnect()
   }
 }

@@ -26,9 +26,7 @@
   }
 
   const deleteGame = () => {
-    const gameRestClient = new RestClient()
-    gameRestClient.makeRequest('delete', 'game')
-    socket.socket.disconnect()
+    socket.deleteGame()
     navigate('dashboard')
   }
 

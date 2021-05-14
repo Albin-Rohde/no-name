@@ -100,7 +100,7 @@ export async function deleteGameFromUser (user: User): Promise<void> {
     throw new GameRuleError('User is not host, Only host can delete game')
   }
   const gameKey = user.game_fk
-  await User.createQueryBuilder()
+  const resetUser = User.createQueryBuilder()
     .where('game_fk = :gameKey', {gameKey})
     .update({
       game_fk: null,
@@ -120,6 +120,7 @@ export async function deleteGameFromUser (user: User): Promise<void> {
     .where('game_key_fk = :gameKey', {gameKey})
     .delete()
     .execute()
+  await resetUser
   await Promise.all([deleteWcr, deleteGame, deleteGameRound])
   return
 }
