@@ -61,3 +61,9 @@ export interface UserData {
   username: string
   cards?: CardResponse[]
 }
+
+export type RestResponse<T> = {
+  err: Record<any, any>
+  ok: boolean
+  data: T
+}

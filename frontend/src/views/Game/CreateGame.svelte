@@ -23,8 +23,8 @@
   }
 
   const createGame = async () => {
-    const rest = new RestClient('/game')
-    const gameData: GameResponse = await rest.makeRequest('post', gameSettings)
+    const rest = new RestClient()
+    const gameData: GameResponse = await rest.makeRequest('post', 'game', gameSettings)
     onGameCreated(gameData.key)
   }
 
@@ -40,7 +40,7 @@
         <div class="form-group">
           <label class="form-label" for="customRange2">Play cards</label>
           <div class="range">
-            <input type="range" class="form-range" min="5" max="10" id="customRange2" bind:value={gameSettings.playCards}/>
+            <input type="range" class="form-range" min="5" max="10" id="customRange1" bind:value={gameSettings.playCards}/>
           </div>
           {gameSettings.playCards}
         </div>
@@ -54,7 +54,7 @@
         <div class="form-group">
           <label class="form-label" for="customRange2">Player limit</label>
           <div class="range">
-            <input type="range" class="form-range" min="2" max="10" id="customRange2" bind:value={gameSettings.playerLimit}/>
+            <input type="range" class="form-range" min="2" max="10" id="customRange3" bind:value={gameSettings.playerLimit}/>
           </div>
           {gameSettings.playerLimit}
         </div>

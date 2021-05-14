@@ -2,5 +2,5 @@
   "watch": ["src"],
   "ext": "ts,json",
   "ignore": [],
-  "exec": "npm run build && node build/src/app.js"
+  "exec": "TYPEORM_ENTITIES=src/db/**/models/*.ts ts-node src/app.ts -- "
 }

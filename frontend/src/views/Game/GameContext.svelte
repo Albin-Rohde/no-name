@@ -26,8 +26,8 @@
   }
 
   const deleteGame = () => {
-    const gameRestClient = new RestClient('/game')
-    gameRestClient.makeRequest('delete')
+    const gameRestClient = new RestClient()
+    gameRestClient.makeRequest('delete', 'game')
     navigate('dashboard')
   }
 

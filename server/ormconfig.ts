@@ -8,12 +8,15 @@ module.exports = {
   "synchronize": false,
   "logging": false,
   "entities": [
-    "build/src/db/**/models/*.js"
+    process.env.TYPEORM_ENTITIES
   ],
   "migrations": [
     "build/src/db/migrations/*.js"
   ],
   "subscribers": [
     "build/src/subscriber/**/*.js"
-  ]
+  ],
+  "cli": {
+    "migrationsDir": "src/db/migrations"
+  }
 }

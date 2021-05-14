@@ -1,13 +1,21 @@
 import { Router, Request, Response } from 'express'
-import { loginRequired, gameRequired } from '../authenticate'
-import { createNewGame, deleteGame } from './services'
+import {loginRequired, gameRequired, handleRestError} from '../authenticate'
+import { createNewGame, deleteGameFromUser } from '../../db/game/services'
+import {RestResponse} from "../types";
+import {Game} from "../../db/game/models/Game";
+import {User} from "../../db/user/models/User";
 
 const gameRouter = Router()
 
 gameRouter.use(loginRequired)
 
 gameRouter.get('/', gameRequired, async (req: Request, res: Response) => {
-  return res.json(req.session.user.game)
+  const response: RestResponse<Game> = {
+    ok: true,
+    err: null,
+    data: req.session.user.game
+  }
+  return res.json(response)
 })
 
 gameRouter.post('/', async (req: Request, res: Response) => {
@@ -15,24 +23,34 @@ gameRouter.post('/', async (req: Request, res: Response) => {
     const game = await createNewGame(req.session.user, req.body)
     req.session.user.game = game
     req.session.save(() => null)
-    res.json(game)
+    const response: RestResponse<Game> = {
+      ok: true,
+      err: null,
+      data: game
+    }
+    return res.json(response)
   } catch(err) {
-    res.status(500).json(err)
+    handleRestError(req, res, err)
   }
 })
 
 gameRouter.delete('/', gameRequired, async (req: Request, res: Response) => {
   try {
-    await deleteGame(req.session.user)
+    await deleteGameFromUser(req.session.user)
     req.session.save(() => null)
-    res.json()
+    res.json({ok: true, err: null, data: null} as RestResponse<null>)
   } catch(err) {
-    res.status(500).json(err)
+    handleRestError(req, res, err)
   }
 })
 
 gameRouter.get('/users', gameRequired, async (req: Request, res: Response) => {
-  return res.json(req.session.user.game.users)
+  const response: RestResponse<User[]> = {
+    ok: true,
+    err: null,
+    data: req.session.user.game.users
+  }
+  return res.json(response)
 })
 
 
