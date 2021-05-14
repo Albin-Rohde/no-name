@@ -4,7 +4,6 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "nodemon",
-    "predev": "npm run build",
     "start": "sirv public --host 0.0.0.0",
     "prestart": "npm run build",
     "validate": "svelte-check"

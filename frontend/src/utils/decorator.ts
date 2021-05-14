@@ -4,6 +4,7 @@ export function HandleError(target: Object, key: string | symbol, descriptor: Pr
     try {
       return original.apply(this, args)
     } catch (err) {
+      console.error('ERROR: ', err)
       console.warn('client_error: ', err.message)
     }
   }

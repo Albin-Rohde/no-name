@@ -4,6 +4,7 @@
   import UserClient from './clients/UserClient';
   import GameContext from './views/Game/GameContext.svelte';
   import type {UserData} from './clients/ResponseTypes'
+  import {AuthenticationError} from "./clients/error";
 
   let view = 'login'
   let errorMsg = ''
@@ -31,7 +32,7 @@
       await userClient.login(detail.email, detail.password)
       navigate('game')
     } catch(error) {
-      if(error.message == 'AUTHENTICATION_FAILED') {
+      if(error instanceof AuthenticationError) {
         errorMsg = 'Wrong password or email.'
       }
     }
