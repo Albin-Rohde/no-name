@@ -151,31 +151,31 @@
 </div>
 
 <style>
-  .game-state-info {
-      grid-column-start: 2;
-      grid-column-end: 3;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-  }
   .content-grid {
     display: grid;
-    grid-template-columns: 15% 70% 15%;
+    grid-template-columns: 2.5% 15% 65% 15% 2.5%;
     grid-template-rows: 15% 75% 10%;
     width: 100%;
     height: 70%;
   }
+  .game-state-info {
+    grid-column-start: 3;
+    grid-column-end: 4;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   .left-coll {
-    grid-column-start: 1;
-    grid-column-end: 2;
+    grid-column-start: 2;
+    grid-column-end: 3;
     grid-row-start: 1;
     grid-row-end: 3;
   }
   .main-coll {
-    grid-column-start: 2;
-    grid-column-end: 4;
+    grid-column-start: 3;
+    grid-column-end: 5;
     grid-row-start: 2;
     grid-row-end: 3;
     display: grid;
@@ -189,7 +189,8 @@
     grid-row-end: 3;
   }
   .white-cards {
-    width: 100%;
+    width: 97.5%;
+    margin-left: 2.5%;
     display: flex;
   }
   .white-card {

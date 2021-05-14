@@ -2,7 +2,7 @@
   import { createEventDispatcher } from 'svelte'
   import CopyTextField from '../../components/CopyTextField.svelte'
   import PlayerInfo from '../../components/PlayerInfo.svelte'
-  import type SocketClient from '../../clients/SocketClient'
+  import type { SocketClient } from '../../clients/SocketClient'
   import type {GameSocketResponse} from "../../clients/ResponseTypes";
 
   export let socket: SocketClient
