@@ -22,3 +22,14 @@ For example the Game [service.ts](./src/db/game/services.ts) file. These functio
 Both the rest server and socket server are using sessions for authentication, authentication middlewares can be found in
 `src/rest/authenticate.ts` and `src/socket/authenticate.ts`.
 
+
+## Migrations
+Run all migrations:
+- `npm run migrate:latest`
+
+Add new migration
+- Alter Models in source code
+- Build `npm run build`
+- Create migration `npm run typeorm migration:generate -- -n <NameOfMigration>`
+- Migrations are created in .ts, so we need to build `npm run build`
+- Now we can run our new migration `npm run migrate:latest`
