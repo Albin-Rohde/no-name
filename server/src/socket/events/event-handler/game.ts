@@ -56,6 +56,6 @@ export const startGameEvent: EventFunctionWithGame<never> = async (game: Game): 
  * @param game
  */
 export const leaveGameEvent: EventFunctionWithGame<never> = async(game): Promise<Game> => {
-  game.removePlayer(game.currentUser)
+  await game.removePlayer(game.currentUser)
   return game
 }
