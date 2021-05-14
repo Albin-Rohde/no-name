@@ -26,7 +26,7 @@ import {SocketWithSession} from "../index";
  */
 export const registerSocketEvents = (io: Server, socket: SocketWithSession) => {
   addListener<string>(io, socket, Events.JOIN_GAME, joinGameEvent)
-  addListenerWithGame<never>(io, socket, Events.GET_GAME, getGameEvent)
+  addListener<never>(io, socket, Events.GET_GAME, getGameEvent)
   addListenerWithGame<never>(io, socket, Events.START_GAME, startGameEvent)
   addListenerWithGame<never>(io, socket, Events.LEAVE_GAME, leaveGameEvent)
 
@@ -90,7 +90,7 @@ const addListener = <T>(
   async function eventCallback(...args: T[]) {
     try {
       eventFn(io, socket, ...args)
-        .then((game) => emitUpdateEvent(io, game))
+        .then((game) => game ? emitUpdateEvent(io, game) : null)
     } catch (err) {
       handleError(err, socket)
     }

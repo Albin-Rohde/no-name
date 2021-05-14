@@ -2,17 +2,29 @@ import {Server} from "socket.io";
 import {getUserWithRelation} from "../../../db/user/services";
 import {Game} from "../../../db/game/models/Game";
 import {EventFunction, EventFunctionWithGame} from "./index";
-import {getGameWithRelations} from "../../../db/game/services";
+import {getGameFromUser, getGameWithRelations} from "../../../db/game/services";
 import {GameRuleError, GameStateError, SocketWithSession} from "../..";
+import {NotFoundError} from "../../../db/error";
 
 
 /**
  * Gets a game if any is attached to the
  * user making the request.
- * @param game
+ * @param io
+ * @param socket
  */
-export const getGameEvent: EventFunctionWithGame<never> = async(game): Promise<Game> => {
-  return game
+export const getGameEvent: EventFunction<never> = async(io: Server, socket: SocketWithSession): Promise<Game | null> => {
+  try {
+    const game = await getGameFromUser(socket.request.session.user.id)
+    if(!socket.rooms.has(game.key)) {
+      socket.join(game.key)
+    }
+    return game
+  } catch (err) {
+    if (!(err instanceof NotFoundError)) {
+      return null
+    }
+  }
 }
 
 /**

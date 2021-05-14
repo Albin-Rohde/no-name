@@ -38,9 +38,9 @@ export class SocketClient {
     })
     // socket event listeners
     this.socket.on('update', (game: GameSocketResponse) => {
-      if(this.updateGameState(game)) {
-        rerenderCb()
-      }
+      this.game = game
+      this.currentUser = game.users.find(user => user.id === this.currentUser.id)
+      rerenderCb()
     })
     this.socket.on('disconnect', () => {
       rerenderCb('disconnect')
@@ -67,15 +67,6 @@ export class SocketClient {
 
   private get allUsersPlayed() {
     return this.allPlayers.every(user => user.hasPlayed)
-  }
-
-  private updateGameState = (game: GameSocketResponse) => {
-    // a type of cache to not re-update the state if the new state is the same as current
-    // todo: This might not be needed anymore since we've fixed the issues with the socket
-    if(JSON.stringify(this.game) === JSON.stringify(game)) return false
-    this.currentUser = game.users.find(user => user.id === this.currentUser.id)
-    this.game = game
-    return true
   }
 
   @HandleError

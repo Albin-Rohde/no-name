@@ -12,7 +12,7 @@ export enum Events {
   VOTE_CARD = 'vote-card',
 }
 
-export type EventFunction<T> = (io: Server, socket: SocketWithSession, ...args: T[]) => Promise<Game>
+export type EventFunction<T> = (io: Server, socket: SocketWithSession, ...args: T[]) => Promise<Game | null>
 
 export type EventFunctionWithGame<T> = (game: Game, ...args: T[]) => Promise<Game>
 
