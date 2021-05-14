@@ -1,11 +1,13 @@
 import { User } from './models/User'
+import {BadRequestError, CreateError} from "../../rest/error";
+import bcrypt from "bcrypt";
 
 /**
  * Get a user with relevant relations
  * @param userId - User to fetch
  * @param relations - Relations to get for user, if empty gets a default set.
  */
-const getUserWithRelation = async (userId: number, relations: Array<string> | undefined = undefined) => {
+export const getUserWithRelation = async (userId: number, relations: Array<string> | undefined = undefined) => {
   try {
     return User.findOneOrFail(userId, {
       relations: relations ? relations : [
@@ -18,4 +20,34 @@ const getUserWithRelation = async (userId: number, relations: Array<string> | un
   }
 }
 
-export { getUserWithRelation }
+interface CreateUserData {
+  email: string
+  password: string
+  username: string
+}
+
+/**
+ * Registers a new user to the app
+ * Will register a user from the data of body arument.
+ *
+ * Returns the newly created user on success
+ * @param body
+ */
+export async function createUser (body: CreateUserData) {
+  const user = new User()
+  if(!body.email || !body.password || !body.username) {
+    throw new BadRequestError(`'email', 'password' and 'username' required on body`)
+  }
+  const existingUser = await User.createQueryBuilder('user')
+    .where('user.email = :email', {email: body.email})
+    .orWhere('user.username = :username', {username: body.username})
+    .getOne()
+  if (existingUser) {
+    throw new CreateError('A user with same Email or Username already exist')
+  }
+  user.password = await bcrypt.hash(body.password, 10)
+  user.email = body.email
+  user.username = body.username
+  await user.save()
+  return user
+}
