@@ -53,6 +53,7 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
     return res.status(200).json(response);
   }
   // makes sure any unexpected error is not sent to client.
+  console.error(err)
   response.err = new Error('INTERNAL_ERROR')
   return res.status(500).json(response)
 }

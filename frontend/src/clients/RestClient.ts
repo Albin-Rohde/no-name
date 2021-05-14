@@ -15,9 +15,10 @@ export default class RestClient {
     action: string = '',
   ): Promise<T> {
     try {
+      action = action ? `/${action}` : ''
       const res: RestResponse<T> = await axios({
         withCredentials: true,
-        url: `${this.baseUrl}/${route}/${action}`,
+        url: `${this.baseUrl}/${route}${action}`,
         method,
         headers: {
           "Content-Type": "application/json",
@@ -26,7 +27,7 @@ export default class RestClient {
         data: data
       }).then(r => r.data)
       if (!res.ok) {
-        throw new Error(`Request failed with error type: ${res.err.name}`)
+        console.warn(`Request failed with error type: ${res.err.name}`)
       }
       return res.data
     } catch(err) {

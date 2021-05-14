@@ -58,7 +58,7 @@ export default class UserClient extends RestClient{
         password: this.password,
         username: this.username
       },
-      '',
+      'register'
     )
     if(userData) {
       this.id = userData.id

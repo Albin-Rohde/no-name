@@ -23,7 +23,6 @@ gameRouter.post('/', async (req: Request, res: Response) => {
     const game = await createNewGame(req.session.user, req.body)
     req.session.user.game = game
     req.session.save(() => null)
-    res.json(game)
     const response: RestResponse<Game> = {
       ok: true,
       err: null,
