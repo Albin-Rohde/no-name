@@ -6,6 +6,8 @@ import autoBind from "auto-bind";
 // @ts-ignore
 import * as process from "process";
 
+type RerenderCallback = (disconnect?: boolean) => any
+
 enum Events {
   GET_GAME = 'get-game',
   JOIN = 'join',
@@ -18,17 +20,16 @@ enum Events {
 
 export class SocketClient {
   private readonly baseUrl: string = process.env.API_BASE_URL
-  socket: Socket
-
-  game: GameSocketResponse
-  currentUser: UserResponse
+  public socket: Socket
+  public game: GameSocketResponse
+  public currentUser: UserResponse
 
   constructor(user: UserResponse) {
     this.currentUser = user
     autoBind(this)
   }
 
-  public connect = async (rerenderCb: CallableFunction): Promise<void> => {
+  public connect = async (rerenderCb: RerenderCallback): Promise<void> => {
     this.socket = io(this.baseUrl, {
       withCredentials: true,
       transports: ['websocket'],
@@ -43,7 +44,10 @@ export class SocketClient {
       rerenderCb()
     })
     this.socket.on('disconnect', () => {
-      rerenderCb('disconnect')
+      this.socket = undefined
+      this.game = undefined
+      this.currentUser = undefined
+      rerenderCb(true)
     })
     this.socket.on('connection_error', (err: string) => {
       console.error('connection error: ', err)
@@ -127,5 +131,6 @@ export class SocketClient {
   public leaveGame() {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     this.socket.emit(Events.LEAVE_GAME)
+    this.socket.disconnect()
   }
 }
