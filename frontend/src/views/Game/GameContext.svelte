@@ -1,6 +1,6 @@
 <script lang="typescript">
   import { createEventDispatcher } from 'svelte'
-  import type UserClientType from '../../clients/UserClient'
+  import type userType from '../../clients/User'
   import CreateGame from './CreateGame.svelte'
   import Dashboard from './Dashboard.svelte'
   import Lobby from './Lobby.svelte'
@@ -15,11 +15,11 @@
   type views = 'dashboard' | 'ingame' | 'lobby' | 'join' | 'create'
   let view: views = 'dashboard'
 
-  export let userClient: UserClientType
-  const socket = new SocketClient(userClient.getData())
+  export let user: userType
+  const socket = new SocketClient(user.getData())
 
   let gameData: GameSocketResponse
-  let currentUser: UserResponse = userClient.getData()
+  let currentUser: UserResponse = user.getData()
 
   const navigate = (location: views) => {
     view = location
@@ -38,7 +38,7 @@
   const rerender = async (disconnect: boolean = false): Promise<void> => {
     if (disconnect) {
       gameData = undefined
-      currentUser = userClient.getData()
+      currentUser = user.getData()
       socket.currentUser = currentUser
       await socket.connect(rerender)
       view = 'dashboard'
@@ -63,7 +63,7 @@
     }
   }
 
-  if(!userClient.id) {
+  if(!user.id) {
     dispatch('logout')
   } else {
     checkGameSession()

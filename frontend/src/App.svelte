@@ -1,14 +1,14 @@
 <script lang="ts">
   import Register from './views/Login/Register.svelte'
   import Login from './views/Login/Login.svelte'
-  import UserClient from './clients/UserClient';
+  import User from './clients/User';
   import GameContext from './views/Game/GameContext.svelte';
   import type {UserData} from './clients/ResponseTypes'
   import {AuthenticationError} from "./clients/error";
 
   let view = 'login'
   let errorMsg = ''
-  const userClient: UserClient = new UserClient()
+  const user: User = new User()
   const navigate = location => {
     errorMsg = ''
     view = location
@@ -16,11 +16,11 @@
 
   const register = async (detail: UserData) => {
     try {
-      userClient.email = detail.email
-      userClient.password = detail.password
-      userClient.username = detail.username
-      await userClient.register()
-      if(userClient.isActive) {
+      user.email = detail.email
+      user.password = detail.password
+      user.username = detail.username
+      await user.register()
+      if(user.isActive) {
         navigate('game')
       }
     } catch(error) {}
@@ -29,7 +29,7 @@
   const login = async detail => {
     errorMsg = ''
     try {
-      await userClient.login(detail.email, detail.password)
+      await user.login(detail.email, detail.password)
       navigate('game')
     } catch(error) {
       if(error instanceof AuthenticationError) {
@@ -40,8 +40,8 @@
 
   const checkSession = async () => {
     try {
-      await userClient.getSessionUser()
-      if(userClient.isActive) {
+      await user.getSessionUser()
+      if(user.isActive) {
         navigate('game')
       } else {
         navigate('login')
@@ -51,7 +51,7 @@
 
   const logout = async () => {
     try {
-      await userClient.logout()
+      await user.logout()
       navigate('login')
     } catch(error) {}
   }
@@ -61,7 +61,7 @@
 
 <main>
   {#if view === 'game'}
-    <GameContext on:logout={logout} userClient={userClient}/>
+    <GameContext on:logout={logout} user={user}/>
   {:else}
     <div class="grid">
       <div class="title">
