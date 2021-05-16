@@ -1,8 +1,7 @@
 <script lang="typescript">
   import { createEventDispatcher } from 'svelte'
-  import type SocketClient from '../../clients/SocketClient'
-  import type {GameSocketResponse} from "../../clients/ResponseTypes";
-  
+  import type {SocketClient} from '../../clients/SocketClient'
+
   export let socket: SocketClient
   const dispatch = createEventDispatcher()
   let gameKey: string

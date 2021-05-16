@@ -6,29 +6,31 @@ import autoBind from "auto-bind";
 // @ts-ignore
 import * as process from "process";
 
+type RerenderCallback = (disconnect?: boolean) => any
+
 enum Events {
   GET_GAME = 'get-game',
-  JOIN = 'join',
-  START = 'start',
+  JOIN = 'join-game',
+  START = 'start-game',
+  LEAVE_GAME = 'leave-game',
+  DELETE_GAME = 'delete-game',
   PLAY_CARD = 'play-card',
   FLIP_CARD = 'flip-card',
   VOTE_CARD = 'vote-card',
-  LEAVE_GAME = 'leave-game',
 }
 
 export class SocketClient {
   private readonly baseUrl: string = process.env.API_BASE_URL
-  socket: Socket
-
-  game: GameSocketResponse
-  currentUser: UserResponse
+  public socket: Socket
+  public game: GameSocketResponse
+  public currentUser: UserResponse
 
   constructor(user: UserResponse) {
     this.currentUser = user
     autoBind(this)
   }
 
-  public connect = async (rerenderCb: CallableFunction): Promise<void> => {
+  public connect = async (rerenderCb: RerenderCallback): Promise<void> => {
     this.socket = io(this.baseUrl, {
       withCredentials: true,
       transports: ['websocket'],
@@ -38,12 +40,19 @@ export class SocketClient {
     })
     // socket event listeners
     this.socket.on('update', (game: GameSocketResponse) => {
-      if(this.updateGameState(game)) {
-        rerenderCb()
-      }
+      this.game = game
+      this.currentUser = game.users.find(user => user.id === this.currentUser.id)
+      rerenderCb()
+    })
+    this.socket.on('removed', (gameKey: string) => {
+      console.log(`game with key ${gameKey} has been removed by host`)
+      this.socket.disconnect()
     })
     this.socket.on('disconnect', () => {
-      rerenderCb('disconnect')
+      this.socket = undefined
+      this.game = undefined
+      this.currentUser = undefined
+      rerenderCb(true)
     })
     this.socket.on('connection_error', (err: string) => {
       console.error('connection error: ', err)
@@ -69,15 +78,6 @@ export class SocketClient {
     return this.allPlayers.every(user => user.hasPlayed)
   }
 
-  private updateGameState = (game: GameSocketResponse) => {
-    // a type of cache to not re-update the state if the new state is the same as current
-    // todo: This might not be needed anymore since we've fixed the issues with the socket
-    if(JSON.stringify(this.game) === JSON.stringify(game)) return false
-    this.currentUser = game.users.find(user => user.id === this.currentUser.id)
-    this.game = game
-    return true
-  }
-
   @HandleError
   public getGame() {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
@@ -87,7 +87,7 @@ export class SocketClient {
   @HandleError
   public joinGame(key: string = this.game.key) {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
-    if(!key && !this.game.key) throw new Error('No gameKey specified.')
+    if(!key) throw new Error('No gameKey specified.')
     this.socket.emit(Events.JOIN, key)
   }
 
@@ -136,5 +136,13 @@ export class SocketClient {
   public leaveGame() {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     this.socket.emit(Events.LEAVE_GAME)
+    this.socket.disconnect()
+  }
+
+  @HandleError
+  public deleteGame() {
+    if(!this.socket) throw new Error('InGameClient not connected to socket.')
+    this.socket.emit(Events.DELETE_GAME)
+    this.socket.disconnect()
   }
 }

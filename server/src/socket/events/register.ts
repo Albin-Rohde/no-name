@@ -1,20 +1,23 @@
 import {Server} from "socket.io";
 import {
-  playCardEvent,
+  deleteGameEvent,
+  EventFunction,
+  EventFunctionWithGame,
+  Events,
   flipCardEvent,
-  voteCardEvent,
   getGameEvent,
   joinGameEvent,
-  startGameEvent,
   leaveGameEvent,
+  playCardEvent,
+  startGameEvent,
+  voteCardEvent,
 } from './event-handler'
-import { Events, EventFunction, EventFunctionWithGame} from "./event-handler";
 import { Game } from "../../db/game/models/Game";
 import { GameRound } from "../../db/game/models/GameRound";
 import { normalizeGameResponse } from "./response";
 import { getGameFromUser } from "../../db/game/services";
-import { GameRuleError } from "../error";
-import {SocketWithSession} from "../index";
+import {ExpectedError, GameRuleError, GameStateError} from "../error";
+import { SocketWithSession } from "../index";
 
 /**
  * Register events to the socket
@@ -26,9 +29,10 @@ import {SocketWithSession} from "../index";
  */
 export const registerSocketEvents = (io: Server, socket: SocketWithSession) => {
   addListener<string>(io, socket, Events.JOIN_GAME, joinGameEvent)
-  addListenerWithGame<never>(io, socket, Events.GET_GAME, getGameEvent)
+  addListener<never>(io, socket, Events.GET_GAME, getGameEvent)
   addListenerWithGame<never>(io, socket, Events.START_GAME, startGameEvent)
   addListenerWithGame<never>(io, socket, Events.LEAVE_GAME, leaveGameEvent)
+  addListenerWithGame<never>(io, socket, Events.DELETE_GAME, deleteGameEvent)
 
   addListenerWithGame<number>(io, socket, Events.PLAY_CARD, playCardEvent)
   addListenerWithGame<number>(io, socket, Events.FLIP_CARD, flipCardEvent)
@@ -59,9 +63,14 @@ const addListenerWithGame = <T>(
   async function eventCallback(...args: T[]) {
     try {
       // @ts-ignore
-      const game = await getGameFromUser(socket.request.session.user.id)
-      await eventFn(game, ...args)
-        .then((game) => emitUpdateEvent(io, game))
+      const g = await getGameFromUser(socket.request.session.user.id)
+      await eventFn(g, ...args)
+        .then((game) => {
+          if (game) {
+            return emitUpdateEvent(io, game)
+          }
+          emitRemovedEvent(io, socket, g)
+        })
     } catch (err) {
       handleError(err, socket)
     }
@@ -89,8 +98,8 @@ const addListener = <T>(
 ): void => {
   async function eventCallback(...args: T[]) {
     try {
-      eventFn(io, socket, ...args)
-        .then((game) => emitUpdateEvent(io, game))
+      await eventFn(io, socket, ...args)
+        .then((game) => game ? emitUpdateEvent(io, game) : null)
     } catch (err) {
       handleError(err, socket)
     }
@@ -110,6 +119,11 @@ const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
   await game.save()
   const currentRound = await GameRound.findOne({game_key: game.key, round_number: game.current_round})
   io.in(game.key).emit('update', normalizeGameResponse(game, currentRound))
+}
+
+const emitRemovedEvent = async (io: Server, socket: SocketWithSession, game: Game): Promise<void> => {
+  socket.leave(game.key)
+  io.in(game.key).emit('removed', game.key)
 }
 
 /**

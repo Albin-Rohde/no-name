@@ -141,8 +141,13 @@ export class Game extends BaseEntity {
    * Removes a user from the game
    * @param user
    */
-  public removePlayer = (user: User): void => {
+  public removePlayer = async (user: User): Promise<void> => {
     this.users = this.users.filter((u) => u.id !== user.id)
+    user.game_fk = null
+    user.hasPlayed = false
+    user.score = 0
+    await user.save()
+    return
   }
 
   /**

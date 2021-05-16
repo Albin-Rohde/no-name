@@ -26,8 +26,7 @@
   }
 
   const deleteGame = () => {
-    const gameRestClient = new RestClient()
-    gameRestClient.makeRequest('delete', 'game')
+    socket.deleteGame()
     navigate('dashboard')
   }
 
@@ -36,9 +35,12 @@
     navigate('dashboard')
   }
 
-  const rerender = (err: string | undefined = undefined) => {
-    if(err) {
-      console.error(err)
+  const rerender = async (disconnect: boolean = false): Promise<void> => {
+    if (disconnect) {
+      gameData = undefined
+      currentUser = userClient.getData()
+      socket.currentUser = currentUser
+      await socket.connect(rerender)
       view = 'dashboard'
       return
     }
@@ -68,6 +70,7 @@
   }
 
   const onGameCreated = async (key: string) => {
+    console.log('game created, joining...')
     socket.joinGame(key)
   }
 
