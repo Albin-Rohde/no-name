@@ -16,7 +16,7 @@ import { Game } from "../../db/game/models/Game";
 import { GameRound } from "../../db/game/models/GameRound";
 import { normalizeGameResponse } from "./response";
 import { getGameFromUser } from "../../db/game/services";
-import { GameRuleError } from "../error";
+import {ExpectedError, GameRuleError, GameStateError} from "../error";
 import { SocketWithSession } from "../index";
 
 /**
@@ -98,7 +98,7 @@ const addListener = <T>(
 ): void => {
   async function eventCallback(...args: T[]) {
     try {
-      eventFn(io, socket, ...args)
+      await eventFn(io, socket, ...args)
         .then((game) => game ? emitUpdateEvent(io, game) : null)
     } catch (err) {
       handleError(err, socket)

@@ -1,4 +1,10 @@
-export class GameRuleError extends Error {
+export class ExpectedError extends Error {
+  constructor(message: string) {
+    super(message)
+  }
+}
+
+export class GameRuleError extends ExpectedError {
   constructor(message: string) {
     super(message)
     this.name = this.constructor.name

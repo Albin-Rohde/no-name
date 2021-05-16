@@ -21,9 +21,10 @@ export const getGameEvent: EventFunction<never> = async(io: Server, socket: Sock
     }
     return game
   } catch (err) {
-    if (!(err instanceof NotFoundError)) {
+    if (err instanceof NotFoundError) {
       return null
     }
+    throw err
   }
 }
 
@@ -36,6 +37,9 @@ export const getGameEvent: EventFunction<never> = async(io: Server, socket: Sock
 export const joinGameEvent: EventFunction<string> = async (io: Server, socket: SocketWithSession, key) => {
   const game = await getGameWithRelations(key)
   const user = await getUserWithRelation(socket.request.session.user.id)
+  if (game.started) {
+    throw new GameStateError('Game already started')
+  }
   game.addPlayer(user)
   socket.join(game.key)
   return game

@@ -87,7 +87,7 @@ export class SocketClient {
   @HandleError
   public joinGame(key: string = this.game.key) {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
-    if(!key && !this.game.key) throw new Error('No gameKey specified.')
+    if(!key) throw new Error('No gameKey specified.')
     this.socket.emit(Events.JOIN, key)
   }
 
