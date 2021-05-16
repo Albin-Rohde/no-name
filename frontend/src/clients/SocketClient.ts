@@ -5,6 +5,7 @@ import { HandleError } from "../utils/decorator";
 import autoBind from "auto-bind";
 // @ts-ignore
 import * as process from "process";
+import Game from "./Game";
 
 type RerenderCallback = (disconnect?: boolean) => any
 
@@ -22,11 +23,10 @@ enum Events {
 export class SocketClient {
   private readonly baseUrl: string = process.env.API_BASE_URL
   public socket: Socket
-  public game: GameSocketResponse
-  public currentUser: UserResponse
+  private game: Game
 
   constructor(user: UserResponse) {
-    this.currentUser = user
+    this.game = new Game(user)
     autoBind(this)
   }
 
@@ -40,8 +40,7 @@ export class SocketClient {
     })
     // socket event listeners
     this.socket.on('update', (game: GameSocketResponse) => {
-      this.game = game
-      this.currentUser = game.users.find(user => user.id === this.currentUser.id)
+      this.game.update(game)
       rerenderCb()
     })
     this.socket.on('removed', (gameKey: string) => {
@@ -51,7 +50,6 @@ export class SocketClient {
     this.socket.on('disconnect', () => {
       this.socket = undefined
       this.game = undefined
-      this.currentUser = undefined
       rerenderCb(true)
     })
     this.socket.on('connection_error', (err: string) => {
@@ -70,12 +68,8 @@ export class SocketClient {
     })
   }
 
-  private get allPlayers() {
-    return this.game.users.filter(user => !user.cardWizz)
-  }
-
-  private get allUsersPlayed() {
-    return this.allPlayers.every(user => user.hasPlayed)
+  public get gameData(): Game {
+    return this.game
   }
 
   @HandleError
@@ -100,7 +94,7 @@ export class SocketClient {
   @HandleError
   public playCard(card: CardResponse) {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
-    if(!this.currentUser.hasPlayed) {
+    if(!this.game.currentUser.hasPlayed) {
       this.socket.emit(Events.PLAY_CARD, card.id)
     }
   }
@@ -113,7 +107,7 @@ export class SocketClient {
     if(card.state === CardState.PLAYED_SHOW) {
       throw new Error('Card is already flipped')
     }
-    if(!this.allUsersPlayed) {
+    if(!this.game.players.every(user => user.hasPlayed)) {
       throw new Error('All user must play before flipping')
     }
     this.socket.emit(Events.FLIP_CARD, card.id)
@@ -122,10 +116,10 @@ export class SocketClient {
   @HandleError
   public voteCard(card: CardResponse) {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
-    if(!this.allUsersPlayed) {
+    if(!this.game.players.every(user => user.hasPlayed)) {
       throw new Error('All user must play before voting')
     }
-    const allCards = this.allPlayers.flatMap(user => user.cards)
+    const allCards = this.game.players.flatMap(user => user.cards)
     if(allCards.some(card => card.state === CardState.PLAYED_HIDDEN)) {
       throw new Error('All cards must be flipped before vote')
     }
