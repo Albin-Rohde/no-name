@@ -3,10 +3,10 @@
   import CopyTextField from '../../components/CopyTextField.svelte'
   import PlayerInfo from '../../components/PlayerInfo.svelte'
   import type { SocketClient } from '../../clients/SocketClient'
-  import type {GameSocketResponse} from "../../clients/ResponseTypes";
+  import Game from "../../clients/Game";
 
   export let socket: SocketClient
-  export let gameData: GameSocketResponse
+  export let gameData: Game
   const dispatch = createEventDispatcher()
 
 </script>
@@ -23,7 +23,7 @@
     <div class="flex-center">
       <CopyTextField value={gameData.key} />
     </div>
-    {#if socket.currentUser.isHost }
+    {#if gameData.currentUser.isHost }
       <div class="button-grid">
         <div class="form-container">
           <div class="btn-container">

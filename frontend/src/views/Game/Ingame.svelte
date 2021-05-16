@@ -1,77 +1,18 @@
 <script lang="typescript">
-  import type {CardResponse, GameSocketResponse, UserResponse} from '../../clients/ResponseTypes'
+  import type {CardResponse} from '../../clients/ResponseTypes'
   import { CardState } from '../../clients/ResponseTypes'
   import BlackCard from '../../components/BlackCard.svelte'
   import PlayerInfo from '../../components/PlayerInfo.svelte'
   import WhiteCard from '../../components/WhiteCard.svelte'
   import type { SocketClient } from '../../clients/SocketClient'
+  import Game, { GameState } from "../../clients/Game";
 
   export let socket: SocketClient
-  export let gameData: GameSocketResponse
-  export let currentUser: UserResponse
-  enum GameState {
-    PLAYING = 'playing',
-    FLIPPING = 'flipping',
-    VOTING = 'voting',
-    DISPLAY_WINNER = 'winner',
-  }
-
-  const getWinningPlayer = (game: GameSocketResponse): UserResponse => {
-    const winningPlayer = getPlayers(game).find(user => user.cards.some(c => c.state === CardState.WINNER))
-    if(!winningPlayer) {
-      throw new Error('Could not find winning player')
-    }
-    return winningPlayer
-  }
-
-  const getPlayers = (game: GameSocketResponse): UserResponse[] => {
-    return game.users.filter(user => !user.cardWizz)
-  }
-
-  const getPlayedCards = (game: GameSocketResponse): CardResponse[] => {
-    let allPlayedCards: CardResponse[] = []
-    for(const player of getPlayers(game)) {
-      // todo: remember that !== CardState.HAND will also return card with state USED
-      allPlayedCards = [...allPlayedCards, ...player.cards.filter(card => card.state !== CardState.HAND)]
-    }
-    return allPlayedCards
-  }
-
-  const cardsPlayed = (game: GameSocketResponse): number => {
-    return getPlayedCards(game).length
-  }
-
-  const cardsHidden = (game: GameSocketResponse): number => {
-    return getPlayedCards(game).filter(card => card.state === CardState.PLAYED_HIDDEN).length
-  }
-
-  const cardsShown = (game: GameSocketResponse): number => {
-    return getPlayedCards(game).filter(card => card.state === CardState.PLAYED_SHOW).length
-  }
-
-  const getGameState = (game: GameSocketResponse): GameState  => {
-    const players = getPlayers(game)
-    const allHasPlayed = players.every(user => user.hasPlayed)
-    if(!allHasPlayed) {
-      return GameState.PLAYING
-    }
-    if(allHasPlayed) {
-      let playedCards = getPlayedCards(gameData)
-      if(playedCards.some(card => card.state === CardState.PLAYED_HIDDEN)) {
-        return GameState.FLIPPING
-      }
-      if(playedCards.every(card => card.state === CardState.PLAYED_SHOW)) {
-        return GameState.VOTING
-      }
-      if(playedCards.some(card => card.state === CardState.WINNER)) {
-        return GameState.DISPLAY_WINNER
-      }
-    }
-  }
+  export let gameData: Game
 
   const handleCardClick = (card: CardResponse): void => {
     if(card.state === CardState.HAND) {
-      if(!socket.currentUser.cardWizz) {
+      if(!gameData.currentUser.cardWizz) {
         return socket.playCard(card)
       }
     }
@@ -91,21 +32,21 @@
     </div>
     <div class="game-state-info">
       <p class="fs-3">
-        {#if getGameState(gameData) === GameState.PLAYING}
-          {cardsPlayed(gameData)}/{getPlayers(gameData).length} Played
+        {#if gameData.state === GameState.PLAYING}
+          {gameData.playedCards}/{gameData.players.length} Played
         {/if}
-        {#if getGameState(gameData) === GameState.FLIPPING}
-          {cardsShown(gameData)}/{cardsPlayed(gameData)} Flipped
+        {#if gameData.state === GameState.FLIPPING}
+          {gameData.shownCards}/{gameData.playedCards} Flipped
         {/if}
-        {#if getGameState(gameData) === GameState.VOTING}
-          {#if socket.currentUser.cardWizz}
+        {#if gameData.state === GameState.VOTING}
+          {#if gameData.currentUser.cardWizz}
             Select the winning card
             {:else}
             Waiting for card wizz to vote
           {/if}
         {/if}
-        {#if getGameState(gameData) === GameState.DISPLAY_WINNER}
-          {getWinningPlayer(gameData).username} won this round
+        {#if gameData.state === GameState.DISPLAY_WINNER}
+          {gameData.winningPlayer.username} won this round
         {/if}
       </p>
     </div>
@@ -114,7 +55,7 @@
         <BlackCard text={gameData.blackCard.text}/>
         {#each gameData.users as user}
           {#each user.cards as card}
-            {#if getGameState(gameData) !== GameState.DISPLAY_WINNER}
+            {#if gameData.state !== GameState.DISPLAY_WINNER}
               {#if card.state === CardState.PLAYED_HIDDEN || card.state === CardState.PLAYED_SHOW}
                 <div class="white-card" on:click={() => handleCardClick(card)}>
                   <WhiteCard
@@ -124,7 +65,7 @@
                 </div>
               {/if}
             {/if}
-            {#if getGameState(gameData) === GameState.DISPLAY_WINNER}
+            {#if gameData.state === GameState.DISPLAY_WINNER}
               {#if card.state === CardState.WINNER}
                 <div class="white-card" on:click={() => handleCardClick(card)}>
                   <WhiteCard
@@ -140,10 +81,10 @@
     </div>
   </div>
   <div class="white-cards">
-    {#each currentUser.cards as card}
+    {#each gameData.currentUser.cards as card}
       {#if card.state === CardState.HAND}
         <div class="white-card" on:click={() => handleCardClick(card)}>
-          <WhiteCard text={card.text} disabled={currentUser.cardWizz} cardState={card.state}/>
+          <WhiteCard text={card.text} disabled={gameData.currentUser.cardWizz} cardState={card.state}/>
         </div>
       {/if}
     {/each}

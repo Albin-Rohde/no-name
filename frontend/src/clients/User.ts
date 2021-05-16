@@ -10,7 +10,7 @@ interface LoginRequest {
   password: string,
 }
 
-export default class UserClient extends RestClient{
+export default class User extends RestClient {
   public id: number
   public email: string
   public password: string
@@ -33,7 +33,7 @@ export default class UserClient extends RestClient{
     this.email = email
     this.password = password
     if(!this.email || !this.password) {
-      throw Error('<UserClient.email> and <UserClient.password> need to be set in order to login')
+      throw Error('<user.email> and <user.password> need to be set in order to login')
     }
     const userData = await this.makeRequest<UserData>(
       'post',

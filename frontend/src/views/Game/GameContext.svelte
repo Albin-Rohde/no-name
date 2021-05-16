@@ -1,25 +1,25 @@
 <script lang="typescript">
   import { createEventDispatcher } from 'svelte'
-  import type UserClientType from '../../clients/UserClient'
+  import type userType from '../../clients/User'
   import CreateGame from './CreateGame.svelte'
   import Dashboard from './Dashboard.svelte'
   import Lobby from './Lobby.svelte'
   import JoinGame from './JoinGame.svelte'
   import Navbar from '../../components/Navbar.svelte'
   import Ingame from './Ingame.svelte'
-  import RestClient from '../../clients/RestClient'
   import { SocketClient } from '../../clients/SocketClient'
-  import type {GameSocketResponse, UserResponse} from "../../clients/ResponseTypes";
+  import type {UserResponse} from "../../clients/ResponseTypes";
+  import Game from "../../clients/Game";
   const dispatch = createEventDispatcher()
 
   type views = 'dashboard' | 'ingame' | 'lobby' | 'join' | 'create'
   let view: views = 'dashboard'
 
-  export let userClient: UserClientType
-  const socket = new SocketClient(userClient.getData())
+  export let user: userType
+  let socket = new SocketClient(user.getData())
 
-  let gameData: GameSocketResponse
-  let currentUser: UserResponse = userClient.getData()
+  let gameData: Game
+  let currentUser: UserResponse = user.getData()
 
   const navigate = (location: views) => {
     view = location
@@ -38,20 +38,19 @@
   const rerender = async (disconnect: boolean = false): Promise<void> => {
     if (disconnect) {
       gameData = undefined
-      currentUser = userClient.getData()
-      socket.currentUser = currentUser
+      socket = new SocketClient(user.getData())
       await socket.connect(rerender)
       view = 'dashboard'
       return
     }
-    if (view !== 'ingame' && socket.game?.started) {
+    gameData = socket.gameData
+    if (view !== 'ingame' && gameData.started) {
       view = 'ingame'
     }
-    else if(view !== 'lobby' && socket.game?.key && !socket.game.started) {
+    else if(view !== 'lobby' && gameData.key && !gameData.started) {
       view = 'lobby'
     }
-    gameData = socket.game
-    currentUser = socket.currentUser
+    currentUser = gameData.currentUser
   }
 
   const checkGameSession = async () => {
@@ -63,14 +62,13 @@
     }
   }
 
-  if(!userClient.id) {
+  if(!user.id) {
     dispatch('logout')
   } else {
     checkGameSession()
   }
 
   const onGameCreated = async (key: string) => {
-    console.log('game created, joining...')
     socket.joinGame(key)
   }
 
@@ -118,7 +116,6 @@
     <Ingame
       socket={socket}
       gameData={gameData}
-      currentUser={currentUser}
     />
   {/if}
 </div>
