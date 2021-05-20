@@ -54,7 +54,8 @@ services:
       - REDIS_REPLICATION_MODE=master
 
   nginx:
-    image: nginx:latest
+    image: jonasal/nginx-certbot:latest
+    restart: unless-stopped
     container_name: production_nginx
     depends_on:
       - db
@@ -67,12 +68,17 @@ services:
     ports:
       - 80:80
       - 443:443
+    environment:
+      - CERTBOT_EMAIL=albin.rohde@notifyme.se
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      #- '/etc/letsencrypt/:/etc/letsencrypt/'
+      - cert:/etc/letsencrypt
+      - ./nginx.conf:/etc/nginx/user_conf.d/nginx.conf
 
 networks:
   local:
     driver: bridge
   public:
     driver: bridge
+
+volumes:
+  cert:

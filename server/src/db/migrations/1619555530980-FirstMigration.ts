@@ -4,6 +4,7 @@ export class FirstMigration1619555530980 implements MigrationInterface {
     name = 'FirstMigration1619555530980'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
         await queryRunner.query(`CREATE TABLE "black_card" ("id" SERIAL NOT NULL, "deck" character varying DEFAULT null, "text" character varying NOT NULL, CONSTRAINT "UQ_e072db27ec070353974390f8b39" UNIQUE ("text"), CONSTRAINT "PK_fb6e986af8db6449ccfcf8dc9d0" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "game_round" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "game_key_fk" uuid NOT NULL, "round_number" integer NOT NULL, "card_wizz_user_id_fk" integer, CONSTRAINT "PK_d1d2e62e56e43c9d3a576d30a54" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE INDEX "game_key_idx" ON "game_round" ("game_key_fk") `);

@@ -14,3 +14,7 @@
 # build
 *build/
 *dist/
+
+# certificates
+/cert
+*.pem

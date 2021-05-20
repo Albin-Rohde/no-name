@@ -26,27 +26,47 @@ The backend use `postgres` as its database, and `typeorm` as orm mapper. Read mo
 
 
 ## How to start the app
-To start in production
-- `docker-compose build`
-- `docker-compose up`
+### Production mode
+- First, make sure the file `.env.docker` contains the content of `.env.docker.schema`.
 
-frontend will start on 0.0.0.0:80
-backend will start on localhost:5000
+- Then run the following from root directory.
+  - `docker-compose up db redis frontend server`
+- frontend will start on `http://localhost:3000`
+- backend will start on `http://localhost:5000`
 
-To start in dev
-- `docker-compose up db redis`
-- From frontend root:
-  - `npm run dev`
-- From server root:
-  - `npm run typeorm migration:run`
-  - `npm run dev`
+### Dev mode
+- First make sure the file `/frontend/.env` contains the content of `/frontend/.env.schema`
+- and that the file `server/.env` contains the content of `/server/.env.schema`.
 
-frontend will start on localhost:3000
-backend will start on localhost:5000
+- Then run the following commands:
+  - From root
+    - `docker-compose up -d db redis`
+  - From frontend root:
+    - `npm run dev`
+  - From server root:
+    - `npm run typeorm migration:run`
+    - `npm run dev`
+
+- frontend will start on `localhost:3000`
+- backend will start on `localhost:5000`
+- In dev mode, the app will reload changes, the app does not need to be restarted between changes.
+
+### Deploy live
+- First, make sure the file `.env.docker` contains the content of `.env.docker.schema`.
+- Alter these lines in `.env.docker`
+  ```
+  API_EXTENSION=/api
+  API_BASE_URL=https://yobotics.club
+  PORT=5000
+  CLIENT_URL=https://yobotics.club
+  ```
+- Then run following command from root:
+  - `docker-compose up`
+- Provided that port forwarding is enabled, the server will be reached on `yobotics.club`
 
 
 ## How to play
-The game is not yet in a stage where it can be played, this section of the redme will be filled out later.
+The game is not yet in a stage where it can be played, this section of the readme will be filled out later.
 
 
 ## Report Issues
