@@ -71,11 +71,14 @@ services:
     environment:
       - CERTBOT_EMAIL=albin.rohde@notifyme.se
     volumes:
-      - ./cert:/etc/letsencrypt
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - cert:/etc/letsencrypt
+      - ./nginx.conf:/etc/nginx/user_conf.d/nginx.conf
 
 networks:
   local:
     driver: bridge
   public:
     driver: bridge
+
+volumes:
+  cert:
