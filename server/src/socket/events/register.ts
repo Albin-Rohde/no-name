@@ -13,10 +13,9 @@ import {
   voteCardEvent,
 } from './event-handler'
 import { Game } from "../../db/game/models/Game";
-import { GameRound } from "../../db/game/models/GameRound";
 import { normalizeGameResponse } from "./response";
 import { getGameFromUser } from "../../db/game/services";
-import {ExpectedError, GameRuleError, GameStateError} from "../error";
+import { GameRuleError } from "../error";
 import { SocketWithSession } from "../index";
 
 /**
@@ -117,8 +116,7 @@ const addListener = <T>(
 const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
   await Promise.all(game.users.map(u => u.save()))
   await game.save()
-  const currentRound = await GameRound.findOne({game_key: game.key, round_number: game.current_round})
-  io.in(game.key).emit('update', normalizeGameResponse(game, currentRound))
+  io.in(game.key).emit('update', normalizeGameResponse(game))
 }
 
 const emitRemovedEvent = async (io: Server, socket: SocketWithSession, game: Game): Promise<void> => {

@@ -157,7 +157,7 @@ export class Game extends BaseEntity {
   public assingCardWizz = async (): Promise<void> => {
     const rounds = await GameRound.find({game_key: this.key})
     let userIdx = 0
-    const saveRounds = rounds.map(round => {
+    const setCardWizzOnRounds = rounds.map(round => {
       if(userIdx == this.users.length) {
         userIdx = 0
       }
@@ -166,7 +166,8 @@ export class Game extends BaseEntity {
       userIdx++
       return round.save()
     })
-    await Promise.all(saveRounds)
+    this.round = rounds[0]
+    await Promise.all(setCardWizzOnRounds)
   }
 
   /**

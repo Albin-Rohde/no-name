@@ -19,7 +19,7 @@ export function createSocketServer(server: http.Server, options: ServerOptions) 
       allowedHeaders: [options.clientUrl, "user"],
       credentials: true,
     },
-    pingTimeout: 500,
+    pingTimeout: 30000,
     transports: ['websocket']
   })
   io.use((socket: any, next: any) => userSession(socket.request, {} as any, next))

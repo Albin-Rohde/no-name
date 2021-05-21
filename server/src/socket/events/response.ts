@@ -74,7 +74,7 @@ const normalizeBlackCardResponse = (card: BlackCard): BlackCardResponse | undefi
  * @param game
  * @param currentRound
  */
-export const normalizeGameResponse = (game: Game, currentRound: GameRound | undefined): GameResponse => ({
+export const normalizeGameResponse = (game: Game): GameResponse => ({
   key: game.key,
   gameOptions: {
     deck: game.cardDeck,
@@ -85,5 +85,5 @@ export const normalizeGameResponse = (game: Game, currentRound: GameRound | unde
   },
   started: game.started,
   blackCard: normalizeBlackCardResponse(game.blackCard),
-  users: game.users ? [...game.users.map(user => normalizeUserResponse(user, currentRound))] : []
+  users: game.users ? [...game.users.map(user => normalizeUserResponse(user, game.round))] : []
 })

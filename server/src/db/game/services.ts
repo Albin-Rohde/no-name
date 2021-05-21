@@ -21,6 +21,7 @@ export const getGameWithRelations = async (key: string): Promise<Game> => {
         'users.game',
         'users.game.round',
         'blackCard',
+        'round',
       ]
     })
   } catch (err){
