@@ -107,20 +107,17 @@ export async function deleteGameFromUser (user: User): Promise<void> {
       score: 0,
       hasPlayed: false,
     })
-    .execute()
   const deleteWcr = WhiteCardRef.createQueryBuilder()
     .where('game_key =:gameKey', {gameKey})
     .delete()
-    .execute()
   const deleteGame = Game.createQueryBuilder()
     .where('key = :gameKey', {gameKey})
     .delete()
-    .execute()
   const deleteGameRound = GameRound.createQueryBuilder()
     .where('game_key_fk = :gameKey', {gameKey})
     .delete()
-    .execute()
-  await resetUser
-  await Promise.all([deleteWcr, deleteGame, deleteGameRound])
+  await resetUser.execute()
+  await deleteGame.execute()
+  await Promise.all([deleteGameRound.execute(), deleteWcr.execute()])
   return
 }
