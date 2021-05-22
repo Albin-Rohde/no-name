@@ -33,10 +33,10 @@
     <div class="game-state-info">
       <p class="fs-3">
         {#if gameData.state === GameState.PLAYING}
-          {gameData.playedCards}/{gameData.players.length} Played
+          {gameData.playedCards.length}/{gameData.players.length} Played
         {/if}
         {#if gameData.state === GameState.FLIPPING}
-          {gameData.shownCards}/{gameData.playedCards} Flipped
+          {gameData.shownCards.length}/{gameData.playedCards.length} Flipped
         {/if}
         {#if gameData.state === GameState.VOTING}
           {#if gameData.currentUser.cardWizz}
