@@ -1,8 +1,8 @@
-import { CardState, WhiteCardRef } from '../../db/card/models/WhiteCardRef'
-import { User } from '../../db/user/models/User'
-import { Game } from '../../db/game/models/Game'
-import { GameRound } from '../../db/game/models/GameRound'
-import { BlackCard } from '../../db/card/models/BlackCard'
+import {CardState, WhiteCardRef} from '../../db/card/models/WhiteCardRef'
+import {User} from '../../db/user/models/User'
+import {Game} from '../../db/game/models/Game'
+import {GameRound} from '../../db/game/models/GameRound'
+import {BlackCard} from '../../db/card/models/BlackCard'
 
 interface GameResponse {
   key: string
@@ -44,7 +44,9 @@ interface BlackCardResponse {
 const normalizeUserResponse = (user: User, currentRound: GameRound | undefined): UserResponse => ({
   id: user.id,
   username: user.username,
-  cards: user.cards ? [...user.cards.map(normalizeCardResponse)] : [],
+  cards: user.cards
+    .filter((card) => card.state !== CardState.USED)
+    .map((card) => normalizeCardResponse(card)),
   cardWizz: currentRound?.card_wizz_user_id_fk === user.id,
   hasPlayed: user.hasPlayed,
   isHost: user.isHost,
@@ -72,7 +74,6 @@ const normalizeBlackCardResponse = (card: BlackCard): BlackCardResponse | undefi
  * normalize the data into a format that
  * the client will understand. <GameResponse>
  * @param game
- * @param currentRound
  */
 export const normalizeGameResponse = (game: Game): GameResponse => ({
   key: game.key,

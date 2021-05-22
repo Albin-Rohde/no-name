@@ -12,8 +12,8 @@ import {Game} from "../game/models/Game";
  */
 const getUnusedWhiteCards = async (gameKey: string, limit: number): Promise<WhiteCard[]> => {
   return await WhiteCard.createQueryBuilder('wc')
-    .leftJoin(WhiteCardRef, 'wcr', 'wcr.id = wc.id')
-    .where('wcr.game_key != :gameKey or wcr.game_key is null', {gameKey})
+    .leftJoin(WhiteCardRef, 'wcr', 'wcr.white_card_id_fk = wc.id')
+    .where('wcr.game_key != :gameKey', {gameKey})
     .orWhere('wcr.game_key is null')
     .orderBy('random()')
     .limit(limit)
