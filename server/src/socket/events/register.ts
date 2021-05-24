@@ -35,7 +35,7 @@ export const registerSocketEvents = (io: Server, socket: SocketWithSession) => {
 
   addListenerWithGame<number>(io, socket, Events.PLAY_CARD, playCardEvent)
   addListenerWithGame<number>(io, socket, Events.FLIP_CARD, flipCardEvent)
-  addListenerWithGame<number>(io, socket, Events.VOTE_CARD, voteCardEvent)
+  addListener<number>(io, socket, Events.VOTE_CARD, voteCardEvent)
 }
 
 /**
@@ -107,18 +107,25 @@ const addListener = <T>(
 }
 
 /**
- * Emits a update event with the game supplied
+ * Emits an update event with the game supplied
  * Saves the updated game to db before exit.
  *
  * @param io
  * @param game
  */
-const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
+export const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
   await Promise.all(game.users.map(u => u.save()))
   await game.save()
   io.in(game.key).emit('update', normalizeGameResponse(game))
 }
 
+/**
+ * Emits a removed event to all clients connected to game
+ * current socket will leave the socket room.
+ * @param io
+ * @param socket
+ * @param game
+ */
 const emitRemovedEvent = async (io: Server, socket: SocketWithSession, game: Game): Promise<void> => {
   socket.leave(game.key)
   io.in(game.key).emit('removed', game.key)

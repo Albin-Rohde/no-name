@@ -1,7 +1,8 @@
 import {Game} from "../../../db/game/models/Game";
-import {EventFunctionWithGame} from "./index";
+import {EventFunction, EventFunctionWithGame} from "./index";
 import { NotAllowedError} from "../..";
 import {CardState} from "../../../db/card/models/WhiteCardRef";
+import {getGameFromUser} from "../../../db/game/services";
 
 /**
  * Play card event
@@ -40,10 +41,16 @@ export const flipCardEvent: EventFunctionWithGame<number> = async(game, cardId: 
  * Vote card event
  * Will vote for a card in the game that the user it attached to
  * if allowed by game rules.
- * @param game
+ * @param io
+ * @param socket
  * @param cardId
  */
-export const voteCardEvent: EventFunctionWithGame<number> = async(game, cardId: number): Promise<Game> => {
+export const voteCardEvent: EventFunction<number> = async(
+  io,
+  socket,
+  cardId: number,
+): Promise<Game> => {
+  const game = await getGameFromUser(socket.request.session.user.id)
   if(!game.currentUser.isCardWizz) {
     throw new NotAllowedError('Only card wizz can vote card')
   }
