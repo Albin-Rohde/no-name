@@ -114,10 +114,9 @@ export const nextRound = async(io: Server, socket: SocketWithSession, gameKey: s
   })
   await game.newBlackCard() // new black
   await game.handOutCards() // hand out new cards
+  game.turnNumber++
+  game.currentTurn = await getGameRound(game.key, game.turnNumber)
   await game.save()
-  await Game.query(
-    'UPDATE game SET current_round = $1 where key = $2;',
-    [game.current_round + 1, gameKey],
-  )
+
   await emitUpdateEvent(io, game)
 }

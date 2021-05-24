@@ -1,6 +1,6 @@
 import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm"
 import {User} from "../../user/models/User"
-import {GameRound} from "./GameRound"
+import {GameTurn} from "./GameTurn"
 import {createWhiteCardRef, getUnusedBlackCard, getUnusedWhiteCards} from "../../card/services";
 import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {BlackCard} from "../../card/models/BlackCard";
@@ -30,8 +30,8 @@ export class Game extends BaseEntity {
   @Column({default: false})
   started: boolean
 
-  @Column({default: 1})
-  current_round: number
+  @Column({default: 1, name: 'current_turn_number'})
+  turnNumber: number
 
   @Column({name: 'host_user_id_fk'})
   hostUserId: number
@@ -42,12 +42,9 @@ export class Game extends BaseEntity {
   @JoinColumn({name: 'user_game_session_key'})
   users: User[]
 
-  @OneToOne(type => GameRound)
-  @JoinColumn([
-    {name: 'key', referencedColumnName: 'game_key'},
-    {name: 'current_round', referencedColumnName: 'round_number'},
-  ])
-  round: GameRound
+  @OneToOne(type => GameTurn)
+  @JoinColumn({name: 'game_turn_fk'})
+  currentTurn: GameTurn
 
   @ManyToOne(type => BlackCard)
   @JoinColumn({name: 'black_card_id_fk'})
@@ -151,21 +148,24 @@ export class Game extends BaseEntity {
   }
 
   /**
-   * Assign a cardwizz for each round in the game
-   * Makes sure that there is a new cardwizz for every round.
+   * Assign a cardwizz for each currentTurn in the game
+   * Makes sure that there is a new cardwizz for every currentTurn.
    */
   public assingCardWizz = async (): Promise<void> => {
-    const rounds = await GameRound.find({game_key: this.key})
-    let userIdx = 0
-    for (const round of rounds) {
-      if (userIdx == this.users.length) {
-        userIdx = 0
-      }
-      round.cardWizz = this.users[userIdx]
-      round.card_wizz_user_id_fk = this.users[userIdx].id
-      userIdx++
+    let turns: Promise<GameTurn>[] = []
+    let turnNumber = 1
+    for (let i = 0; i < this.rounds; i++) {
+      turns.push(...this.users.map((u) => {
+        const turn = new GameTurn()
+        turn.game_key = this.key
+        turn.turnNumber = turnNumber
+        turn.cardWizz = u
+        turnNumber++
+        return turn.save()
+      }))
     }
-    await Promise.all(rounds.map(r => r.save()))
+    const savedTurns = await Promise.all(turns)
+    this.currentTurn = savedTurns[0]
   }
 
   /**
@@ -189,7 +189,6 @@ export class Game extends BaseEntity {
         user.cards.push(wcr)
       }
     }
-    console.log('done')
   }
 
   /**

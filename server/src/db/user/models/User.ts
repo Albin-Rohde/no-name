@@ -67,10 +67,10 @@ export class User extends BaseEntity {
 
   /**
    * Hybrid property, boolean if the user is cardWizz for the
-   * current round in a game.
+   * current currentTurn in a game.
    */
   get isCardWizz(): boolean {
-    return this.id === this.game?.round?.card_wizz_user_id_fk
+    return this.id === this.game?.currentTurn?.card_wizz_user_id_fk
   }
 
   /**

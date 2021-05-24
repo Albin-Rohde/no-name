@@ -2,8 +2,8 @@ import {Entity, BaseEntity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Colum
 import { User } from "../../user/models/User"
 
 @Entity()
-@Index(['game_key', 'round_number'], {unique: true})
-export class GameRound extends BaseEntity {
+@Index(['game_key', 'turnNumber'], {unique: true})
+export class GameTurn extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
@@ -11,8 +11,8 @@ export class GameRound extends BaseEntity {
   @Column({name: 'game_key_fk', type: 'uuid'})
   game_key: string
 
-  @Column({name: 'round_number'})
-  round_number: number
+  @Column({name: 'turn_number'})
+  turnNumber: number
 
   @ManyToOne(type => User)
   @JoinColumn({name: 'card_wizz_user_id_fk'})
