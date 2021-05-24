@@ -73,15 +73,6 @@ export async function createNewGame (user: User, options: GameSettings): Promise
   game.cardDeck = 'default'
   game.hostUserId = user.id
   user.game = game
-
-  let gameRounds = []
-  for(let i = 1; i <= game.rounds; i++) {
-    const gameRound = new GameTurn()
-    gameRound.game_key = game.key
-    gameRound.turn_number = i
-    gameRounds.push(gameRound.save())
-  }
-  await Promise.all(gameRounds)
   await user.save()
   return game
 }
@@ -121,4 +112,16 @@ export async function deleteGameFromUser (user: User): Promise<void> {
   await deleteGame.execute()
   await Promise.all([deleteGameRound.execute(), deleteWcr.execute()])
   return
+}
+
+/**
+ * Get game currentTurn from game and currentTurn number
+ * @param gameKey
+ * @param roundNumber
+ */
+export async function getGameRound(gameKey: string, roundNumber: number) {
+  return GameTurn.createQueryBuilder('gr')
+    .where('gr.game_key_fk = :gameKey', {gameKey})
+    .andWhere('gr.turnNumber = :roundNumber', {roundNumber})
+    .getOne()
 }

@@ -152,19 +152,20 @@ export class Game extends BaseEntity {
    * Makes sure that there is a new cardwizz for every currentTurn.
    */
   public assingCardWizz = async (): Promise<void> => {
-    const rounds = await GameTurn.find({game_key: this.key})
-    let userIdx = 0
-    const setCardWizzOnRounds = rounds.map(round => {
-      if(userIdx == this.users.length) {
-        userIdx = 0
-      }
-      round.cardWizz = this.users[userIdx]
-      round.card_wizz_user_id_fk = this.users[userIdx].id
-      userIdx++
-      return round.save()
-    })
-    this.currentTurn = rounds[0]
-    await Promise.all(setCardWizzOnRounds)
+    let turns: Promise<GameTurn>[] = []
+    let turnNumber = 1
+    for (let i = 0; i < this.rounds; i++) {
+      turns.push(...this.users.map((u) => {
+        const turn = new GameTurn()
+        turn.game_key = this.key
+        turn.turn_number = turnNumber
+        turn.cardWizz = u
+        turnNumber++
+        return turn.save()
+      }))
+    }
+    const savedTurns = await Promise.all(turns)
+    this.currentTurn = savedTurns[0]
   }
 
   /**
