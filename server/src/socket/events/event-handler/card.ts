@@ -1,7 +1,9 @@
 import {Game} from "../../../db/game/models/Game";
-import {EventFunctionWithGame} from "./index";
+import {EventFunction, EventFunctionWithGame, nextRound} from "./index";
 import { NotAllowedError} from "../..";
 import {CardState} from "../../../db/card/models/WhiteCardRef";
+import {emitUpdateEvent} from "../register";
+import {getGameFromUser} from "../../../db/game/services";
 
 /**
  * Play card event
@@ -40,10 +42,16 @@ export const flipCardEvent: EventFunctionWithGame<number> = async(game, cardId: 
  * Vote card event
  * Will vote for a card in the game that the user it attached to
  * if allowed by game rules.
- * @param game
+ * @param io
+ * @param socket
  * @param cardId
  */
-export const voteCardEvent: EventFunctionWithGame<number> = async(game, cardId: number): Promise<Game> => {
+export const voteCardEvent: EventFunction<number> = async(
+  io,
+  socket,
+  cardId,
+): Promise<Game> => {
+  const game = await getGameFromUser(socket.request.session.user.id)
   if(!game.currentUser.isCardWizz) {
     throw new NotAllowedError('Only card wizz can vote card')
   }
@@ -60,5 +68,6 @@ export const voteCardEvent: EventFunctionWithGame<number> = async(game, cardId: 
   const winningUser = game.findUser(card.user_id_fk)
   winningUser.score += 1
   await card.winner()
+  nextRound(io, socket, game.key)
   return game
 }

@@ -2,10 +2,17 @@ import {Server} from "socket.io";
 import {getUserWithRelation} from "../../../db/user/services";
 import {Game} from "../../../db/game/models/Game";
 import {EventFunction, EventFunctionWithGame} from "./index";
-import {deleteGameFromUser, getGameFromUser, getGameWithRelations} from "../../../db/game/services";
+import {
+  deleteGameFromUser,
+  getGameFromUser,
+  getGameRound,
+  getGameWithRelations
+} from "../../../db/game/services";
 import {GameRuleError, GameStateError, SocketWithSession} from "../..";
 import {NotFoundError} from "../../../db/error";
-
+import {CardState} from "../../../db/card/models/WhiteCardRef";
+import {setTimeoutAsync} from "../../../util";
+import {emitUpdateEvent} from "../register";
 
 /**
  * Gets a game if any is attached to the
@@ -13,7 +20,7 @@ import {NotFoundError} from "../../../db/error";
  * @param io
  * @param socket
  */
-export const getGameEvent: EventFunction<never> = async(io: Server, socket: SocketWithSession) => {
+export const getGameEvent: EventFunction<never> = async(io, socket) => {
   try {
     const game = await getGameFromUser(socket.request.session.user.id)
     if(!socket.rooms.has(game.key)) {
@@ -76,7 +83,41 @@ export const leaveGameEvent: EventFunctionWithGame<never> = async(game) => {
   return game
 }
 
+/**
+ * Deletes the game from database
+ * @param game
+ */
 export const deleteGameEvent: EventFunctionWithGame<never> = async(game) => {
   await deleteGameFromUser(game.currentUser)
   return null
+}
+
+export const nextRound = async(io: Server, socket: SocketWithSession, gameKey: string) => {
+  await setTimeoutAsync(10000)
+  const game = await getGameWithRelations(gameKey)
+  const updateCards = game.allPlayerCards // set cards to used
+    .filter((card) => {
+      return (
+        card.state === CardState.PLAYED_SHOW ||
+        card.state === CardState.WINNER
+      )
+    })
+    .map(async (card) => {
+      card.state = CardState.USED
+      await card.save()
+      return
+    })
+  await Promise.all(updateCards)
+  await game.users.map((user) => {
+    user.hasPlayed = false
+    user.save()
+  })
+  await game.newBlackCard() // new black
+  await game.handOutCards() // hand out new cards
+  await game.save()
+  await Game.query(
+    'UPDATE game SET current_round = $1 where key = $2;',
+    [game.current_round + 1, gameKey],
+  )
+  await emitUpdateEvent(io, game)
 }

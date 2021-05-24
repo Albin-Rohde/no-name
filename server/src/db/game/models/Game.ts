@@ -1,7 +1,7 @@
 import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm"
 import {User} from "../../user/models/User"
 import {GameRound} from "./GameRound"
-import {getUnusedBlackCard, getUnusedWhiteCards} from "../../card/services";
+import {createWhiteCardRef, getUnusedBlackCard, getUnusedWhiteCards} from "../../card/services";
 import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {BlackCard} from "../../card/models/BlackCard";
 import {NotFoundError} from "../../error";
@@ -157,17 +157,15 @@ export class Game extends BaseEntity {
   public assingCardWizz = async (): Promise<void> => {
     const rounds = await GameRound.find({game_key: this.key})
     let userIdx = 0
-    const setCardWizzOnRounds = rounds.map(round => {
-      if(userIdx == this.users.length) {
+    for (const round of rounds) {
+      if (userIdx == this.users.length) {
         userIdx = 0
       }
       round.cardWizz = this.users[userIdx]
       round.card_wizz_user_id_fk = this.users[userIdx].id
       userIdx++
-      return round.save()
-    })
-    this.round = rounds[0]
-    await Promise.all(setCardWizzOnRounds)
+    }
+    await Promise.all(rounds.map(r => r.save()))
   }
 
   /**
@@ -178,21 +176,20 @@ export class Game extends BaseEntity {
    */
   public handOutCards = async (): Promise<void> => {
     for(const user of this.users) {
-      const cardAmount = this.playCards - user.cards.length
-      const whiteCards = await getUnusedWhiteCards(this.key, cardAmount)
-      user.cards = whiteCards.map(wc => {
-        const wcr = new WhiteCardRef()
-        wcr.user = user
-        wcr.user_id_fk = user.id
-        wcr.game_key = this.key
-        wcr.state = CardState.HAND
-        wcr.white_card = wc
-        wcr.white_card_id_fk = wc.id
-        return wcr
-      })
-      await Promise.all(user.cards.map(c => c.save()))
-      await user.save()
+      const cardOnHand = user.cards.filter((card) => card.state === CardState.HAND).length
+      const cardDelta = this.playCards - cardOnHand
+      const whiteCards = await getUnusedWhiteCards(this.key, cardDelta)
+      for (const wc of whiteCards) {
+        const wcr = await createWhiteCardRef({
+          user,
+          whiteCard: wc,
+          gameKey: this.key,
+          state: CardState.HAND,
+        })
+        user.cards.push(wcr)
+      }
     }
+    console.log('done')
   }
 
   /**

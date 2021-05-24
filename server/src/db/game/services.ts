@@ -10,11 +10,13 @@ import {WhiteCardRef} from "../card/models/WhiteCardRef";
 /**
  * Get a game with all relations needed
  * @param key
+ * @param relations - Optionally specify exactly what
+ * relations to retrieve with the game.
  */
-export const getGameWithRelations = async (key: string): Promise<Game> => {
+export const getGameWithRelations = async (key: string, relations?: string[]): Promise<Game> => {
   try {
     return await Game.findOneOrFail(key, {
-      relations: [
+      relations: relations || [
         'users',
         'users.cards',
         'users.cards.white_card',
@@ -121,4 +123,17 @@ export async function deleteGameFromUser (user: User): Promise<void> {
   await deleteGame.execute()
   await Promise.all([deleteGameRound.execute(), deleteWcr.execute()])
   return
+}
+
+
+/**
+ * Get game round from game and round number
+ * @param gameKey
+ * @param roundNumber
+ */
+export async function getGameRound(gameKey: string, roundNumber: number) {
+  return GameRound.createQueryBuilder('gr')
+    .where('gr.game_key_fk = :gameKey', {gameKey})
+    .andWhere('gr.round_number = :roundNumber', {roundNumber})
+    .getOne()
 }

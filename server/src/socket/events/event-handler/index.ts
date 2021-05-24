@@ -17,6 +17,6 @@ export type EventFunction<T> = (io: Server, socket: SocketWithSession, ...args: 
 
 export type EventFunctionWithGame<T> = (game: Game, ...args: T[]) => Promise<Game | null>
 
-export { getGameEvent, joinGameEvent, startGameEvent, leaveGameEvent, deleteGameEvent } from './game'
+export { getGameEvent, joinGameEvent, startGameEvent, leaveGameEvent, deleteGameEvent, nextRound } from './game'
 
 export { playCardEvent, flipCardEvent, voteCardEvent } from './card'
