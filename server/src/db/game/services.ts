@@ -122,6 +122,6 @@ export async function deleteGameFromUser (user: User): Promise<void> {
 export async function getGameRound(gameKey: string, roundNumber: number) {
   return GameTurn.createQueryBuilder('gr')
     .where('gr.game_key_fk = :gameKey', {gameKey})
-    .andWhere('gr.turnNumber = :roundNumber', {roundNumber})
+    .andWhere('gr.turn_number = :roundNumber', {roundNumber})
     .getOne()
 }

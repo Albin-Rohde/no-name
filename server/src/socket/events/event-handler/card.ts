@@ -1,8 +1,9 @@
-import {Game} from "../../../db/game/models/Game";
-import {EventFunction, EventFunctionWithGame} from "./index";
+import { Game } from "../../../db/game/models/Game";
+import { EventFunction, EventFunctionWithGame } from "./index";
 import { NotAllowedError} from "../..";
-import {CardState} from "../../../db/card/models/WhiteCardRef";
-import {getGameFromUser} from "../../../db/game/services";
+import { CardState } from "../../../db/card/models/WhiteCardRef";
+import { getGameFromUser } from "../../../db/game/services";
+import { nextRoundEvent } from "./game";
 
 /**
  * Play card event
@@ -67,5 +68,6 @@ export const voteCardEvent: EventFunction<number> = async(
   const winningUser = game.findUser(card.user_id_fk)
   winningUser.score += 1
   await card.winner()
+  nextRoundEvent(io, socket, game.key)
   return game
 }
