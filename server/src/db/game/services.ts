@@ -2,7 +2,7 @@ import { User } from "../user/models/User"
 import { Game } from "./models/Game"
 import { NotFoundError } from "../error";
 import {v4 as uuidv4} from "uuid";
-import {GameRound} from "./models/GameRound";
+import {GameTurn} from "./models/GameTurn";
 import {GameRuleError} from "../../socket";
 import {WhiteCardRef} from "../card/models/WhiteCardRef";
 
@@ -19,9 +19,9 @@ export const getGameWithRelations = async (key: string): Promise<Game> => {
         'users.cards',
         'users.cards.white_card',
         'users.game',
-        'users.game.round',
+        'users.game.currentTurn',
         'blackCard',
-        'round',
+        'currentTurn',
       ]
     })
   } catch (err){
@@ -76,9 +76,9 @@ export async function createNewGame (user: User, options: GameSettings): Promise
 
   let gameRounds = []
   for(let i = 1; i <= game.rounds; i++) {
-    const gameRound = new GameRound()
+    const gameRound = new GameTurn()
     gameRound.game_key = game.key
-    gameRound.round_number = i
+    gameRound.turn_number = i
     gameRounds.push(gameRound.save())
   }
   await Promise.all(gameRounds)
@@ -114,7 +114,7 @@ export async function deleteGameFromUser (user: User): Promise<void> {
   const deleteGame = Game.createQueryBuilder()
     .where('key = :gameKey', {gameKey})
     .delete()
-  const deleteGameRound = GameRound.createQueryBuilder()
+  const deleteGameRound = GameTurn.createQueryBuilder()
     .where('game_key_fk = :gameKey', {gameKey})
     .delete()
   await resetUser.execute()

@@ -1,7 +1,7 @@
 import {CardState, WhiteCardRef} from '../../db/card/models/WhiteCardRef'
 import {User} from '../../db/user/models/User'
 import {Game} from '../../db/game/models/Game'
-import {GameRound} from '../../db/game/models/GameRound'
+import {GameTurn} from '../../db/game/models/GameTurn'
 import {BlackCard} from '../../db/card/models/BlackCard'
 
 interface GameResponse {
@@ -41,7 +41,7 @@ interface BlackCardResponse {
   text: string,
 }
 
-const normalizeUserResponse = (user: User, currentRound: GameRound | undefined): UserResponse => ({
+const normalizeUserResponse = (user: User, currentRound: GameTurn | undefined): UserResponse => ({
   id: user.id,
   username: user.username,
   cards: user.cards
@@ -86,5 +86,5 @@ export const normalizeGameResponse = (game: Game): GameResponse => ({
   },
   started: game.started,
   blackCard: normalizeBlackCardResponse(game.blackCard),
-  users: game.users ? [...game.users.map(user => normalizeUserResponse(user, game.round))] : []
+  users: game.users ? [...game.users.map(user => normalizeUserResponse(user, game.currentTurn))] : []
 })

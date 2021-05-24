@@ -1,6 +1,6 @@
 import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm"
 import {User} from "../../user/models/User"
-import {GameRound} from "./GameRound"
+import {GameTurn} from "./GameTurn"
 import {createWhiteCardRef, getUnusedBlackCard, getUnusedWhiteCards} from "../../card/services";
 import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {BlackCard} from "../../card/models/BlackCard";
@@ -31,7 +31,7 @@ export class Game extends BaseEntity {
   started: boolean
 
   @Column({default: 1})
-  current_round: number
+  turn_number: number
 
   @Column({name: 'host_user_id_fk'})
   hostUserId: number
@@ -42,12 +42,9 @@ export class Game extends BaseEntity {
   @JoinColumn({name: 'user_game_session_key'})
   users: User[]
 
-  @OneToOne(type => GameRound)
-  @JoinColumn([
-    {name: 'key', referencedColumnName: 'game_key'},
-    {name: 'current_round', referencedColumnName: 'round_number'},
-  ])
-  round: GameRound
+  @OneToOne(type => GameTurn)
+  @JoinColumn({name: 'current_turn_fk'})
+  currentTurn: GameTurn
 
   @ManyToOne(type => BlackCard)
   @JoinColumn({name: 'black_card_id_fk'})
@@ -151,11 +148,11 @@ export class Game extends BaseEntity {
   }
 
   /**
-   * Assign a cardwizz for each round in the game
-   * Makes sure that there is a new cardwizz for every round.
+   * Assign a cardwizz for each currentTurn in the game
+   * Makes sure that there is a new cardwizz for every currentTurn.
    */
   public assingCardWizz = async (): Promise<void> => {
-    const rounds = await GameRound.find({game_key: this.key})
+    const rounds = await GameTurn.find({game_key: this.key})
     let userIdx = 0
     const setCardWizzOnRounds = rounds.map(round => {
       if(userIdx == this.users.length) {
@@ -166,7 +163,7 @@ export class Game extends BaseEntity {
       userIdx++
       return round.save()
     })
-    this.round = rounds[0]
+    this.currentTurn = rounds[0]
     await Promise.all(setCardWizzOnRounds)
   }
 
