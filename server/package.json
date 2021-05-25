@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node build/src/app.js",
     "prestart": "npm run build && npm run migrate:latest",
-    "dev": "nodemon",
+    "dev": "TYPEORM_ENTITIES=src/db/**/models/*.ts nodemon",
     "build": "rimraf ./build && tsc",
     "typeorm": "node ./node_modules/typeorm/cli.js",
     "migrate:latest": "npm run typeorm migration:run"
