@@ -4,7 +4,7 @@ import http from "http";
 import { ServerOptions } from "../app";
 import { authSocketUser } from "./authenticate";
 import { registerSocketEvents } from "./events/register";
-import {SocketWithSession} from "./index";
+import { SocketWithSession } from "./index";
 
 /**
  * Creates a socket.io websocket server
@@ -19,14 +19,18 @@ export function createSocketServer(server: http.Server, options: ServerOptions) 
       allowedHeaders: [options.clientUrl, "user"],
       credentials: true,
     },
-    pingTimeout: 30000,
+    pingTimeout: 500,
     transports: ['websocket']
   })
-  io.use((socket: any, next: any) => userSession(socket.request, {} as any, next))
-  io.on('connection', async (socket: SocketWithSession) => {
-    io.use((socket: any, next: any) => authSocketUser(socket, io, next))
-    registerSocketEvents(io, socket)
-    socket.emit('connected')
-  })
+  try {
+    io.use((socket: any, next: any) => userSession(socket.request, {} as any, next))
+    io.on('connection', async (socket: SocketWithSession) => {
+      io.use((socket: any, next: any) => authSocketUser(socket, io, next))
+      registerSocketEvents(io, socket)
+      socket.emit('connected')
+    })
+  } catch (err) {
+    console.error(err)
+  }
   return io
 }
