@@ -11,8 +11,8 @@ export const getUserWithRelation = async (userId: number, relations: Array<strin
   try {
     return User.findOneOrFail(userId, {
       relations: relations ? relations : [
-        'cards',
-        'cards.white_card',
+        '_cards',
+        '_cards.white_card',
       ]
     })
   } catch(err) {

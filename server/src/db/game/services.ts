@@ -16,8 +16,8 @@ export const getGameWithRelations = async (key: string): Promise<Game> => {
     return await Game.findOneOrFail(key, {
       relations: [
         '_users',
-        '_users.cards',
-        '_users.cards.white_card',
+        '_users._cards',
+        '_users._cards.white_card',
         '_users.game',
         '_users.game.currentTurn',
         'blackCard',
