@@ -1,25 +1,25 @@
 <script lang="typescript">
   import type {CardResponse} from '../../clients/ResponseTypes'
-  import { CardState } from '../../clients/ResponseTypes'
+  import {CardState} from '../../clients/ResponseTypes'
   import BlackCard from '../../components/BlackCard.svelte'
   import PlayerInfo from '../../components/PlayerInfo.svelte'
-  import WhiteCard from '../../components/WhiteCard.svelte'
-  import type { SocketClient } from '../../clients/SocketClient'
-  import Game, { GameState } from "../../clients/Game";
+  import type {SocketClient} from '../../clients/SocketClient'
+  import Game, {GameState} from "../../clients/Game";
+  import RenderWhiteCards from "../../components/RenderWhiteCards.svelte";
 
   export let socket: SocketClient
   export let gameData: Game
 
   const handleCardClick = (card: CardResponse): void => {
-    if(card.state === CardState.HAND) {
-      if(!gameData.currentUser.cardWizz) {
+    if (card.state === CardState.HAND) {
+      if (!gameData.currentUser.cardWizz) {
         return socket.playCard(card)
       }
     }
-    if(card.state === CardState.PLAYED_HIDDEN) {
+    if (card.state === CardState.PLAYED_HIDDEN) {
       return socket.flipCard(card)
     }
-    if(card.state === CardState.PLAYED_SHOW) {
+    if (card.state === CardState.PLAYED_SHOW) {
       return socket.voteCard(card)
     }
   }
@@ -53,41 +53,29 @@
     <div class="main-coll">
       <div class="top-cards">
         <BlackCard text={gameData.blackCard.text}/>
-        {#each gameData.users as user}
-          {#each user.cards as card}
-            {#if gameData.state !== GameState.DISPLAY_WINNER}
-              {#if card.state === CardState.PLAYED_HIDDEN || card.state === CardState.PLAYED_SHOW}
-                <div class="white-card" on:click={() => handleCardClick(card)}>
-                  <WhiteCard
-                    text={card.text}
-                    blackCardText={gameData.blackCard.text}
-                    cardState={card.state}/>
-                </div>
-              {/if}
-            {/if}
-            {#if gameData.state === GameState.DISPLAY_WINNER}
-              {#if card.state === CardState.WINNER}
-                <div class="white-card" on:click={() => handleCardClick(card)}>
-                  <WhiteCard
-                    text={card.text}
-                    blackCardText={gameData.blackCard.text}
-                    cardState={card.state}/>
-                </div>
-              {/if}
-            {/if}
-          {/each}
-        {/each}
+        {#if gameData.state !== GameState.DISPLAY_WINNER}
+          <RenderWhiteCards
+            whiteCards={gameData.playedCards}
+            blackCard={gameData.blackCard}
+            handleCardClick={handleCardClick}
+          />
+        {/if}
+        {#if gameData.state === GameState.DISPLAY_WINNER}
+          <RenderWhiteCards
+            whiteCards={[gameData.winnerCard]}
+            blackCard={gameData.blackCard}
+            handleCardClick={handleCardClick}
+          />
+        {/if}
       </div>
     </div>
   </div>
   <div class="white-cards">
-    {#each gameData.currentUser.cards as card}
-      {#if card.state === CardState.HAND}
-        <div class="white-card" on:click={() => handleCardClick(card)}>
-          <WhiteCard text={card.text} disabled={gameData.currentUser.cardWizz} cardState={card.state}/>
-        </div>
-      {/if}
-    {/each}
+    <RenderWhiteCards
+      disabled={gameData.currentUser.cardWizz}
+      whiteCards={gameData.cardsOnHand}
+      handleCardClick={handleCardClick}
+    />
   </div>
 </div>
 
@@ -133,9 +121,5 @@
     width: 97.5%;
     margin-left: 2.5%;
     display: flex;
-  }
-  .white-card {
-    height: 22vh;
-    margin-right: 10px;
   }
 </style>

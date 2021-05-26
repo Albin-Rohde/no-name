@@ -1,27 +1,20 @@
 <script lang="typescript">
-  import { CardState } from "../clients/ResponseTypes";
+  import {BlackCardResponse, CardResponse, CardState} from "../clients/ResponseTypes";
+  import CombinedCardText from "./CombinedCardText.svelte";
 
-  export let text: string = ''
-  export let blackCardText: string = ''
+  export let whiteCard: CardResponse
+  export let blackCard: BlackCardResponse
   export let disabled: boolean = false
-  export let cardState: CardState
-
-  const combinedCardText = (whiteText: string, blackText: string): string[] => {
-    whiteText = `${whiteText}`
-    const blackParts = blackText.split('_')
-    return [blackParts[0], whiteText, blackParts[1]]
-  }
-  const cardParts = combinedCardText(text, blackCardText)
 </script>
 
 
 <div class={disabled ? "card-disabled" : "card"}>
   <p class={disabled ? "disabled" : "active"}>
-    {#if cardState !== CardState.PLAYED_HIDDEN}
-      {#if blackCardText}
-        {cardParts[0]} <p class="bold">{cardParts[1]}</p> {cardParts[2]}
+    {#if whiteCard.state !== CardState.PLAYED_HIDDEN}
+      {#if blackCard}
+        <CombinedCardText blackCard={blackCard} whiteCard={whiteCard}/>
         {:else }
-          {text}
+          {whiteCard.text}
       {/if}
     {/if}
   </p>
@@ -37,10 +30,6 @@
     padding: 10px;
     transition: background-color 0.5s;
     cursor: pointer;
-  }
-
-  .bold {
-    font-weight: 600;
   }
 
   .card-disabled {
@@ -64,8 +53,5 @@
   .disabled {
     color:rgba(138, 138, 138, 0.479);
     font-weight: 100;
-  }
-  p {
-    font-size: 1.8vh;
   }
 </style>

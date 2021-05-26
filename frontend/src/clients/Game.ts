@@ -54,10 +54,17 @@ export default class Game {
   public get playedCards(): CardResponse[] {
     let allPlayedCards: CardResponse[] = []
     for (const player of this.players) {
-      // todo: remember that !== CardState.HAND will also return card with state USED
       allPlayedCards = [...allPlayedCards, ...player.cards.filter(card => card.state !== CardState.HAND)]
     }
-    return allPlayedCards
+    return allPlayedCards.sort((a, b) => a.id - b.id)
+  }
+
+  public get winnerCard(): CardResponse {
+    return this.playedCards.find((card) => card.state === CardState.WINNER)
+  }
+
+  public get cardsOnHand(): CardResponse[] {
+    return this.currentUser.cards.filter(card => card.state === CardState.HAND)
   }
 
   public get hiddenCards(): CardResponse[] {
