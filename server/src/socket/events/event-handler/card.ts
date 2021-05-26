@@ -12,7 +12,10 @@ import { nextRoundEvent } from "./game";
  * @param game
  * @param cardId - Card to play
  */
-export const playCardEvent: EventFunctionWithGame<number> = async(game, cardId: number): Promise<Game> => {
+export const playCardEvent: EventFunctionWithGame<number> = async(
+  game,
+  cardId: number
+): Promise<Game> => {
   const card = game.currentUser.findCard(cardId)
   await card.play()
   game.currentUser.hasPlayed = true
@@ -26,7 +29,10 @@ export const playCardEvent: EventFunctionWithGame<number> = async(game, cardId: 
  * @param game
  * @param cardId
  */
-export const flipCardEvent: EventFunctionWithGame<number> = async(game, cardId: number): Promise<Game> => {
+export const flipCardEvent: EventFunctionWithGame<number> = async(
+  game,
+  cardId: number
+): Promise<Game> => {
   if(!game.currentUser.isCardWizz) {
     throw new NotAllowedError('Only card wizz can flip card')
   }

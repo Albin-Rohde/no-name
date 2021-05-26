@@ -28,13 +28,12 @@ interface CreateUserData {
 
 /**
  * Registers a new user to the app
- * Will register a user from the data of body arument.
+ * Will register a user from the data of the body argument.
  *
  * Returns the newly created user on success
  * @param body
  */
 export async function createUser (body: CreateUserData) {
-  const user = new User()
   if(!body.email || !body.password || !body.username) {
     throw new BadRequestError(`'email', 'password' and 'username' required on body`)
   }
@@ -45,6 +44,7 @@ export async function createUser (body: CreateUserData) {
   if (existingUser) {
     throw new CreateError('A user with same Email or Username already exist')
   }
+  const user = new User()
   user.password = await bcrypt.hash(body.password, 10)
   user.email = body.email
   user.username = body.username
