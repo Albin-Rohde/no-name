@@ -55,15 +55,22 @@ gameRouter.get('/users', gameRequired, async (req: Request, res: Response) => {
 })
 
 gameRouter.get('/join', async (req: Request, res: Response) => {
-  const gameKey = req.query.key.toString()
-  const user = req.session.user
-  const game = await getGameWithRelations(gameKey)
-  if (user.game_fk) {
-    handleRestError(req, res, new ExpectedError('Game already exist on user'))
+  try {
+    const gameKey = req.query.key.toString()
+    const user = req.session.user
+    const game = await getGameWithRelations(gameKey)
+    if (game.users.some(u => u.id === user.id)) {
+      return res.redirect(process.env.CLIENT_URL)
+    }
+    if (user.game_fk) {
+      throw new ExpectedError('User is already connected to a different game')
+    }
+    game.addPlayer(user)
+    await game.save()
+    res.redirect(process.env.CLIENT_URL)
+  } catch (err) {
+    handleRestError(req, res, err)
   }
-  game.addPlayer(user)
-  await game.save()
-  res.redirect(process.env.CLIENT_URL)
 })
 
 

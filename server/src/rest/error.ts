@@ -1,6 +1,8 @@
 export class ExpectedError extends Error {
+  public message
   constructor(message: string) {
     super(message);
+    this.name = this.constructor.name
   }
 }
 
