@@ -61,7 +61,6 @@ const addListenerWithGame = <T>(
 ): void => {
   async function eventCallback(...args: T[]) {
     try {
-      // @ts-ignore
       const g = await getGameFromUser(socket.request.session.user.id)
       await eventFn(g, ...args)
         .then((game) => {
