@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express'
 import {loginRequired, gameRequired, handleRestError} from '../authenticate'
-import { createNewGame, deleteGameFromUser } from '../../db/game/services'
+import {createNewGame, deleteGameFromUser, getGameFromUser, getGameWithRelations} from '../../db/game/services'
 import {RestResponse} from "../types";
 import {Game} from "../../db/game/models/Game";
 import {User} from "../../db/user/models/User";
+import {ExpectedError} from "../error";
 
 const gameRouter = Router()
 
@@ -51,6 +52,25 @@ gameRouter.get('/users', gameRequired, async (req: Request, res: Response) => {
     data: req.session.user.game.users
   }
   return res.json(response)
+})
+
+gameRouter.get('/join', async (req: Request, res: Response) => {
+  try {
+    const gameKey = req.query.key.toString()
+    const user = req.session.user
+    const game = await getGameWithRelations(gameKey)
+    if (game.users.some(u => u.id === user.id)) {
+      return res.redirect(process.env.CLIENT_URL)
+    }
+    if (user.game_fk) {
+      throw new ExpectedError('User is already connected to a different game')
+    }
+    game.addPlayer(user)
+    await game.save()
+    res.redirect(process.env.CLIENT_URL)
+  } catch (err) {
+    handleRestError(req, res, err)
+  }
 })
 
 

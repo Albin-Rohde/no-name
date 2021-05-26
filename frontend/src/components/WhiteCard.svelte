@@ -31,7 +31,7 @@
 <style>
   .card {
     width: 8.9vw;
-    height: 220px;
+    height: 22vh;
     background-color: rgb(226, 226, 226);
     box-shadow: 0px 2px 5px rgb(124, 124, 124);
     padding: 10px;
@@ -45,7 +45,7 @@
 
   .card-disabled {
     width: 8.9vw;
-    height: 220px;
+    height: 22vh;
     background-color: rgba(189, 189, 189, 0.315);
     box-shadow: 0px 2px 5px rgb(124, 124, 124);
     padding: 10px;
@@ -64,5 +64,8 @@
   .disabled {
     color:rgba(138, 138, 138, 0.479);
     font-weight: 100;
+  }
+  p {
+    font-size: 1.8vh;
   }
 </style>

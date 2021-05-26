@@ -46,7 +46,10 @@ export const gameRequired = async (req: Request, res: Response, next: NextFuncti
 export const handleRestError = (req: Request, res: Response, err: Error) => {
   const response: RestResponse<null> = {
     ok: false,
-    err: err,
+    err: {
+      message: err.message,
+      name: err.name
+    },
     data: null
   }
   if (err instanceof ExpectedError || err instanceof GameRuleError) {
@@ -54,6 +57,6 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
   }
   // makes sure any unexpected error is not sent to client.
   console.error(err)
-  response.err = new Error('INTERNAL_ERROR')
+  response.err = {name: 'INTERNAL_ERROR', message: 'UNKNOWN_INTERNAL_ERROR'}
   return res.status(500).json(response)
 }
