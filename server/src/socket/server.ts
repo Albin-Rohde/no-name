@@ -25,7 +25,6 @@ export function createSocketServer(server: http.Server, options: ServerOptions) 
   try {
     io.use((socket: any, next: any) => userSession(socket.request, {} as any, next))
     io.on('connection', async (socket: SocketWithSession) => {
-      io.use((socket: any, next: any) => authSocketUser(socket, io, next))
       registerSocketEvents(io, socket)
       socket.emit('connected')
     })

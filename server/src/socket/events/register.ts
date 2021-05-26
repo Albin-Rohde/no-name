@@ -17,6 +17,7 @@ import { normalizeGameResponse } from "./response";
 import { getGameFromUser } from "../../db/game/services";
 import { GameRuleError } from "../error";
 import { SocketWithSession } from "../index";
+import {authSocketUser} from "../authenticate";
 
 /**
  * Register events to the socket
@@ -61,7 +62,8 @@ const addListenerWithGame = <T>(
 ): void => {
   async function eventCallback(...args: T[]) {
     try {
-      const g = await getGameFromUser(socket.request.session.user.id)
+      const user = await authSocketUser(socket)
+      const g = await getGameFromUser(user.id)
       await eventFn(g, ...args)
         .then((game) => {
           if (game) {
