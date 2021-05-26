@@ -135,7 +135,7 @@
     display: flex;
   }
   .white-card {
-    height: 220px;
+    height: 22vh;
     margin-right: 10px;
   }
 </style>
