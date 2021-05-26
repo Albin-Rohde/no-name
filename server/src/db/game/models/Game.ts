@@ -40,7 +40,7 @@ export class Game extends BaseEntity {
     onDelete: "CASCADE",
   })
   @JoinColumn({name: 'user_game_session_key'})
-  users: User[]
+  _users: User[]
 
   @OneToOne(type => GameTurn)
   @JoinColumn({name: 'current_turn_fk'})
@@ -53,6 +53,21 @@ export class Game extends BaseEntity {
   @Column({nullable: true})
   black_card_id_fk: number
 
+  /**
+   * Sorted array of all users on the game
+   */
+  public get users(): User[] {
+    return this._users.sort((a, b) => a.id - b.id)
+  }
+
+  /**
+   * Set users on the game
+   * shortcut to not have to use game._users
+   * @param users
+   */
+  public set users(users: User[]) {
+    this._users = users
+  }
   /**
    * @private currentUserId
    * Holds the id of what to be considered the currentUser

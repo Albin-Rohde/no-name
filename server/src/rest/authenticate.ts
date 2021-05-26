@@ -9,7 +9,7 @@ const authUser = async (sessionUser: User) => {
   if(!sessionUser) {
     throw new AuthenticationError('NO_SESSION_USER')
   }
-  const user = await User.findOne(sessionUser.id, {relations: ['game', 'game.users']})
+  const user = await User.findOne(sessionUser.id, {relations: ['game', 'game._users']})
   if(!user) {
     throw new NotFoundError(`Could not find <User> with id ${sessionUser.id}`)
   }

@@ -33,7 +33,7 @@ export class User extends BaseEntity {
   @Column({name: "username"})
   username: string
 
-  @ManyToOne(type => Game, game => game.users, {
+  @ManyToOne(type => Game, game => game._users, {
     cascade: true,
   })
   @JoinColumn({name: 'game_fk'})
