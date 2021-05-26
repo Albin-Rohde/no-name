@@ -33,7 +33,7 @@ export class User extends BaseEntity {
   @Column({name: "username"})
   username: string
 
-  @ManyToOne(type => Game, game => game.users, {
+  @ManyToOne(type => Game, game => game._users, {
     cascade: true,
   })
   @JoinColumn({name: 'game_fk'})
@@ -44,7 +44,7 @@ export class User extends BaseEntity {
 
   @OneToMany(type => WhiteCardRef, card => card.user)
   @JoinColumn({name: 'user_game_session_key'})
-  cards: WhiteCardRef[]
+  _cards: WhiteCardRef[]
 
   @Column({nullable: false, name: 'has_played', default: false})
   hasPlayed: boolean
@@ -57,6 +57,14 @@ export class User extends BaseEntity {
 
   @DeleteDateColumn()
   deleted_at: string
+
+  public get cards(): WhiteCardRef[] {
+    return this._cards.sort((a, b) => a.id - b.id)
+  }
+
+  public set cards(cards: WhiteCardRef[]) {
+    this._cards = cards
+  }
 
   /**
    * Hybrid property, boolean if the user is host over a geme
