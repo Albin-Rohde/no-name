@@ -8,7 +8,7 @@
   export let socket: SocketClient
   export let gameData: Game
   const dispatch = createEventDispatcher()
-
+  const joinLink = `${process.env.API_BASE_URL}${process.env.API_EXTENSION}/game/join?key=${gameData.key}`
 </script>
 
 <div class="content-grid">
@@ -21,7 +21,7 @@
       <p class="fs-4">Invite players with the following key</p><br>
     </div>
     <div class="flex-center">
-      <CopyTextField value={gameData.key} />
+      <CopyTextField value={joinLink} />
     </div>
     {#if gameData.currentUser.isHost }
       <div class="button-grid">
