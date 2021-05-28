@@ -1,5 +1,6 @@
 import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinColumn, ManyToOne, Unique, OneToMany} from "typeorm"
 import { WhiteCardRef } from "./WhiteCardRef"
+import {CardDeck} from "./CardDeck";
 
 export enum WhiteCardType {
   NOUN='noun',
@@ -16,11 +17,6 @@ export class WhiteCard extends BaseEntity {
   id: number
 
   @Column({
-    default: null
-  })
-  deck: string
-
-  @Column({
     type: 'enum',
     enum: WhiteCardType,
     default: WhiteCardType.UNKNOWN
@@ -29,6 +25,10 @@ export class WhiteCard extends BaseEntity {
 
   @Column({name: 'text'})
   text: string
+
+  @ManyToOne(type => CardDeck, cardDeck => cardDeck.whiteCards)
+  @JoinColumn({name: 'deck_fk'})
+  deck: CardDeck
 
   @OneToMany(type => WhiteCardRef, card => card.white_card)
   @JoinColumn({name: 'player_cards'})

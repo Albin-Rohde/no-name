@@ -18,7 +18,7 @@ export class Game extends BaseEntity {
   @Column()
   rounds: number
 
-  @Column({name: 'card_deck'})
+  @Column({name: 'card_deck', nullable: false})
   cardDeck: string
 
   @Column({name: 'private_lobby'})
