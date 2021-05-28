@@ -78,7 +78,7 @@ const normalizeBlackCardResponse = (card: BlackCard): BlackCardResponse | undefi
 export const normalizeGameResponse = (game: Game): GameResponse => ({
   key: game.key,
   gameOptions: {
-    deck: game.cardDeck,
+    deck: game.cardDeck.name,
     cardLimit: game.playCards,
     playerLimit: game.playerLimit,
     privateLobby: game.privateLobby,

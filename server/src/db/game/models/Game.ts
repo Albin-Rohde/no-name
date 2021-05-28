@@ -1,10 +1,20 @@
-import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm"
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn
+} from "typeorm"
 import {User} from "../../user/models/User"
 import {GameTurn} from "./GameTurn"
 import {createWhiteCardRef, getUnusedBlackCard, getUnusedWhiteCards} from "../../card/services";
 import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {BlackCard} from "../../card/models/BlackCard";
 import {NotFoundError} from "../../error";
+import {CardDeck} from "../../card/models/CardDeck";
 
 @Entity()
 
@@ -18,8 +28,12 @@ export class Game extends BaseEntity {
   @Column()
   rounds: number
 
-  @Column({name: 'card_deck', nullable: false})
-  cardDeck: string
+  @ManyToOne(type => CardDeck)
+  @JoinColumn({name: 'card_deck_fk'})
+  cardDeck: CardDeck
+
+  @Column({name: 'card_deck_fk'})
+  card_deck_fk: number
 
   @Column({name: 'private_lobby'})
   privateLobby: boolean

@@ -11,7 +11,7 @@
     rounds: number,
     playerLimit: number,
     private: boolean,
-    cardDeck: 'default',
+    cardDeck: number,
   }
 
   const gameSettings: gameSettingsType = {
@@ -19,7 +19,7 @@
     rounds: 3,
     playerLimit: 2,
     private: true,
-    cardDeck: 'default'
+    cardDeck: 1, // TODO: implement way to pick card deck to use.
   }
 
   const createGame = async () => {

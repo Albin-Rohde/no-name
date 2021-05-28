@@ -5,6 +5,8 @@ import {v4 as uuidv4} from "uuid";
 import {GameTurn} from "./models/GameTurn";
 import {GameRuleError} from "../../socket";
 import {WhiteCardRef} from "../card/models/WhiteCardRef";
+import {CardDeck} from "../card/models/CardDeck";
+import {BadRequestError} from "../../rest/error";
 
 
 /**
@@ -15,13 +17,14 @@ export const getGameWithRelations = async (key: string): Promise<Game> => {
   try {
     return await Game.findOneOrFail(key, {
       relations: [
-        '_users',
-        '_users._cards',
-        '_users._cards.white_card',
-        '_users.game',
-        '_users.game.currentTurn',
-        'blackCard',
+        'cardDeck',
         'currentTurn',
+        'blackCard',
+        'users',
+        'users.cards',
+        'users.cards.white_card',
+        'users.game',
+        'users.game.currentTurn',
       ]
     })
   } catch (err){
@@ -49,6 +52,7 @@ interface GameSettings {
   rounds: number
   playerLimit: number
   private: boolean
+  cardDeck: number
 }
 
 /**
@@ -64,13 +68,17 @@ export async function createNewGame (user: User, options: GameSettings): Promise
   if(user.game) {
     await deleteGameFromUser(user)
   }
+  const cardDeck = await CardDeck.findOne(options.cardDeck)
+  if (!cardDeck) {
+    throw new BadRequestError('Supplied card deck was not found')
+  }
   const game = new Game()
   game.key = uuidv4()
   game.playCards = options.playCards
   game.playerLimit = options.playerLimit
   game.privateLobby = options.private
   game.rounds = options.rounds
-  game.cardDeck = 'default'
+  game.cardDeck = cardDeck
   game.hostUserId = user.id
   user.game = game
   await user.save()
