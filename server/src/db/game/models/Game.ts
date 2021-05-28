@@ -207,7 +207,7 @@ export class Game extends BaseEntity {
     for (const user of this.users) {
       const cardOnHand = user.cards.filter((card) => card.state === CardState.HAND).length
       const cardDelta = this.playCards - cardOnHand
-      const whiteCards = await getUnusedWhiteCards(this.key, cardDelta)
+      const whiteCards = await getUnusedWhiteCards(this, cardDelta)
       for (const wc of whiteCards) {
         const wcr = await createWhiteCardRef({
           user,
@@ -224,6 +224,6 @@ export class Game extends BaseEntity {
    * Retrieves and sets a new black card for the Game
    */
   public newBlackCard = async (): Promise<void> => {
-    this.blackCard = await getUnusedBlackCard(this.key)
+    this.blackCard = await getUnusedBlackCard(this)
   }
 }
