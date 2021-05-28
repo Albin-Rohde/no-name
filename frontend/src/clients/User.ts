@@ -35,12 +35,12 @@ export default class User extends RestClient {
     if(!this.email || !this.password) {
       throw Error('<user.email> and <user.password> need to be set in order to login')
     }
-    const userData = await this.makeRequest<UserData>(
-      'post',
-      'user',
-      {email: this.email, password: this.password} as LoginRequest,
-      'login',
-    )
+    const userData = await this.makeRequest<UserData>({
+      method: 'post',
+      route: 'user',
+      data: {email: this.email, password: this.password} as LoginRequest,
+      action: 'login',
+    })
     this.id = userData.id
     this.email = userData.email
     this.password = userData.password
@@ -50,16 +50,16 @@ export default class User extends RestClient {
 
   @HandleError
   public async register() {
-    const userData = await this.makeRequest<UserData>(
-      'post',
-      'user',
-      {
+    const userData = await this.makeRequest<UserData>({
+      method: 'post',
+      route: 'user',
+      data: {
         email: this.email,
         password: this.password,
         username: this.username
       },
-      'register'
-    )
+      action: 'register',
+    })
     if(userData) {
       this.id = userData.id
       this.email = userData.email
@@ -70,12 +70,11 @@ export default class User extends RestClient {
 
   @HandleError
   public async logout() {
-    await this.makeRequest(
-      'post',
-      'user',
-      {},
-      'logout',
-    )
+    await this.makeRequest({
+      method: 'post',
+      route: 'user',
+      action: 'logout',
+    })
     this.id = undefined
     this.email = undefined
     this.password = undefined
@@ -86,7 +85,7 @@ export default class User extends RestClient {
   @HandleError
   public async getSessionUser() {
     //TODO: make this endpoint more "restfull"
-    const userData = await this.makeRequest<UserData>('get', 'user', {}, 'get')
+    const userData = await this.makeRequest<UserData>({method: 'get', route: 'user', action: 'get'})
     this.id = userData.id
     this.email = userData.email
     this.password = userData.password
