@@ -30,6 +30,9 @@ export class WhiteCard extends BaseEntity {
   @JoinColumn({name: 'deck_fk'})
   deck: CardDeck
 
+  @Column({name: 'deck_fk', nullable: false})
+  deck_fk
+
   @OneToMany(type => WhiteCardRef, card => card.white_card)
   @JoinColumn({name: 'player_cards'})
   player_cards: WhiteCardRef[]

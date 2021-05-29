@@ -32,7 +32,7 @@ export class Game extends BaseEntity {
   @JoinColumn({name: 'card_deck_fk'})
   cardDeck: CardDeck
 
-  @Column({name: 'card_deck_fk'})
+  @Column({name: 'card_deck_fk', nullable: false})
   card_deck_fk: number
 
   @Column({name: 'private_lobby'})

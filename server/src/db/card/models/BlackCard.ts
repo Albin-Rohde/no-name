@@ -14,4 +14,7 @@ export class BlackCard extends BaseEntity {
   @ManyToOne(type => CardDeck, cardDeck => cardDeck.blackCards)
   @JoinColumn({name: 'deck_fk'})
   deck: CardDeck
+
+  @Column({name: 'deck_fk', nullable: false})
+  deck_fk
 }
