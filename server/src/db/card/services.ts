@@ -19,8 +19,7 @@ const getUnusedWhiteCards = async (game: Game, limit: number): Promise<WhiteCard
   }
   return WhiteCard.createQueryBuilder('wc')
     .leftJoin(WhiteCardRef, 'wcr', 'wcr.white_card_id_fk = wc.id')
-    .where('wcr.game_key != :gameKey', {gameKey: game.key})
-    .orWhere('wcr.game_key is null')
+    .where('wcr.game_key != :gameKey OR wcr.game_key is null', {gameKey: game.key})
     .andWhere('wc.deck_fk = :deck', {deck: game.card_deck_fk})
     .orderBy('random()')
     .limit(limit)
@@ -56,8 +55,7 @@ const createWhiteCardRef = async (input: CreateWhiteCardRefInput): Promise<White
 const getUnusedBlackCard = async (game: Game): Promise<BlackCard> => {
   return BlackCard.createQueryBuilder('bc')
     .leftJoin(BlackCardRef, 'bcr', 'bcr.black_card_id_fk = bc.id')
-    .where('bcr.game_key != :gameKey', {gameKey: game.key})
-    .orWhere('bcr.game_key is null')
+    .where('bcr.game_key != :gameKey OR bcr.game_key is null', {gameKey: game.key})
     .andWhere('bc.deck_fk = :deck', {deck: game.card_deck_fk})
     .orderBy('random()')
     .getOneOrFail()
