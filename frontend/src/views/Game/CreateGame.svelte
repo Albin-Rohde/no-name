@@ -1,17 +1,28 @@
 <script lang="typescript">
   import { createEventDispatcher } from 'svelte'
   import RestClient from "../../clients/RestClient";
-  import type {GameResponse} from '../../clients/ResponseTypes'
+  import type {CardDeckResponse, GameResponse} from '../../clients/ResponseTypes'
 
   const dispatch = createEventDispatcher()
+  const rest = new RestClient()
+
   export let onGameCreated
+  let cardDecks: CardDeckResponse[]
+
+  const fetchCardDecks = async () => {
+    cardDecks = await rest.makeRequest<CardDeckResponse[]>({
+      method: 'get',
+      route: 'card',
+      action: 'decks'
+    })
+  }
 
   interface gameSettingsType  {
     playCards: number,
     rounds: number,
     playerLimit: number,
     private: boolean,
-    cardDeck: 'default',
+    cardDeck: number,
   }
 
   const gameSettings: gameSettingsType = {
@@ -19,12 +30,17 @@
     rounds: 3,
     playerLimit: 2,
     private: true,
-    cardDeck: 'default'
+    cardDeck: 1
   }
 
+  fetchCardDecks()
   const createGame = async () => {
     const rest = new RestClient()
-    const gameData: GameResponse = await rest.makeRequest('post', 'game', gameSettings)
+    const gameData = await rest.makeRequest<GameResponse>({
+      method: 'post',
+      route: 'game',
+      data: gameSettings,
+    })
     onGameCreated(gameData.key)
   }
 
@@ -57,6 +73,20 @@
             <input type="range" class="form-range" min="2" max="10" id="customRange3" bind:value={gameSettings.playerLimit}/>
           </div>
           {gameSettings.playerLimit}
+        </div>
+        <div class="select-field">
+          {#if cardDecks}
+            <label class="form-label" for="customRange2">Card deck</label>
+            <select class="form-select" aria-label="Default select example" bind:value={gameSettings.cardDeck}>
+              {#each cardDecks as cardDeck}
+                <option value={cardDeck.id}>{cardDeck.name}</option>
+              {/each}
+            </select>
+          {:else}
+            <select class="form-select" aria-label="Default select example">
+              <option></option>
+            </select>
+          {/if}
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="private" checked={gameSettings.private}>
@@ -114,5 +144,8 @@
     justify-content: center;
     align-items: center;
     text-align: center;
+  }
+  .select-field {
+    margin-bottom: 4vh;
   }
 </style>

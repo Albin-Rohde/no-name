@@ -9,6 +9,12 @@ export interface GameResponse {
   users?: UserResponse[]
 }
 
+export interface CardDeckResponse {
+  id: number,
+  name: string,
+  description: string,
+}
+
 export interface GameSocketResponse {
   key: string
   gameOptions: GameOptionsResponse

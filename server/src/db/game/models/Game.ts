@@ -1,10 +1,20 @@
-import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm"
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn
+} from "typeorm"
 import {User} from "../../user/models/User"
 import {GameTurn} from "./GameTurn"
 import {createWhiteCardRef, getUnusedBlackCard, getUnusedWhiteCards} from "../../card/services";
 import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {BlackCard} from "../../card/models/BlackCard";
 import {NotFoundError} from "../../error";
+import {CardDeck} from "../../card/models/CardDeck";
 
 @Entity()
 
@@ -18,8 +28,12 @@ export class Game extends BaseEntity {
   @Column()
   rounds: number
 
-  @Column({name: 'card_deck'})
-  cardDeck: string
+  @ManyToOne(type => CardDeck)
+  @JoinColumn({name: 'card_deck_fk'})
+  cardDeck: CardDeck
+
+  @Column({name: 'card_deck_fk', nullable: false})
+  card_deck_fk: number
 
   @Column({name: 'private_lobby'})
   privateLobby: boolean
@@ -193,7 +207,7 @@ export class Game extends BaseEntity {
     for (const user of this.users) {
       const cardOnHand = user.cards.filter((card) => card.state === CardState.HAND).length
       const cardDelta = this.playCards - cardOnHand
-      const whiteCards = await getUnusedWhiteCards(this.key, cardDelta)
+      const whiteCards = await getUnusedWhiteCards(this, cardDelta)
       for (const wc of whiteCards) {
         const wcr = await createWhiteCardRef({
           user,
@@ -210,6 +224,6 @@ export class Game extends BaseEntity {
    * Retrieves and sets a new black card for the Game
    */
   public newBlackCard = async (): Promise<void> => {
-    this.blackCard = await getUnusedBlackCard(this.key)
+    this.blackCard = await getUnusedBlackCard(this)
   }
 }

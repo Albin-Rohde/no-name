@@ -9,17 +9,21 @@ import {DbError} from "../error";
  * Get a set of random WhiteCards that is not yet
  * used in the game.
  *
- * @param gameKey - game_key for the game to act on
+ * @param game - Game to filter cards on
  * @param limit - how many cards to get
  */
-const getUnusedWhiteCards = async (gameKey: string, limit: number): Promise<WhiteCard[]> => {
+const getUnusedWhiteCards = async (game: Game, limit: number): Promise<WhiteCard[]> => {
   if (limit === 0) {
     return []
   }
-  return await WhiteCard.createQueryBuilder('wc')
+  const query = WhiteCard.createQueryBuilder('wc')
     .leftJoin(WhiteCardRef, 'wcr', 'wcr.white_card_id_fk = wc.id')
-    .where('wcr.game_key != :gameKey', {gameKey})
+    .where('wcr.game_key != :gameKey', {gameKey: game.key})
     .orWhere('wcr.game_key is null')
+  if (game.cardDeck) {
+    query.andWhere('wc.deck_fk = :deck', {deck: game.card_deck_fk})
+  }
+  return query
     .orderBy('random()')
     .limit(limit)
     .getMany()
@@ -49,14 +53,16 @@ const createWhiteCardRef = async (input: createWhiteCardRefInput): Promise<White
 /**
  * Get a BlackCard that does not exist on the game
  *
- * @param gameKey
+ * @param game
  */
-const getUnusedBlackCard = async (gameKey: string): Promise<BlackCard> => {
-  return await BlackCard.createQueryBuilder('bc')
+const getUnusedBlackCard = async (game: Game): Promise<BlackCard> => {
+  const query = BlackCard.createQueryBuilder('bc')
     .leftJoin(Game, 'g', 'g.black_card_id_fk = bc.id')
-    .where('g.key != :gameKey or g.key is null', {gameKey})
-    .orderBy('random()')
-    .getOneOrFail()
+    .where('g.key != :gameKey or g.key is null', {gameKey: game.key})
+  if (game.cardDeck) {
+    query.andWhere('bc.deck_fk = :deck', {deck: game.card_deck_fk})
+  }
+  return query.orderBy('random()').getOneOrFail()
 }
 
 export { getUnusedWhiteCards, getUnusedBlackCard, createWhiteCardRef }
