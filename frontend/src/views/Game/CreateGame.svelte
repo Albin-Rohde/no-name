@@ -76,6 +76,7 @@
         </div>
         <div class="select-field">
           {#if cardDecks}
+            <label class="form-label" for="customRange2">Card deck</label>
             <select class="form-select" aria-label="Default select example" bind:value={gameSettings.cardDeck}>
               {#each cardDecks as cardDeck}
                 <option value={cardDeck.id}>{cardDeck.name}</option>
