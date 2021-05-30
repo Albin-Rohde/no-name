@@ -1,20 +1,11 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn
-} from "typeorm"
+import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm"
 import {User} from "../../user/models/User"
 import {GameTurn} from "./GameTurn"
-import {createWhiteCardRef, getUnusedBlackCard, getUnusedWhiteCards} from "../../card/services";
+import {createBlackCardRef, createWhiteCardRef, getUnusedBlackCard, getUnusedWhiteCards} from "../../card/services";
 import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
-import {BlackCard} from "../../card/models/BlackCard";
 import {NotFoundError} from "../../error";
 import {CardDeck} from "../../card/models/CardDeck";
+import {BlackCardRef, BlackCardState} from "../../card/models/BlackCardRef";
 
 @Entity()
 
@@ -60,9 +51,9 @@ export class Game extends BaseEntity {
   @JoinColumn({name: 'current_turn_fk'})
   currentTurn: GameTurn
 
-  @ManyToOne(type => BlackCard)
+  @ManyToOne(type => BlackCardRef)
   @JoinColumn({name: 'black_card_id_fk'})
-  blackCard: BlackCard
+  blackCard: BlackCardRef
 
   @Column({nullable: true})
   black_card_id_fk: number
@@ -224,6 +215,14 @@ export class Game extends BaseEntity {
    * Retrieves and sets a new black card for the Game
    */
   public newBlackCard = async (): Promise<void> => {
-    this.blackCard = await getUnusedBlackCard(this)
+    if (this.blackCard) {
+      this.blackCard.state = BlackCardState.USED
+      await this.blackCard.save()
+    }
+    const blackCard = await getUnusedBlackCard(this)
+    this.blackCard = await createBlackCardRef({
+      blackCard,
+      gameKey: this.key
+    })
   }
 }

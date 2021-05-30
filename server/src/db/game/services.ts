@@ -7,6 +7,7 @@ import {GameRuleError} from "../../socket";
 import {WhiteCardRef} from "../card/models/WhiteCardRef";
 import {CardDeck} from "../card/models/CardDeck";
 import {BadRequestError} from "../../rest/error";
+import {BlackCardRef} from "../card/models/BlackCardRef";
 
 
 /**
@@ -20,6 +21,7 @@ export const getGameWithRelations = async (key: string): Promise<Game> => {
         'cardDeck',
         'currentTurn',
         'blackCard',
+        'blackCard.blackCard',
         '_users',
         '_users._cards',
         '_users._cards.white_card',
@@ -110,6 +112,9 @@ export async function deleteGameFromUser (user: User): Promise<void> {
   const deleteWcr = WhiteCardRef.createQueryBuilder()
     .where('game_key =:gameKey', {gameKey})
     .delete()
+  const deleteBcr = BlackCardRef.createQueryBuilder()
+    .where('game_key = :gameKey', {gameKey})
+    .delete()
   const deleteGame = Game.createQueryBuilder()
     .where('key = :gameKey', {gameKey})
     .delete()
@@ -118,7 +123,11 @@ export async function deleteGameFromUser (user: User): Promise<void> {
     .delete()
   await resetUser.execute()
   await deleteGame.execute()
-  await Promise.all([deleteGameRound.execute(), deleteWcr.execute()])
+  await Promise.all([
+    deleteGameRound.execute(),
+    deleteWcr.execute(),
+    deleteBcr.execute()
+  ])
   return
 }
 

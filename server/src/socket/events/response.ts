@@ -3,6 +3,7 @@ import {User} from '../../db/user/models/User'
 import {Game} from '../../db/game/models/Game'
 import {GameTurn} from '../../db/game/models/GameTurn'
 import {BlackCard} from '../../db/card/models/BlackCard'
+import {BlackCardRef} from "../../db/card/models/BlackCardRef";
 
 interface GameResponse {
   key: string
@@ -59,11 +60,11 @@ const normalizeCardResponse = (card: WhiteCardRef): CardResponse => ({
   state: card.state,
 })
 
-const normalizeBlackCardResponse = (card: BlackCard): BlackCardResponse | undefined => {
+const normalizeBlackCardResponse = (card: BlackCardRef): BlackCardResponse | undefined => {
   if (card) {
     return {
       id: card.id,
-      text: card.text
+      text: card.blackCard.text
     }
   }
   return undefined
