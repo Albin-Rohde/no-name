@@ -4,6 +4,7 @@ import {BlackCard} from "./models/BlackCard";
 import {Game} from "../game/models/Game";
 import {User} from "../user/models/User";
 import {DbError} from "../error";
+import {BlackCardRef, BlackCardState} from "./models/BlackCardRef";
 
 /**
  * Get a set of random WhiteCards that is not yet
@@ -16,27 +17,24 @@ const getUnusedWhiteCards = async (game: Game, limit: number): Promise<WhiteCard
   if (limit === 0) {
     return []
   }
-  const query = WhiteCard.createQueryBuilder('wc')
+  return WhiteCard.createQueryBuilder('wc')
     .leftJoin(WhiteCardRef, 'wcr', 'wcr.white_card_id_fk = wc.id')
     .where('wcr.game_key != :gameKey', {gameKey: game.key})
     .orWhere('wcr.game_key is null')
-  if (game.cardDeck) {
-    query.andWhere('wc.deck_fk = :deck', {deck: game.card_deck_fk})
-  }
-  return query
+    .andWhere('wc.deck_fk = :deck', {deck: game.card_deck_fk})
     .orderBy('random()')
     .limit(limit)
     .getMany()
 }
 
-interface createWhiteCardRefInput {
+interface CreateWhiteCardRefInput {
   user: User,
-    whiteCard: WhiteCard,
-    state?: CardState,
-    gameKey: string
+  whiteCard: WhiteCard,
+  state?: CardState,
+  gameKey: string
 }
 
-const createWhiteCardRef = async (input: createWhiteCardRefInput): Promise<WhiteCardRef> => {
+const createWhiteCardRef = async (input: CreateWhiteCardRefInput): Promise<WhiteCardRef> => {
   if (!input.user.id) {
     console.log(input.user)
     throw new DbError('Can not create wcr without user id')
@@ -56,13 +54,30 @@ const createWhiteCardRef = async (input: createWhiteCardRefInput): Promise<White
  * @param game
  */
 const getUnusedBlackCard = async (game: Game): Promise<BlackCard> => {
-  const query = BlackCard.createQueryBuilder('bc')
-    .leftJoin(Game, 'g', 'g.black_card_id_fk = bc.id')
-    .where('g.key != :gameKey or g.key is null', {gameKey: game.key})
-  if (game.cardDeck) {
-    query.andWhere('bc.deck_fk = :deck', {deck: game.card_deck_fk})
-  }
-  return query.orderBy('random()').getOneOrFail()
+  return BlackCard.createQueryBuilder('bc')
+    .leftJoin(BlackCardRef, 'bcr', 'bcr.black_card_id_fk = bc.id')
+    .where('bcr.game_key != :gameKey', {gameKey: game.key})
+    .orWhere('bcr.game_key is null')
+    .andWhere('bc.deck_fk = :deck', {deck: game.card_deck_fk})
+    .orderBy('random()')
+    .getOneOrFail()
 }
 
-export { getUnusedWhiteCards, getUnusedBlackCard, createWhiteCardRef }
+interface CreateBlackCardRefInput {
+  state?: BlackCardState
+  gameKey: string
+  blackCard: BlackCard
+}
+
+const createBlackCardRef = async (input: CreateBlackCardRefInput): Promise<BlackCardRef> => {
+  const blackCardRef = new BlackCardRef()
+  blackCardRef.blackCard = input.blackCard
+  blackCardRef.game_key = input.gameKey
+  if (input.state) {
+    blackCardRef.state = input.state
+  }
+  await blackCardRef.save()
+  return blackCardRef
+}
+
+export { getUnusedWhiteCards, getUnusedBlackCard, createWhiteCardRef, createBlackCardRef }
