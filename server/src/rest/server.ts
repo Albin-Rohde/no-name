@@ -56,5 +56,6 @@ export function createRestServer(options: ServerOptions) {
   app.use('/game', gameRouter)
   app.use('/card', cardRouter)
   app.use('/deploy/github', github)
+
   return app
 }
