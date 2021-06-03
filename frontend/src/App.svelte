@@ -65,7 +65,7 @@
   {:else}
     <div class="grid">
       <div class="title">
-        <h1 class="title">No-Name Game</h1>
+        <h1 class="title">I want it fast</h1>
       </div>
       <div class="flex-center">
         <div class="wrap-form">
