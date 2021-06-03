@@ -1,4 +1,4 @@
-import express, {Application} from "express";
+import express, {Application, NextFunction, Request, Response} from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -31,6 +31,12 @@ declare module 'express-session' {
   }
 }
 
+declare module 'express' {
+  export interface Request {
+    rawBody: Buffer,
+  }
+}
+
 /**
  * @param options Port and Host options to run rest server on
  *
@@ -39,7 +45,11 @@ declare module 'express-session' {
 export function createRestServer(options: ServerOptions) {
   const app: Application = express()
   app.use(bodyParser.urlencoded({extended: false}))
-  app.use(bodyParser.json())
+  app.use(bodyParser.json({
+    verify: (req: Request, res, buf) => {
+      req.rawBody = buf
+    }
+  }))
   app.use(cookieParser())
   app.set('trust proxy', true)
   app.use(cors({origin: options.clientUrl, credentials: true}))
