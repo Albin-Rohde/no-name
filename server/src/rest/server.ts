@@ -8,6 +8,7 @@ import userRoute from "./user/route";
 import gameRouter from "./game/route";
 import {User} from "../db/user/models/User";
 import cardRouter from "./card/route";
+import {github} from "./githubhook";
 
 export const userSession = session({
   name: 'sid',
@@ -54,5 +55,6 @@ export function createRestServer(options: ServerOptions) {
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
   app.use('/card', cardRouter)
+  app.use('/deploy/github', github)
   return app
 }
