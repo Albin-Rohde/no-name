@@ -10,7 +10,7 @@ services:
     ports:
       - '5000:5000'
     env_file:
-      - '.env.docker'
+      - '.env'
     links:
       - db
       - redis
@@ -26,7 +26,7 @@ services:
     ports:
       - '5432:5432'
     env_file:
-      - '.env.docker'
+      - '.env'
 
   frontend:
     container_name: frontend
@@ -39,7 +39,7 @@ services:
     expose:
       - '5000'
     env_file:
-      - '.env.docker'
+      - '.env'
     volumes:
       - './frontend/src:/usr/src/frontend/src'
 
@@ -72,7 +72,7 @@ services:
       - CERTBOT_EMAIL=albin.rohde@notifyme.se
     volumes:
       - cert:/etc/letsencrypt
-      - ./nginx.conf:/etc/nginx/user_conf.d/nginx.conf
+      - ./nginx.dev.conf:/etc/nginx/user_conf.d/${NGINX_CONF_FILE}
 
 networks:
   local:
