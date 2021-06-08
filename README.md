@@ -1,15 +1,27 @@
 # NO-NAME
 
 ## What is no-name
-No-name is an open source project centered around the popular card game _Cards Against Humanity_. This intend to make it possible to play _Cards Against Humanity_ online with friends even in the times ov covid-19 and isolation. 
+No-name is a project centered around the popular card game _Cards Against Humanity_. 
+The project intend to make it possible to play _Cards Against Humanity_ online with friends even in the times of 
+covid-19 and self-isolation. 
 
-No-name sprung to life almost a full year ago where a poc where developed. The poc was built with nodejs and mongodb as its database. It became clear that a project like this would benefit a lot more from a sequal databse. I also decided to go with typescript as supose to regular node. 
+The idea to the project began when me and some friends tried playing cards against humanity online. We discovered a lot
+of bugs on the website we played on. The experience was less than perfect to say the least. My partner Dessi Korths suggested that we
+would build our own solution. The possibilities would then be to create our own "card decks", including internal jokes
+in our group.
 
-The goal of this project is to make it easy to understand and start playing the game with friends, so far the project is in very early stages and it is not possible to play it.
+This was a fascinating idea and something that started teasing my brain, is it possible to build something like that?
+
+A bit of investigation, a poc and a full year later to this day, here we are. Closing in on the final product.
+More ideas and inovation has been brought in along the way. The though of making it possible for ANYONE to create
+their own deck to use with their friend group, is probably one of the key features.
 
 
 ## Authour
-My name is Albin Rohde. Coding has always been close to my heart and i started already in highschool with my "_gymnasieprojekt_" or _Highschool exams project_. Since then i have done numourus project. I started working as a programming teacher in 2017, got my first job as a backend developer 2019, Mentored a team and competed in robotics world championship 2019; and since 2021 i am working as a Backend Developer at advinans.
+My name is Albin Rohde. Coding has always been close to my heart and i started already in highschool with my 
+"_gymnasieprojekt_" or _Highschool exams project_. Since then i have done numourus project. I started working 
+as a programming teacher in 2017, got my first job as a backend developer 2019, Mentored a 
+team and competed in robotics world championship 2019; and since 2021 i am working as a Backend Developer at advinans.
 
 I like to have hobby projects running outside of work to get the oppertunity to try out tech that i dont get to try out otherwise. I am always looking for new ways to learn.
 
@@ -17,28 +29,26 @@ I like to have hobby projects running outside of work to get the oppertunity to 
 ## Tech stack
 This project consists of two parts; A Frontend and a Backend. These are called [`frontend`](./frontend/README.md) and [`server`](./server/README.md) in the repo. 
 
-The frontend is developed with typescript using svelte. The frontend aims to be very minimalistic using bootstrap and very simple html components with straigh forward css.
+The frontend is developed with typescript using svelte. The frontend aims to be very minimalistic using bootstrap and very simple html components with straight forward css.
 
 The backend is also developed in typescript. The backend uses an `express` server along with a `socket.io` server 
-to handle websockets. The backend server acts both as a rest api (`express`) and a websocket server (`socket.io`). 
-Since the game relies on live actions between multiple players, websocket where the obvious desicion. 
-The backend use `postgres` as its database, and `typeorm` as orm mapper. Read more about the server [here](./server/README.md).
+to handle websockets. The backend server acts both as a rest api (`express`) and a websocket server (`socket.io`).
+Read more about the server [here](./server/README.md).
 
 
-## How to start the app
-### Production mode
-- First, make sure the file `.env.docker` contains the content of `.env.docker.schema`.
+## Run the app
 
-- Then run the following from root directory.
-  - `docker-compose up db redis frontend server`
-- frontend will start on `http://localhost:3000`
-- backend will start on `http://localhost:5000`
+### Requirements
+- development
+  - node 14.16.1
+  - docker
+  - docker-compose
+- deployment/live
+  - docker
+  - docker-compose
 
-### Dev mode
-- First make sure the file `/frontend/.env` contains the content of `/frontend/.env.schema`
-- and that the file `server/.env` contains the content of `/server/.env.schema`.
-
-- Then run the following commands:
+### Dev
+- Run the following commands:
   - From root
     - `docker-compose up -d db redis`
   - From frontend root:
@@ -49,25 +59,41 @@ The backend use `postgres` as its database, and `typeorm` as orm mapper. Read mo
 
 - frontend will start on `localhost:3000`
 - backend will start on `localhost:5000`
-- In dev mode, the app will reload changes, the app does not need to be restarted between changes.
+- In dev mode, the app will reload changes, the app does not need to be restarted between changes to source code.
+
+### Production
+- Copy content of `.env.schema` to a new file and name it`.env`.
+
+- then run `docker-compose up`
+- The app will now run on `https://localhost`, running the app like this is as close to the live set up as possible.
+
 
 ### Deploy live
-- First, make sure the file `.env.docker` contains the content of `.env.docker.schema`.
-- Alter these lines in `.env.docker`
+- Copy the content of `.env.schema` to a new file and name it `.env`.
+- Alter these lines in `.env`.
   ```
-  API_EXTENSION=/api
   API_BASE_URL=https://yobotics.club
-  PORT=5000
   CLIENT_URL=https://yobotics.club
   ```
-- Then run following command from root:
-  - `docker-compose up`
-- Provided that port forwarding is enabled, the server will be reached on `yobotics.club`
+- Then run `docker-compose up`
 
 
 ## How to play
-The game is not yet in a stage where it can be played, this section of the readme will be filled out later.
+Begin by signing up or signing in. When logged in one is greeted by the "dashboard", from here the player can create a
+game with desired settings. When the game is created, invite some friends and hit start.
 
+A black card consiting of a sentence with a "blank" will appear, vissible to all players.
+The players will receive a couple of "white cards" consisting of word(s) or a short sentences. 
+The goal now is for the player to match a white card on their hand with the black card; creating the funniest sentence.
+
+One player each round will be assigned to the role as "card wizz". This player will not get to play any card.
+This player will instead be tasked of voting for the funniest card.
+
+Once all players has played their cards, the card wizz will get to flip one card at a time, reading them out loud.
+When the card wizz has read all cards, he/she should decide on the funniest combination.
+
+The winner is awarded 1 point and the gamw will continue to the next round, a new card wizz will be assigned for the
+new round.
 
 ## Report Issues
 Issues should be created on the github page for this repo https://github.com/albinr99salt/no-name/issues. Issues can also be reported to albin.rohde@notifyme.se
