@@ -47,6 +47,16 @@ Read more about the server [here](./server/README.md).
   - docker
   - docker-compose
 
+### Environments
+Both dev production and live require environments variables to run.
+These are stored and accessed from a `.env` file. to create them run:
+- `cp frontend/.env.schema frontend/.env`
+- `cp server/.env.schema server/.env`
+- `cp .env.schema .env`
+
+To run in live, there are some changes needed to the `.env` file, more on
+that further down.
+
 ### Dev
 - Run the following commands:
   - From root
@@ -62,18 +72,17 @@ Read more about the server [here](./server/README.md).
 - In dev mode, the app will reload changes, the app does not need to be restarted between changes to source code.
 
 ### Production
-- Copy content of `.env.schema` to a new file and name it`.env`.
-
-- then run `docker-compose up`
+- Run `docker-compose up`
 - The app will now run on `https://localhost`, running the app like this is as close to the live set up as possible.
 
 
 ### Deploy live
-- Copy the content of `.env.schema` to a new file and name it `.env`.
-- Alter these lines in `.env`.
+- Alter these lines in `.env` located in the root (same directory as this readme).
   ```
   API_BASE_URL=https://yobotics.club
   CLIENT_URL=https://yobotics.club
+  NGINX_CONF_FILE=nginx.live.conf
+  NGINX_STAGE=0
   ```
 - Then run `docker-compose up`
 
@@ -97,5 +106,3 @@ new round.
 
 ## Report Issues
 Issues should be created on the github page for this repo https://github.com/albinr99salt/no-name/issues. Issues can also be reported to albin.rohde@notifyme.se
-
-

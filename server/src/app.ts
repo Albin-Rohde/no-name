@@ -5,7 +5,6 @@ import { createSocketServer } from "./socket";
 import { createRestServer } from "./rest";
 import { createConnection } from "typeorm";
 
-dotenv.config({path: '.env.schema'})
 dotenv.config({path: '.env'})
 
 export interface ServerOptions {
