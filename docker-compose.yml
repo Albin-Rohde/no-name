@@ -70,15 +70,13 @@ services:
       - 443:443
     environment:
       - CERTBOT_EMAIL=albin.rohde@notifyme.se
+      - STAGING=
     volumes:
-      - cert:/etc/letsencrypt
-      - ./nginx.dev.conf:/etc/nginx/user_conf.d/${NGINX_CONF_FILE}
+      - ./.ssl:/etc/letsencrypt
+      - ./${NGINX_CONF_FILE}:/etc/nginx/user_conf.d/nginx.conf
 
 networks:
   local:
     driver: bridge
   public:
     driver: bridge
-
-volumes:
-  cert:

@@ -16,7 +16,9 @@
 *dist/
 
 # certificates
-/cert
+.ssl
+*.crt
+*.key
 *.pem
 
 # Other
