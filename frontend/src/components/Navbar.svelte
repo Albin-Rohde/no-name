@@ -3,6 +3,8 @@
   import {createEventDispatcher} from 'svelte'
   export let username: string
   export let gameActive: boolean
+  export let currentRound: number
+  export let totalRounds: number
   export let isHost: boolean
 
   let dropdownOpen = false
@@ -41,6 +43,11 @@
   <div class="username">
     <p class="inline fs-5">{username}</p>
   </div>
+  <div class="rounds">
+    {#if gameActive}
+      <p class="fs-5">Round {currentRound}/{totalRounds}</p>
+    {/if}
+  </div>
 </div>
 
 
@@ -50,7 +57,7 @@
   }
   .top-grid {
     display: grid;
-    grid-template-columns: 100px auto 50%;
+    grid-template-columns: 100px auto 10%;
     width: 100%;
     height: 45px;
     background-color: rgb(226, 226, 226);
@@ -62,6 +69,10 @@
     grid-column-end: 2;
     padding-top: 0.3vh;
     padding-left: 8%;
+  }
+  .rounds {
+    display: flex;
+    align-items: center;
   }
   .username {
     grid-column-start: 2;

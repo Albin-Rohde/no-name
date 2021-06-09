@@ -79,6 +79,8 @@
     username={currentUser.username}
     isHost={currentUser.isHost}
     gameActive={!!gameData?.key}
+    currentRound={gameData?.currentRound}
+    totalRounds={gameData?.gameOptions.rounds}
     on:logout={() => dispatch('logout')}
     on:delete-game={deleteGame}
     on:leave-game={leaveGame}

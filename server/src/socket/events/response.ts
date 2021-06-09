@@ -9,6 +9,7 @@ interface GameResponse {
   key: string
   gameOptions: GameOptionsResponse
   started: boolean
+  currentTurn: number
   blackCard?: BlackCardResponse | undefined
   users: UserResponse[]
 }
@@ -86,6 +87,7 @@ export const normalizeGameResponse = (game: Game): GameResponse => ({
     rounds: game.rounds
   },
   started: game.started,
+  currentTurn: game.turn_number,
   blackCard: normalizeBlackCardResponse(game.blackCard),
   users: game.users ? [...game.users.map(user => normalizeUserResponse(user, game.currentTurn))] : []
 })

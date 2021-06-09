@@ -19,6 +19,7 @@ export interface GameSocketResponse {
   key: string
   gameOptions: GameOptionsResponse
   blackCard?: BlackCardResponse
+  currentTurn: number
   started: boolean
   users: UserResponse[]
 }

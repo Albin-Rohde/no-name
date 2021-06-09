@@ -15,6 +15,7 @@ export default class Game {
   public gameOptions: GameOptionsResponse
   public blackCard?: BlackCardResponse
   public started: boolean
+  public currentTurn: number
   public users: UserResponse[]
   public currentUser: UserResponse
 
@@ -25,6 +26,7 @@ export default class Game {
       this.blackCard = game.blackCard
       this.started = game.started
       this.users = game.users
+      this.currentTurn = game.currentTurn
     }
     this.currentUser = currentUser
     autoBind(this)
@@ -36,6 +38,7 @@ export default class Game {
     this.blackCard = data.blackCard
     this.started = data.started
     this.users = data.users
+    this.currentTurn = data.currentTurn
     this.currentUser = this.users.find(user => user.id === this.currentUser.id)
   }
 
@@ -73,6 +76,10 @@ export default class Game {
 
   public get shownCards(): CardResponse[] {
     return this.playedCards.filter(card => card.state === CardState.PLAYED_SHOW)
+  }
+
+  public get currentRound(): number {
+    return Math.ceil(this.currentTurn / this.users.length)
   }
 
   public get state(): GameState {
