@@ -152,7 +152,7 @@ const emitRemovedEvent = async (io: Server, socket: SocketWithSession, game: Gam
  * @param err
  * @param socket
  */
-const handleError = (err: Error, socket: SocketWithSession) => {
+export const handleError = (err: Error, socket: SocketWithSession) => {
   if (err instanceof GameRuleError) {
     logger.warn(err)
     socket.emit('rule_error', err.message)

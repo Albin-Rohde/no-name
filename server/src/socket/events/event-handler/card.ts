@@ -1,6 +1,6 @@
 import { Game } from "../../../db/game/models/Game";
 import { EventFunction, EventFunctionWithGame } from "./index";
-import { NotAllowedError} from "../..";
+import {GameStateError, NotAllowedError} from "../..";
 import { CardState } from "../../../db/card/models/WhiteCardRef";
 import { getGameFromUser } from "../../../db/game/services";
 import { nextRoundEvent } from "./game";
@@ -58,6 +58,9 @@ export const voteCardEvent: EventFunction<number> = async(
   cardId: number,
 ): Promise<Game> => {
   const game = await getGameFromUser(socket.request.session.user.id)
+  if (!game.active) {
+    throw new GameStateError('Game is not active')
+  }
   if(!game.currentUser.isCardWizz) {
     throw new NotAllowedError('Only card wizz can vote card')
   }
