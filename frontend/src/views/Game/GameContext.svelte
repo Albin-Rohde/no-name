@@ -1,5 +1,5 @@
 <script lang="typescript">
-  import { createEventDispatcher } from 'svelte'
+  import {createEventDispatcher} from 'svelte'
   import type userType from '../../clients/User'
   import CreateGame from './CreateGame.svelte'
   import Dashboard from './Dashboard.svelte'
@@ -7,12 +7,14 @@
   import JoinGame from './JoinGame.svelte'
   import Navbar from '../../components/Navbar.svelte'
   import Ingame from './Ingame.svelte'
-  import { SocketClient } from '../../clients/SocketClient'
+  import {SocketClient} from '../../clients/SocketClient'
   import type {UserResponse} from "../../clients/ResponseTypes";
   import Game from "../../clients/Game";
+  import Victory from "./Victory.svelte";
+
   const dispatch = createEventDispatcher()
 
-  type views = 'dashboard' | 'ingame' | 'lobby' | 'join' | 'create'
+  type views = 'dashboard' | 'ingame' | 'lobby' | 'join' | 'create' | 'victory'
   let view: views = 'dashboard'
 
   export let user: userType
@@ -44,11 +46,12 @@
       return
     }
     gameData = socket.gameData
-    if (view !== 'ingame' && gameData.started) {
-      view = 'ingame'
-    }
-    else if(view !== 'lobby' && gameData.key && !gameData.started) {
+    if (!gameData.active && gameData.currentTurn > 1) {
+      view = 'victory'
+    } else if (!gameData.active && gameData.key) {
       view = 'lobby'
+    } else if (gameData.active) {
+      view = 'ingame'
     }
     currentUser = gameData.currentUser
   }
@@ -62,7 +65,7 @@
     }
   }
 
-  if(!user.id) {
+  if (!user.id) {
     dispatch('logout')
   } else {
     checkGameSession()
@@ -99,7 +102,7 @@
       on:abort={() => navigate('dashboard')}
     />
   {/if}
-    {#if view === 'lobby' && gameData?.key}
+  {#if view === 'lobby' && gameData?.key}
     <Lobby
       gameData={gameData}
       socket={socket}
@@ -118,6 +121,12 @@
     <Ingame
       socket={socket}
       gameData={gameData}
+    />
+  {/if}
+  {#if view === 'victory'}
+    <Victory
+      gameData={gameData}
+      socket={socket}
     />
   {/if}
 </div>
