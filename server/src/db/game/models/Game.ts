@@ -33,7 +33,7 @@ export class Game extends BaseEntity {
   playerLimit: number
 
   @Column({default: false})
-  started: boolean
+  active: boolean
 
   @Column({default: 1})
   turn_number: number

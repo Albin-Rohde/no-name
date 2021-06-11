@@ -59,13 +59,13 @@ export const joinGameEvent: EventFunction<string> = async (io: Server, socket: S
  * @param game
  */
 export const startGameEvent: EventFunctionWithGame<never> = async (game: Game) => {
-  if (game.started) {
-    throw new GameStateError('Game already started')
+  if (game.active) {
+    throw new GameStateError('Game already active')
   }
   if (!game.currentUser.isHost) {
     throw new GameRuleError('User is not host, only host can start game')
   }
-  game.started = true
+  game.active = true
   await Promise.all([
     game.handOutCards(),
     game.assingCardWizz(),
