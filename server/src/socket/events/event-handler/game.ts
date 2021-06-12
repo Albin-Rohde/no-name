@@ -41,11 +41,14 @@ export const getGameEvent: EventFunction<never> = async(io: Server, socket: Sock
  * @param socket - live socket
  * @param key - gameKey refering to the game to join
  */
-export const joinGameEvent: EventFunction<string> = async (io: Server, socket: SocketWithSession, key) => {
+export const joinGameEvent: EventFunction<string> = async (io, socket, key) => {
   const game = await getGameWithRelations(key)
   const user = await getUserWithRelation(socket.request.session.user.id)
-  if (game.active || (!game.active && game.turn_number > 1)) {
+  if (game.active) {
     throw new GameStateError('Can not join active game')
+  }
+  if (game.isFinished) {
+    throw new GameStateError('Can not join finished game')
   }
   game.addPlayer(user)
   socket.join(game.key)
@@ -60,6 +63,9 @@ export const joinGameEvent: EventFunction<string> = async (io: Server, socket: S
 export const startGameEvent: EventFunctionWithGame<never> = async (game: Game) => {
   if (game.active) {
     throw new GameStateError('Game already active')
+  }
+  if (game.isFinished) {
+    throw new GameStateError('Can not start finished game')
   }
   if (!game.currentUser.isHost) {
     throw new GameRuleError('User is not host, only host can start game')
@@ -105,51 +111,40 @@ export const deleteGameEvent: EventFunctionWithGame<never> = async(game) => {
  * - Discards played cards as used
  * @param game
  */
-export const nextRoundEvent = async(game): Promise<Game> => {
+export const nextRoundEvent: EventFunctionWithGame<never> = async(game) => {
   await setTimeoutAsync(6000)
-  try {
-    game = await getGameWithRelations(game.key)
-    if (game.turn_number === game.rounds * game.users.length) {
-      console.log('finish')
-      const g = await gameFinishedEvent(game)
-      return g
-    }
-    const updateCards = game.allPlayerCards
-      .filter((card) => {
-        return (
-          card.state === CardState.PLAYED_SHOW ||
-          card.state === CardState.WINNER
-        )
-      })
-      .map(async (card) => {
-        card.state = CardState.USED
-        await card.save()
-      })
-    const updateUsers = game.users.map(async (user) => {
-      user.hasPlayed = false
-      await user.save()
-    })
-    const newBlackCard = game.newBlackCard()
-    const newPlayerCards = game.handOutCards()
-    const nextTurn = async () => {
-      game.turn_number++
-      game.currentTurn = await getGameRound(game.key, game.turn_number)
-    }
-    await Promise.all([
-      ...updateCards,
-      ...updateUsers,
-      newBlackCard,
-      newPlayerCards,
-      nextTurn(),
-    ])
-    await game.save()
-    return game
-  } catch (err) {
+  if (game.turn_number === game.rounds * game.users.length) {
+    game.active = false
     return game
   }
-}
-
-export const gameFinishedEvent: EventFunctionWithGame<never> = async (game) => {
-  game.active = false
+  const updateCards = game.allPlayerCards
+    .filter((card) => {
+      return (
+        card.state === CardState.PLAYED_SHOW ||
+        card.state === CardState.WINNER
+      )
+    })
+    .map(async (card) => {
+      card.state = CardState.USED
+      await card.save()
+    })
+  const updateUsers = game.users.map(async (user) => {
+    user.hasPlayed = false
+    await user.save()
+  })
+  const newBlackCard = game.newBlackCard()
+  const newPlayerCards = game.handOutCards()
+  const nextTurn = async () => {
+    game.turn_number++
+    game.currentTurn = await getGameRound(game.key, game.turn_number)
+  }
+  await Promise.all([
+    ...updateCards,
+    ...updateUsers,
+    newBlackCard,
+    newPlayerCards,
+  ])
+  await nextTurn()
+  await game.save()
   return game
 }
