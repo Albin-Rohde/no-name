@@ -9,6 +9,7 @@
 
 {#each whiteCards as card}
   <div class="white-card" on:click={() => handleCardClick(card)}>
+    {card.state}
     <WhiteCard
       disabled={disabled}
       whiteCard={card}

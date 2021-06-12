@@ -46,7 +46,7 @@
       return
     }
     gameData = socket.gameData
-    if (!gameData.active && gameData.currentTurn > 1) {
+    if (gameData.isFinished) {
       view = 'victory'
     } else if (!gameData.active && gameData.key) {
       view = 'lobby'
@@ -127,6 +127,7 @@
     <Victory
       gameData={gameData}
       socket={socket}
+      on:leave-game={leaveGame}
     />
   {/if}
 </div>
