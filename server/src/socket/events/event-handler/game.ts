@@ -12,7 +12,6 @@ import { GameRuleError, GameStateError, SocketWithSession } from "../..";
 import { NotFoundError } from "../../../db/error";
 import { setTimeoutAsync } from "../../../util";
 import { CardState } from "../../../db/card/models/WhiteCardRef";
-import { emitUpdateEvent, handleError } from "../register";
 
 
 /**
@@ -104,18 +103,16 @@ export const deleteGameEvent: EventFunctionWithGame<never> = async(game) => {
  * - Hand out new white cards
  * - Next round with new card wizz
  * - Discards played cards as used
- * @param io
- * @param socket
- * @param gameKey
+ * @param game
  */
-export const nextRoundEvent = async(io: Server, socket: SocketWithSession, gameKey: string): Promise<void> => {
+export const nextRoundEvent = async(game): Promise<Game> => {
   await setTimeoutAsync(6000)
   try {
-    const game = await getGameWithRelations(gameKey)
+    game = await getGameWithRelations(game.key)
     if (game.turn_number === game.rounds * game.users.length) {
       console.log('finish')
       const g = await gameFinishedEvent(game)
-      return emitUpdateEvent(io, g)
+      return g
     }
     const updateCards = game.allPlayerCards
       .filter((card) => {
@@ -146,9 +143,9 @@ export const nextRoundEvent = async(io: Server, socket: SocketWithSession, gameK
       nextTurn(),
     ])
     await game.save()
-    await emitUpdateEvent(io, game)
+    return game
   } catch (err) {
-    handleError(err, socket)
+    return game
   }
 }
 

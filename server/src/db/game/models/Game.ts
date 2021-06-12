@@ -118,6 +118,13 @@ export class Game extends BaseEntity {
   }
 
   /**
+   * Game is finished, ture if active false and turn number > 1
+   */
+  public get isFinished(): boolean {
+    return !this.active && this.turn_number > 1
+  }
+
+  /**
    * Find card on game that match supplied cardId
    *
    * Returns a WhiteCardRef on success

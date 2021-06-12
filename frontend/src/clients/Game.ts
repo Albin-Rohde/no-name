@@ -47,6 +47,9 @@ export default class Game {
     return this.users.filter(user => !user.cardWizz)
   }
 
+  public get isFinished(): boolean {
+    return !this.active && this.currentTurn > 1
+  }
   public get winningPlayer(): UserResponse {
     const winningPlayer = this.players.find(user => user.cards.some(c => c.state === CardState.WINNER))
     if(!winningPlayer) {

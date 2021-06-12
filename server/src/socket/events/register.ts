@@ -19,6 +19,7 @@ import { GameRuleError } from "../error";
 import { SocketWithSession } from "../index";
 import {authSocketUser, loggerMiddleware} from "../authenticate";
 import {logger} from "../../logger";
+import {nextRoundEvent} from "./event-handler/game";
 
 /**
  * Register events to the socket
@@ -30,14 +31,14 @@ import {logger} from "../../logger";
  */
 export const registerSocketEvents = (io: Server, socket: SocketWithSession) => {
   addListener<string>(io, socket, Events.JOIN_GAME, joinGameEvent)
-  addListener<never>(io, socket, Events.GET_GAME, getGameEvent)
-  addListenerWithGame<never>(io, socket, Events.START_GAME, startGameEvent)
-  addListenerWithGame<never>(io, socket, Events.LEAVE_GAME, leaveGameEvent)
-  addListenerWithGame<never>(io, socket, Events.DELETE_GAME, deleteGameEvent)
+  addListener(io, socket, Events.GET_GAME, getGameEvent)
+  addListenersWithGame(io, socket, Events.START_GAME, [startGameEvent])
+  addListenersWithGame(io, socket, Events.LEAVE_GAME, [leaveGameEvent])
+  addListenersWithGame(io, socket, Events.DELETE_GAME, [deleteGameEvent])
 
-  addListenerWithGame<number>(io, socket, Events.PLAY_CARD, playCardEvent)
-  addListenerWithGame<number>(io, socket, Events.FLIP_CARD, flipCardEvent)
-  addListener<number>(io, socket, Events.VOTE_CARD, voteCardEvent)
+  addListenersWithGame<number>(io, socket, Events.PLAY_CARD, [playCardEvent])
+  addListenersWithGame<number>(io, socket, Events.FLIP_CARD, [flipCardEvent])
+  addListenersWithGame<number>(io, socket, Events.VOTE_CARD, [voteCardEvent, nextRoundEvent])
 }
 
 /**
@@ -53,32 +54,29 @@ export const registerSocketEvents = (io: Server, socket: SocketWithSession) => {
  * @param io Socket.io Server instance
  * @param socket Socket.io Socket
  * @param event event string to listen for
- * @param eventFn eventHandlerFunction
+ * @param eventFns eventHandlerFunctions
  */
-const addListenerWithGame = <T>(
+const addListenersWithGame = <T>(
   io: Server,
   socket: SocketWithSession,
   event: Events,
-  eventFn: EventFunctionWithGame<T>,
+  eventFns: EventFunctionWithGame<T>[],
 ): void => {
   async function eventCallback(...args: T[]) {
     try {
-      loggerMiddleware(socket, {
-        eventName: event,
-        eventMethod: eventFn.name,
-        arguments: args,
-        userId: socket.request.session.user.id,
-        gameId: socket.request.session.user.game_fk,
-      })
       const user = await authSocketUser(socket)
-      const g = await getGameFromUser(user.id)
-      await eventFn(g, ...args)
-        .then((game) => {
-          if (game) {
-            return emitUpdateEvent(io, game)
-          }
-          emitRemovedEvent(io, socket, g)
+      for (const fn of eventFns) {
+        loggerMiddleware(socket, {
+          eventName: event,
+          eventMethod: fn.name,
+          arguments: args,
+          userId: socket.request.session.user.id,
+          gameId: socket.request.session.user.game_fk,
         })
+        const g = await getGameFromUser(user.id)
+        const game = await fn(g, ...args)
+        game ? await emitUpdateEvent(io, game) : await emitRemovedEvent(io, socket, g)
+      }
     } catch (err) {
       handleError(err, socket)
     }
@@ -129,7 +127,7 @@ const addListener = <T>(
  * @param io
  * @param game
  */
-export const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
+const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
   await Promise.all(game.users.map(u => u.save()))
   await game.save()
   io.in(game.key).emit('update', normalizeGameResponse(game))
@@ -152,7 +150,7 @@ const emitRemovedEvent = async (io: Server, socket: SocketWithSession, game: Gam
  * @param err
  * @param socket
  */
-export const handleError = (err: Error, socket: SocketWithSession) => {
+const handleError = (err: Error, socket: SocketWithSession) => {
   if (err instanceof GameRuleError) {
     logger.warn(err)
     socket.emit('rule_error', err.message)
