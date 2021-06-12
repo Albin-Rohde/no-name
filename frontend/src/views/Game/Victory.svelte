@@ -32,8 +32,8 @@
     <div class="button-grid">
       <div class="form-container">
         <div class="btn-container">
-          <button class="btn btn-danger" on:click={() => dispatch('abort')}>Leave game</button>
-          <button class="btn btn-success" on:click={socket.startGame}> Play again </button>
+          <button class="btn btn-danger" on:click={() => dispatch('leave-game')}>Leave game</button>
+          <button class="btn btn-success disabled" on:click={socket.startGame}> Play again </button>
         </div>
       </div>
     </div>
