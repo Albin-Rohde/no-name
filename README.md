@@ -75,8 +75,13 @@ that further down.
 - Run `docker-compose up`
 - The app will now run on `https://localhost`, running the app like this is as close to the live set up as possible.
 
-
 ### Deploy live
+Latest master is always running in live. If a new commit/push/merge occurs on 
+the master branch. The app will reload (up to 1min) and host the new version.
+
+The live version can be accessed on yobotics.club
+
+### Live configuration
 - Alter these lines in `.env` located in the root (same directory as this readme).
   ```
   API_BASE_URL=https://yobotics.club
@@ -85,7 +90,8 @@ that further down.
   NGINX_STAGE=0
   ```
 - Then run `docker-compose up`
-
+Note. Deploying live like this is only possible from the public ip `81.170.195.205`.
+And the local router must be forwarding port `443` and `80` to the machines local address.
 
 ## How to play
 Begin by signing up or signing in. When logged in one is greeted by the "dashboard", from here the player can create a
