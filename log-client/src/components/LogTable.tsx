@@ -21,7 +21,7 @@ interface Column {
 
 const columns: Column[] = [
   { id: 'level', label: 'Level', minWidth: 90 },
-  { id: 'time', label: 'Timestamp', minWidth: 100 },
+  { id: 'timestamp', label: 'Timestamp', minWidth: 100 },
   {
     id: 'message',
     label: 'Message',
@@ -36,81 +36,10 @@ const columns: Column[] = [
   },
 ];
 
-function createData(name, code, population, size) {
-  const density = population / size;
-  return { name, code, population, size, density };
-}
-
-let i = 0
-function createLog(level, time, message, service, secret: any = {}) {
-  if (level === 'error') {
-    secret = {name: 'AuthError', stack: 'long stack explaining error', info: 'some more error info'}
-  }
-  return { id: i++, level, time, message, service, secret };
-}
-
-const logs = [
-  createLog('info', '2021-06-30T22:04:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:04:03.565Z', 'Server Started to db', 'Server'),
-  createLog('error', '2021-06-30T23:04:03.565Z', 'ECONRESET 127.0.0.1:5432', 'Server'),
-  createLog('info', '2021-06-30T23:08:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:22:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T22:04:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:04:03.565Z', 'Server Started to db', 'Server'),
-  createLog('error', '2021-06-30T23:04:03.565Z', 'ECONRESET 127.0.0.1:5432', 'Server'),
-  createLog('info', '2021-06-30T23:08:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:22:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T22:04:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:04:03.565Z', 'Server Started to db', 'Server'),
-  createLog('error', '2021-06-30T23:04:03.565Z', 'ECONRESET 127.0.0.1:5432', 'Server'),
-  createLog('info', '2021-06-30T23:08:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:22:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T22:04:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:04:03.565Z', 'Server Started to db', 'Server'),
-  createLog('error', '2021-06-30T23:04:03.565Z', 'ECONRESET 127.0.0.1:5432', 'Server'),
-  createLog('info', '2021-06-30T23:08:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:22:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T22:04:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:04:03.565Z', 'Server Started to db', 'Server'),
-  createLog('error', '2021-06-30T23:04:03.565Z', 'ECONRESET 127.0.0.1:5432', 'Server'),
-  createLog('info', '2021-06-30T23:08:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:22:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T22:04:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:04:03.565Z', 'Server Started to db', 'Server'),
-  createLog('error', '2021-06-30T23:04:03.565Z', 'ECONRESET 127.0.0.1:5432', 'Server'),
-  createLog('info', '2021-06-30T23:08:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:22:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T22:04:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:04:03.565Z', 'Server Started to db', 'Server'),
-  createLog('error', '2021-06-30T23:04:03.565Z', 'ECONRESET 127.0.0.1:5432', 'Server'),
-  createLog('info', '2021-06-30T23:08:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:22:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T22:04:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:04:03.565Z', 'Server Started to db', 'Server'),
-  createLog('error', '2021-06-30T23:04:03.565Z', 'ECONRESET 127.0.0.1:5432', 'Server'),
-  createLog('info', '2021-06-30T23:08:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:22:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T22:04:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:04:03.565Z', 'Server Started to db', 'Server'),
-  createLog('error', '2021-06-30T23:04:03.565Z', 'ECONRESET 127.0.0.1:5432', 'Server'),
-  createLog('info', '2021-06-30T23:08:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:22:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T22:04:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:04:03.565Z', 'Server Started to db', 'Server'),
-  createLog('error', '2021-06-30T23:04:03.565Z', 'ECONRESET 127.0.0.1:5432', 'Server'),
-  createLog('info', '2021-06-30T23:08:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:22:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T22:04:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:04:03.565Z', 'Server Started to db', 'Server'),
-  createLog('error', '2021-06-30T23:04:03.565Z', 'ECONRESET 127.0.0.1:5432', 'Server'),
-  createLog('info', '2021-06-30T23:08:03.565Z', 'Server connected to db', 'Server'),
-  createLog('info', '2021-06-30T23:22:03.565Z', 'Server connected to db', 'Server'),
-]
-
 const useStyles = makeStyles({
   root: {
     width: '100%',
-    marginTop: '15vh',
+    marginTop: '5vh',
   },
   container: {
     maxHeight: 440,
@@ -127,7 +56,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function LogTable() {
+export default function LogTable(props) {
   const classes = useStyles();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -161,7 +90,7 @@ export default function LogTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {logs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+              {props.logs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                 return (
                   <TableRow
                     hover
@@ -189,7 +118,7 @@ export default function LogTable() {
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={logs.length}
+          count={props.logs.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
@@ -198,7 +127,7 @@ export default function LogTable() {
       </Paper>
       <Paper variant="outlined">
         {detailedLog !== null ? <ReactJson
-          src={logs[detailedLog]}
+          src={props.logs[detailedLog]}
           theme="monokai"
           displayDataTypes={false}
           enableClipboard={false}

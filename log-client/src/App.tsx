@@ -1,10 +1,8 @@
 import React from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Container from '@material-ui/core/Container';
-import LogTable from "./components/LogTable";
 
 import {
-  BrowserRouter as Router,
   Switch,
   Route,
   useHistory,
@@ -21,7 +19,6 @@ function App() {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
-    history.push(newValue)
   };
 
   const theme = React.useMemo(
@@ -51,17 +48,8 @@ function App() {
             <Tab label="Requests" value={'/requests'} />
             </Tabs>
           </Paper>
-          <Switch>
-            <Route path="/">
-              <Combined />
-            </Route>
-            <Route path="/error">
-              <Error />
-            </Route>
-            <Route path="/request">
-              <Requests />
-            </Route>
-          </Switch>
+          {value === '/' && <Combined />}
+          {value === '/error' && <Error />}
         </Container>
       </ThemeProvider>
     </React.Fragment>
