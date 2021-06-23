@@ -23,3 +23,6 @@
 
 # Other
 .idea
+
+# logs
+*.log
