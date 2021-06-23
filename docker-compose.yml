@@ -43,6 +43,21 @@ services:
     volumes:
       - './frontend/src:/usr/src/frontend/src'
 
+    log-client:
+      container_name: log-client
+      restart: always
+      build: ./log-client
+      networks:
+        - local
+      ports:
+        - '3000:5000'
+      expose:
+        - '5000'
+      env_file:
+        - '.env'
+      volumes:
+        - './log-client/src:/usr/src/log-client/src'
+
   redis:
     image: "redis:alpine"
     command: redis-server
