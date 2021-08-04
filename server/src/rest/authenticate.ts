@@ -4,6 +4,7 @@ import {AuthenticationError, ExpectedError, GameRequiredError} from "./error";
 import {NotFoundError} from "../db/error";
 import {RestResponse} from "./types";
 import {GameRuleError} from "../socket";
+import {logger} from "../logger";
 
 const authUser = async (sessionUser: User) => {
   if(!sessionUser) {
@@ -52,11 +53,16 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
     },
     data: null
   }
-  if (err instanceof ExpectedError || err instanceof GameRuleError) {
+  if (err instanceof GameRuleError) {
+    logger.warn(err)
+    return res.status(200).json(response);
+  }
+  if (err instanceof ExpectedError) {
+    logger.error(err)
     return res.status(200).json(response);
   }
   // makes sure any unexpected error is not sent to client.
-  console.error(err)
+  logger.error(err)
   response.err = {name: 'INTERNAL_ERROR', message: 'UNKNOWN_INTERNAL_ERROR'}
   return res.status(500).json(response)
 }
