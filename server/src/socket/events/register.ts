@@ -42,14 +42,16 @@ export const registerSocketEvents = (io: Server, socket: SocketWithSession) => {
 }
 
 /**
- * takes an eventFunction wrap in in an error handler
- * register the handler on the socket as an eventListener
+ * takes an eventFunction(s) wrap it in an error handler
+ * register the handler on the socket as an eventListener(s)
  *
  * The response from the eventFunction <Game> will be sent
  * to the client as an update event on every successfully event
  *
  * fetches a new Game instance on every event and send it in
- * as argument to the eventFunction
+ * as argument to the eventFunction(s)
+ *
+ * eventFunctions will be executed in the same order as supplied
  *
  * @param io Socket.io Server instance
  * @param socket Socket.io Socket
