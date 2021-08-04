@@ -39,7 +39,9 @@ export const expressLogger = expressWinston.logger({
   format: winstonFileFormat,
   expressFormat: true,
   colorize: false,
-  ignoreRoute: function (req, res) { return false; }
+  ignoreRoute: function (req, res) {
+    return req.url.includes('/logs')
+  }
 })
 
 /**
@@ -59,7 +61,7 @@ export const socketLogger = winston.createLogger({
  */
 export const logger = winston.createLogger({
   format: winstonFileFormat,
-  defaultMeta: {service: 'General'},
+  defaultMeta: {service: 'Server'},
   transports: [
     new winston.transports.Console({ format: winstonConsoleFormat, level: 'silly' }),
     new winston.transports.File({ filename: 'error.log', level: 'error' }),
