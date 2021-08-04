@@ -145,6 +145,5 @@ export const nextRoundEvent: EventFunctionWithGame<never> = async(game) => {
     newPlayerCards,
   ])
   await nextTurn()
-  await game.save()
   return game
 }

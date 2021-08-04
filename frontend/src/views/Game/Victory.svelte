@@ -19,13 +19,14 @@
       <h1 class="game-over-text">Score</h1>
     </div>
     <div class="ranking">
-      {#each sortedPlayer as player}
+      {#each top3 as player}
         <div class="flex-center">
-          {#if i < 4}
-            <p class={`fs-${i}`}><b>1.</b> {player.username} {player.score}pts.</p>
-          {:else }
-            <p class="fs-4"><b>1.</b> {player.username} {player.score}pts.</p>
-          {/if}
+          <p class={`fs-${i}`}><b>{i++}.</b> {player.username} {player.score}pts.</p>
+        </div>
+      {/each}
+      {#each bellow3 as player}
+        <div class="flex-center">
+          <p class="fs-4"><b>{i++}.</b> {player.username} {player.score}pts.</p>
         </div>
       {/each}
     </div>
