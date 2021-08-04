@@ -8,11 +8,10 @@ export default function Error() {
     console.log('doing fetch!')
     axios({
       withCredentials: true,
-      url: `http://localhost:5000/logs/error`,
+      url: `http://app.${document.domain}/api/logs/error`,
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": process.env.API_BASE_URL,
       },
     }).then(r => {
       const logsWithId = r.data.data.logs.map((log, i) => {

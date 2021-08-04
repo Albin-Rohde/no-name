@@ -5,14 +5,12 @@ import axios from 'axios'
 export default function Combined() {
   const [logs, setLogs] = useState([])
   useEffect(() => {
-    console.log('doing fetch!')
     axios({
       withCredentials: true,
-      url: `http://localhost:5000/logs/combined`,
+      url: `http://app.${document.domain}/api/logs/combined`,
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": process.env.API_BASE_URL,
       },
     }).then(r => {
       const logsWithId = r.data.data.logs.map((log, i) => {

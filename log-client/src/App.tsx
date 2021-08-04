@@ -12,6 +12,7 @@ import {createMuiTheme, Paper, Tab, Tabs, ThemeProvider} from "@material-ui/core
 import Combined from "./views/Combined";
 import Error from "./views/Error";
 import Requests from "./views/Requests";
+import Socket from "./views/Socket";
 
 function App() {
   const [value, setValue] = React.useState('');
@@ -43,13 +44,16 @@ function App() {
               onChange={handleChange}
               aria-label="disabled tabs example"
             >
-            <Tab label="Combined" value={'/'} />
+            <Tab label="Combined" value={''} />
             <Tab label="Error" value={'/error'} />
             <Tab label="Requests" value={'/requests'} />
+            <Tab label="Socket" value={'/socket'} />
             </Tabs>
           </Paper>
-          {value === '/' && <Combined />}
+          {value === '' && <Combined />}
           {value === '/error' && <Error />}
+          {value === '/requests' && <Requests />}
+          {value === '/socket' && <Socket />}
         </Container>
       </ThemeProvider>
     </React.Fragment>

@@ -61,6 +61,7 @@ export default function LogTable(props) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [detailedLog, setDetailLog] = React.useState(null);
+  const cols = props.columns || columns
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -78,7 +79,7 @@ export default function LogTable(props) {
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                {columns.map((column) => (
+                {cols.map((column) => (
                   <TableCell
                     key={column.id}
                     align={column.align}
@@ -100,7 +101,7 @@ export default function LogTable(props) {
                     onClick={() => setDetailLog(row.id)}
                     className={row.id === detailedLog ? classes.selected : ''}
                   >
-                    {columns.map((column) => {
+                    {cols.map((column) => {
                       const value = row[column.id];
                       console.log(value)
                       return (
