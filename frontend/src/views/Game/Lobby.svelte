@@ -4,11 +4,12 @@
   import PlayerInfo from '../../components/PlayerInfo.svelte'
   import type { SocketClient } from '../../clients/SocketClient'
   import Game from "../../clients/Game";
+  import * as process from "process";
 
   export let socket: SocketClient
   export let gameData: Game
   const dispatch = createEventDispatcher()
-  const joinLink = `${process.env.API_BASE_URL}${process.env.API_EXTENSION}/game/join?key=${gameData.key}`
+  const joinLink = `${process.env.API_BASE_URL}/game/join?key=${gameData.key}`
 </script>
 
 <div class="content-grid">
