@@ -46,6 +46,7 @@ Read more about the server [here](./server/README.md).
 - deployment/live
   - docker
   - docker-compose
+  - certbot
 
 ### Environments
 Both dev production and live require environments variables to run.
@@ -60,20 +61,20 @@ that further down.
 ### Dev
 - Run the following commands:
   - From root
-    - `docker-compose up -d db redis`
+    - `docker-compose up -d db redis nginx`
   - From frontend root:
     - `npm run dev`
   - From server root:
     - `npm run typeorm migration:run`
     - `npm run dev`
 
-- frontend will start on `localhost:3000`
-- backend will start on `localhost:5000`
+- frontend will start on `app.localhost`
+- backend will start on `api.localhost`
 - In dev mode, the app will reload changes, the app does not need to be restarted between changes to source code.
 
 ### Production
 - Run `docker-compose up`
-- The app will now run on `https://localhost`, running the app like this is as close to the live set up as possible.
+- The app will now run on `https://app.localhost`, running the app like this is as close to the live set up as possible.
 
 ### Deploy live
 Latest master is always running in live. If a new commit/push/merge occurs on 

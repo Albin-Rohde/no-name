@@ -15,7 +15,7 @@ interface RestRequestOptions {
 }
 
 export default class RestClient {
-  private readonly baseUrl = `${process.env.API_BASE_URL}${process.env.API_EXTENSION || ''}`
+  private readonly baseUrl = process.env.API_BASE_URL
   public async makeRequest<T>(option: RestRequestOptions): Promise<T> {
     option.action = option.action ? `/${option.action}` : ''
     const res: RestResponse<T> = await axios({
