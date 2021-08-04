@@ -37,4 +37,32 @@ logRouter.get('/error', async (req: Request, res: Response) => {
   }
 })
 
+logRouter.get('/requests', async (req: Request, res: Response) => {
+  try {
+    const logs = await getLogs('requests.log')
+    const response: RestResponse<Record<string, any>> = {
+      ok: true,
+      err: null,
+      data: { logs }
+    }
+    return res.json(response)
+  } catch (err) {
+    handleRestError(req, res, err);
+  }
+})
+
+logRouter.get('/socket', async (req: Request, res: Response) => {
+  try {
+    const logs = await getLogs('socket.log')
+    const response: RestResponse<Record<string, any>> = {
+      ok: true,
+      err: null,
+      data: { logs }
+    }
+    return res.json(response)
+  } catch (err) {
+    handleRestError(req, res, err);
+  }
+})
+
 export default logRouter
