@@ -3,6 +3,7 @@ import { getUserWithRelation } from "../../../db/user/services";
 import { Game } from "../../../db/game/models/Game";
 import { EventFunction, EventFunctionWithGame } from "./index";
 import {
+  createNewGame,
   deleteGameFromUser,
   getGameFromUser,
   getGameRound,
@@ -12,6 +13,7 @@ import { GameRuleError, GameStateError, SocketWithSession } from "../..";
 import { NotFoundError } from "../../../db/error";
 import { setTimeoutAsync } from "../../../util";
 import { CardState } from "../../../db/card/models/WhiteCardRef";
+import {normalizeGameResponse} from "../response";
 
 
 /**
@@ -77,6 +79,36 @@ export const startGameEvent: EventFunctionWithGame<never> = async (game: Game) =
     game.newBlackCard(),
   ])
   return game
+}
+
+/**
+ * Creates a new game, sending the key for the new game to all
+ * players in the current game. This make it possible for them to use
+ * that key to join the new game.
+ * @param io
+ * @param socket
+ */
+export const playAgainEvent: EventFunction<never> = async (io, socket) => {
+  const game = await getGameFromUser(socket.request.session.user.id)
+  if (game.active) {
+    throw new GameStateError('Can not restart ongoing game')
+  }
+  if (!game.currentUser.isHost) {
+    throw new GameRuleError('Only host can restart game')
+  }
+  const newGame = await createNewGame(game.currentUser, {
+    playCards: game.playCards,
+    playerLimit: game.playerLimit,
+    cardDeck: game.card_deck_fk,
+    private: game.privateLobby,
+    rounds: game.rounds,
+  })
+  newGame.users = [game.currentUser]
+  socket.leave(game.key)
+  socket.join(newGame.key)
+  socket.emit('update', normalizeGameResponse(newGame))
+  io.in(game.key).emit('next-game', newGame.key)
+  return null
 }
 
 /**

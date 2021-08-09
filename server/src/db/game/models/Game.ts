@@ -11,6 +11,8 @@ import {logger} from "../../../logger";
 @Entity()
 
 export class Game extends BaseEntity {
+  public nextGameKey: string | null
+
   @PrimaryGeneratedColumn('uuid')
   key: string
 
@@ -63,7 +65,7 @@ export class Game extends BaseEntity {
    * Sorted array of all users on the game
    */
   public get users(): User[] {
-    return this._users.sort((a, b) => a.id - b.id)
+    return this._users ? this._users.sort((a, b) => a.id - b.id) : []
   }
 
   /**

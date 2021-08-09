@@ -19,6 +19,7 @@ export default class Game {
   public users: UserResponse[]
   public currentUser: UserResponse
   public finished: boolean = false
+  public nextGameKey: string
 
   constructor(currentUser: UserResponse, game?: GameSocketResponse) {
     if(game) {

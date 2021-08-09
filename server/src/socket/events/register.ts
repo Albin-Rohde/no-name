@@ -11,6 +11,7 @@ import {
   playCardEvent,
   startGameEvent,
   voteCardEvent,
+  playAgainEvent
 } from './event-handler'
 import { Game } from "../../db/game/models/Game";
 import { normalizeGameResponse } from "./response";
@@ -32,6 +33,7 @@ import {nextRoundEvent} from "./event-handler/game";
 export const registerSocketEvents = (io: Server, socket: SocketWithSession) => {
   addListener<string>(io, socket, Events.JOIN_GAME, joinGameEvent)
   addListener(io, socket, Events.GET_GAME, getGameEvent)
+  addListener(io, socket, Events.PLAY_AGAIN, playAgainEvent)
   addListenersWithGame(io, socket, Events.START_GAME, [startGameEvent])
   addListenersWithGame(io, socket, Events.LEAVE_GAME, [leaveGameEvent])
   addListenersWithGame(io, socket, Events.DELETE_GAME, [deleteGameEvent])
