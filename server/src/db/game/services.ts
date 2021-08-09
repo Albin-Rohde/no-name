@@ -82,6 +82,8 @@ export async function createNewGame (user: User, options: GameSettings): Promise
   game.cardDeck = cardDeck
   game.hostUserId = user.id
   user.game = game
+  user.score = 0
+  user.hasPlayed = false
   await user.save()
   return game
 }
@@ -120,13 +122,12 @@ export async function deleteGameFromUser (user: User): Promise<void> {
   const deleteGameRound = GameTurn.createQueryBuilder()
     .where('game_key_fk = :gameKey', {gameKey})
     .delete()
+  // TODO: can any of this be executed in paralell?
+  await deleteWcr.execute(),
   await resetUser.execute()
   await deleteGame.execute()
-  await Promise.all([
-    deleteGameRound.execute(),
-    deleteWcr.execute(),
-    deleteBcr.execute()
-  ])
+  await deleteGameRound.execute()
+  await deleteBcr.execute()
   return
 }
 

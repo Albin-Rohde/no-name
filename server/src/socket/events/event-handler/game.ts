@@ -52,6 +52,8 @@ export const joinGameEvent: EventFunction<string> = async (io, socket, key) => {
   if (game.isFinished) {
     throw new GameStateError('Can not join finished game')
   }
+  user.score = 0
+  user.hasPlayed = false
   game.addPlayer(user)
   socket.join(game.key)
   return game
