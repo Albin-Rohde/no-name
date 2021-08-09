@@ -15,6 +15,7 @@ enum Events {
   START = 'start-game',
   LEAVE_GAME = 'leave-game',
   DELETE_GAME = 'delete-game',
+  PLAY_AGAIN = 'play-again',
   PLAY_CARD = 'play-card',
   FLIP_CARD = 'flip-card',
   VOTE_CARD = 'vote-card',
@@ -22,8 +23,9 @@ enum Events {
 
 export class SocketClient {
   private readonly baseUrl: string = process.env.API_SOCKET_URL
-  public socket: Socket
   private game: Game
+  public socket: Socket
+  public nextGameKey: string
 
   constructor(user: UserResponse) {
     this.game = new Game(user)
@@ -46,6 +48,10 @@ export class SocketClient {
     this.socket.on('removed', (gameKey: string) => {
       console.log(`game with key ${gameKey} has been removed by host`)
       this.socket.disconnect()
+    })
+    this.socket.on('next-game', (gameKey: string) => {
+      this.game.nextGameKey = gameKey
+      rerenderCb()
     })
     this.socket.on('disconnect', () => {
       this.socket = undefined
@@ -138,5 +144,11 @@ export class SocketClient {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     this.socket.emit(Events.DELETE_GAME)
     this.socket.disconnect()
+  }
+
+  @HandleError
+  public playAgain() {
+    if(!this.socket) throw new Error('InGameClient not connected to socket.')
+    this.socket.emit(Events.PLAY_AGAIN)
   }
 }

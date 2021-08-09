@@ -8,6 +8,7 @@ export enum Events {
   START_GAME = 'start-game',
   LEAVE_GAME = 'leave-game',
   DELETE_GAME = 'delete-game',
+  PLAY_AGAIN = 'play-again',
   PLAY_CARD = 'play-card',
   FLIP_CARD = 'flip-card',
   VOTE_CARD = 'vote-card',
@@ -17,6 +18,6 @@ export type EventFunction<T> = (io: Server, socket: SocketWithSession, ...args: 
 
 export type EventFunctionWithGame<T> = (game: Game, ...args: T[]) => Promise<Game | null>
 
-export { getGameEvent, joinGameEvent, startGameEvent, leaveGameEvent, deleteGameEvent } from './game'
+export { getGameEvent, joinGameEvent, startGameEvent, leaveGameEvent, deleteGameEvent, playAgainEvent } from './game'
 
 export { playCardEvent, flipCardEvent, voteCardEvent } from './card'

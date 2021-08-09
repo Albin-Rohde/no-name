@@ -53,16 +53,15 @@
     <div class="main-coll">
       <div class="top-cards">
         <BlackCard text={gameData.blackCard.text}/>
-        {#if gameData.state !== GameState.DISPLAY_WINNER}
-          <RenderWhiteCards
-            whiteCards={gameData.playedCards}
-            blackCard={gameData.blackCard}
-            handleCardClick={handleCardClick}
-          />
-        {/if}
         {#if gameData.state === GameState.DISPLAY_WINNER}
           <RenderWhiteCards
             whiteCards={[gameData.winnerCard]}
+            blackCard={gameData.blackCard}
+            handleCardClick={handleCardClick}
+          />
+        {:else}
+          <RenderWhiteCards
+            whiteCards={gameData.playedCards}
             blackCard={gameData.blackCard}
             handleCardClick={handleCardClick}
           />

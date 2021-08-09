@@ -6,10 +6,13 @@ import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {NotFoundError} from "../../error";
 import {CardDeck} from "../../card/models/CardDeck";
 import {BlackCardRef, BlackCardState} from "../../card/models/BlackCardRef";
+import {logger} from "../../../logger";
 
 @Entity()
 
 export class Game extends BaseEntity {
+  public nextGameKey: string | null
+
   @PrimaryGeneratedColumn('uuid')
   key: string
 
@@ -33,7 +36,7 @@ export class Game extends BaseEntity {
   playerLimit: number
 
   @Column({default: false})
-  started: boolean
+  active: boolean
 
   @Column({default: 1})
   turn_number: number
@@ -62,7 +65,7 @@ export class Game extends BaseEntity {
    * Sorted array of all users on the game
    */
   public get users(): User[] {
-    return this._users.sort((a, b) => a.id - b.id)
+    return this._users ? this._users.sort((a, b) => a.id - b.id) : []
   }
 
   /**
@@ -115,6 +118,13 @@ export class Game extends BaseEntity {
    */
   public get allPlayerCards(): WhiteCardRef[] {
     return this.allPlayers.flatMap(user => user.cards)
+  }
+
+  /**
+   * Game is finished, ture if active false and turn number > 1
+   */
+  public get isFinished(): boolean {
+    return !this.active && this.turn_number > 1
   }
 
   /**

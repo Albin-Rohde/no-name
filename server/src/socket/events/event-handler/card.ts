@@ -1,9 +1,7 @@
 import { Game } from "../../../db/game/models/Game";
-import { EventFunction, EventFunctionWithGame } from "./index";
-import { NotAllowedError} from "../..";
+import { EventFunctionWithGame } from "./index";
+import {GameStateError, NotAllowedError} from "../..";
 import { CardState } from "../../../db/card/models/WhiteCardRef";
-import { getGameFromUser } from "../../../db/game/services";
-import { nextRoundEvent } from "./game";
 
 /**
  * Play card event
@@ -16,6 +14,12 @@ export const playCardEvent: EventFunctionWithGame<number> = async(
   game,
   cardId: number
 ): Promise<Game> => {
+  if (!game.active) {
+    throw new GameStateError('Can not play card in inactive game')
+  }
+  if (game.isFinished) {
+    throw new GameStateError('Can not play card in finished game')
+  }
   const card = game.currentUser.findCard(cardId)
   await card.play()
   game.currentUser.hasPlayed = true
@@ -33,6 +37,12 @@ export const flipCardEvent: EventFunctionWithGame<number> = async(
   game,
   cardId: number
 ): Promise<Game> => {
+  if (!game.active) {
+    throw new GameStateError('Can not flip card in inactive game')
+  }
+  if (game.isFinished) {
+    throw new GameStateError('Can not flip card in finished game')
+  }
   if(!game.currentUser.isCardWizz) {
     throw new NotAllowedError('Only card wizz can flip card')
   }
@@ -48,16 +58,16 @@ export const flipCardEvent: EventFunctionWithGame<number> = async(
  * Vote card event
  * Will vote for a card in the game that the user it attached to
  * if allowed by game rules.
- * @param io
- * @param socket
+ * @param game
  * @param cardId
  */
-export const voteCardEvent: EventFunction<number> = async(
-  io,
-  socket,
-  cardId: number,
-): Promise<Game> => {
-  const game = await getGameFromUser(socket.request.session.user.id)
+export const voteCardEvent: EventFunctionWithGame<number> = async(game,cardId: number): Promise<Game> => {
+  if (!game.active) {
+    throw new GameStateError('Game is not active')
+  }
+  if (game.isFinished) {
+    throw new GameStateError('Can not vote card in finished game')
+  }
   if(!game.currentUser.isCardWizz) {
     throw new NotAllowedError('Only card wizz can vote card')
   }
@@ -74,6 +84,5 @@ export const voteCardEvent: EventFunction<number> = async(
   const winningUser = game.findUser(card.user_id_fk)
   winningUser.score += 1
   await card.winner()
-  nextRoundEvent(io, socket, game.key)
   return game
 }

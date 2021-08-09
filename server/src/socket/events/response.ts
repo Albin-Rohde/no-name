@@ -2,13 +2,12 @@ import {CardState, WhiteCardRef} from '../../db/card/models/WhiteCardRef'
 import {User} from '../../db/user/models/User'
 import {Game} from '../../db/game/models/Game'
 import {GameTurn} from '../../db/game/models/GameTurn'
-import {BlackCard} from '../../db/card/models/BlackCard'
 import {BlackCardRef} from "../../db/card/models/BlackCardRef";
 
 interface GameResponse {
   key: string
   gameOptions: GameOptionsResponse
-  started: boolean
+  active: boolean
   currentTurn: number
   blackCard?: BlackCardResponse | undefined
   users: UserResponse[]
@@ -86,7 +85,7 @@ export const normalizeGameResponse = (game: Game): GameResponse => ({
     privateLobby: game.privateLobby,
     rounds: game.rounds
   },
-  started: game.started,
+  active: game.active,
   currentTurn: game.turn_number,
   blackCard: normalizeBlackCardResponse(game.blackCard),
   users: game.users ? [...game.users.map(user => normalizeUserResponse(user, game.currentTurn))] : []

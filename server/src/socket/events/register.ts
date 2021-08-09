@@ -11,6 +11,7 @@ import {
   playCardEvent,
   startGameEvent,
   voteCardEvent,
+  playAgainEvent
 } from './event-handler'
 import { Game } from "../../db/game/models/Game";
 import { normalizeGameResponse } from "./response";
@@ -19,6 +20,7 @@ import { GameRuleError } from "../error";
 import { SocketWithSession } from "../index";
 import {authSocketUser, loggerMiddleware} from "../authenticate";
 import {logger} from "../../logger";
+import {nextRoundEvent} from "./event-handler/game";
 
 /**
  * Register events to the socket
@@ -30,55 +32,55 @@ import {logger} from "../../logger";
  */
 export const registerSocketEvents = (io: Server, socket: SocketWithSession) => {
   addListener<string>(io, socket, Events.JOIN_GAME, joinGameEvent)
-  addListener<never>(io, socket, Events.GET_GAME, getGameEvent)
-  addListenerWithGame<never>(io, socket, Events.START_GAME, startGameEvent)
-  addListenerWithGame<never>(io, socket, Events.LEAVE_GAME, leaveGameEvent)
-  addListenerWithGame<never>(io, socket, Events.DELETE_GAME, deleteGameEvent)
+  addListener(io, socket, Events.GET_GAME, getGameEvent)
+  addListener(io, socket, Events.PLAY_AGAIN, playAgainEvent)
+  addListenersWithGame(io, socket, Events.START_GAME, [startGameEvent])
+  addListenersWithGame(io, socket, Events.LEAVE_GAME, [leaveGameEvent])
+  addListenersWithGame(io, socket, Events.DELETE_GAME, [deleteGameEvent])
 
-  addListenerWithGame<number>(io, socket, Events.PLAY_CARD, playCardEvent)
-  addListenerWithGame<number>(io, socket, Events.FLIP_CARD, flipCardEvent)
-  addListener<number>(io, socket, Events.VOTE_CARD, voteCardEvent)
+  addListenersWithGame<number>(io, socket, Events.PLAY_CARD, [playCardEvent])
+  addListenersWithGame<number>(io, socket, Events.FLIP_CARD, [flipCardEvent])
+  addListenersWithGame<number>(io, socket, Events.VOTE_CARD, [voteCardEvent, nextRoundEvent])
 }
 
 /**
- * takes an eventFunction wrap in in an error handler
- * register the handler on the socket as an eventListener
+ * takes an eventFunction(s) wrap it in an error handler
+ * register the handler on the socket as an eventListener(s)
  *
  * The response from the eventFunction <Game> will be sent
  * to the client as an update event on every successfully event
  *
  * fetches a new Game instance on every event and send it in
- * as argument to the eventFunction
+ * as argument to the eventFunction(s)
+ *
+ * eventFunctions will be executed in the same order as supplied
  *
  * @param io Socket.io Server instance
  * @param socket Socket.io Socket
  * @param event event string to listen for
- * @param eventFn eventHandlerFunction
+ * @param eventFns eventHandlerFunctions
  */
-const addListenerWithGame = <T>(
+const addListenersWithGame = <T>(
   io: Server,
   socket: SocketWithSession,
   event: Events,
-  eventFn: EventFunctionWithGame<T>,
+  eventFns: EventFunctionWithGame<T>[],
 ): void => {
   async function eventCallback(...args: T[]) {
     try {
-      loggerMiddleware(socket, {
-        eventName: event,
-        eventMethod: eventFn.name,
-        arguments: args,
-        userId: socket.request.session.user.id,
-        gameId: socket.request.session.user.game_fk,
-      })
       const user = await authSocketUser(socket)
-      const g = await getGameFromUser(user.id)
-      await eventFn(g, ...args)
-        .then((game) => {
-          if (game) {
-            return emitUpdateEvent(io, game)
-          }
-          emitRemovedEvent(io, socket, g)
+      for (const fn of eventFns) {
+        loggerMiddleware(socket, {
+          eventName: event,
+          eventMethod: fn.name,
+          arguments: args,
+          userId: socket.request.session.user.id,
+          gameId: socket.request.session.user.game_fk,
         })
+        const g = await getGameFromUser(user.id)
+        const game = await fn(g, ...args)
+        game ? await emitUpdateEvent(io, game) : await emitRemovedEvent(io, socket, g)
+      }
     } catch (err) {
       handleError(err, socket)
     }
@@ -129,7 +131,7 @@ const addListener = <T>(
  * @param io
  * @param game
  */
-export const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
+const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
   await Promise.all(game.users.map(u => u.save()))
   await game.save()
   io.in(game.key).emit('update', normalizeGameResponse(game))

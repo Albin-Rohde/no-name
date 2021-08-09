@@ -14,17 +14,19 @@ export default class Game {
   public key: string
   public gameOptions: GameOptionsResponse
   public blackCard?: BlackCardResponse
-  public started: boolean
+  public active: boolean
   public currentTurn: number
   public users: UserResponse[]
   public currentUser: UserResponse
+  public finished: boolean = false
+  public nextGameKey: string
 
   constructor(currentUser: UserResponse, game?: GameSocketResponse) {
     if(game) {
       this.key = game.key
       this.gameOptions = game.gameOptions
       this.blackCard = game.blackCard
-      this.started = game.started
+      this.active = game.active
       this.users = game.users
       this.currentTurn = game.currentTurn
     }
@@ -36,7 +38,7 @@ export default class Game {
     this.key = data.key
     this.gameOptions = data.gameOptions
     this.blackCard = data.blackCard
-    this.started = data.started
+    this.active = data.active
     this.users = data.users
     this.currentTurn = data.currentTurn
     this.currentUser = this.users.find(user => user.id === this.currentUser.id)
@@ -46,6 +48,9 @@ export default class Game {
     return this.users.filter(user => !user.cardWizz)
   }
 
+  public get isFinished(): boolean {
+    return !this.active && this.currentTurn > 1
+  }
   public get winningPlayer(): UserResponse {
     const winningPlayer = this.players.find(user => user.cards.some(c => c.state === CardState.WINNER))
     if(!winningPlayer) {

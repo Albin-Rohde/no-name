@@ -40,11 +40,11 @@
     "express-ws-routes": "^1.1.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "pg": "^8.5.1",
+    "pg": "^8.7.1",
     "redis": "^3.1.0",
     "reflect-metadata": "^0.1.13",
     "socket.io": "3.1.1",
-    "typeorm": "^0.2.31",
+    "typeorm": "^0.2.36",
     "typeorm-store": "^1.2.0",
     "uuid": "^8.3.2",
     "winston": "^3.3.3"
