@@ -34,7 +34,15 @@
       <div class="form-container">
         <div class="btn-container">
           <button class="btn btn-danger" on:click={() => dispatch('leave-game')}>Leave game</button>
-          <button class="btn btn-success disabled" on:click={socket.startGame}> Play again </button>
+          {#if gameData.currentUser.isHost}
+            <button class='btn btn-success' on:click={socket.playAgain}> Play again </button>
+          {/if}
+          {#if gameData.nextGameKey}
+            <button class='btn btn-success' on:click={() => socket.joinGame(gameData.nextGameKey)}> Play again </button>
+          {/if}
+          {#if !gameData.currentUser.isHost && !gameData.nextGameKey}
+            <button class='btn btn-success disabled'> Play again </button>
+          {/if}
         </div>
       </div>
     </div>
