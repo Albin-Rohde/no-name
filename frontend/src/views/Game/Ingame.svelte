@@ -51,7 +51,6 @@
       </p>
     </div>
     <div class="main-coll">
-      {gameData.state}
       <div class="top-cards">
         <BlackCard text={gameData.blackCard.text}/>
         {#if gameData.state === GameState.DISPLAY_WINNER}
