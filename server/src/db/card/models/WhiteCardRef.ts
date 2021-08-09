@@ -23,7 +23,9 @@ export class WhiteCardRef extends BaseEntity {
   })
   state: CardState
 
-  @Column()
+  @Column({
+    type: 'uuid',
+  })
   game_key: string
 
   @ManyToOne(type => WhiteCard, card => card.player_cards)
@@ -36,7 +38,10 @@ export class WhiteCardRef extends BaseEntity {
   @ManyToOne(type => User, user => user._cards, {
     cascade: true,
   })
-  @JoinColumn({name: 'user_id_fk'})
+  @JoinColumn([
+    { name: 'user_id_fk', referencedColumnName: 'id' },
+    { name: 'game_key', referencedColumnName: 'game_fk'},
+  ])
   user: User
 
   @Column({name: 'user_id_fk', nullable: false})

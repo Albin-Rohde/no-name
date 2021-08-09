@@ -18,6 +18,7 @@ import {NotFoundError} from "../../error";
 @Entity({name: "player"})
 @Unique(["email"])
 @Unique(["username"])
+@Unique(['id', 'game_fk'])
 
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -43,10 +44,6 @@ export class User extends BaseEntity {
   game_fk: string | null
 
   @OneToMany(type => WhiteCardRef, card => card.user)
-  @JoinColumn([
-    { name: 'id', referencedColumnName: 'user_id_fk' },
-    { name: 'game_fk', referencedColumnName: 'game_key' },
-  ])
   @JoinColumn({name: 'user_game_session_key'})
   _cards: WhiteCardRef[]
 

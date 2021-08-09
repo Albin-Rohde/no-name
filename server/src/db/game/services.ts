@@ -30,7 +30,7 @@ export const getGameWithRelations = async (key: string): Promise<Game> => {
       ]
     })
   } catch (err){
-    throw new NotFoundError(`Could not find <Game> with key ${key}`)
+    throw new NotFoundError(`Could not find <Game> with key ${key}\n ${err}`)
   }
 }
 

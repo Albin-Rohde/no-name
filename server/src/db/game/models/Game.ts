@@ -6,6 +6,7 @@ import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {NotFoundError} from "../../error";
 import {CardDeck} from "../../card/models/CardDeck";
 import {BlackCardRef, BlackCardState} from "../../card/models/BlackCardRef";
+import {logger} from "../../../logger";
 
 @Entity()
 
