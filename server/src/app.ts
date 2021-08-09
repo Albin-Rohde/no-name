@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import { createSocketServer } from "./socket";
 import { createRestServer } from "./rest";
 import { createConnection } from "typeorm";
+import { logger } from "./logger";
 
 dotenv.config({path: '.env'})
 
@@ -17,19 +18,22 @@ export interface ServerOptions {
  * Will start one express rest server
  * Will start one socket.io websocket server
  */
-function startServer() {
+async function startServer() {
   const options: ServerOptions = {
     port: Number(process.env.PORT),
     clientUrl: process.env.CLIENT_URL!,
   }
-  createConnection().then(async () => {
-    console.log('connected to db')
-    console.log(options)
+  try {
+    await createConnection()
+    logger.info('Connected to db')
+    logger.debug(options)
     const server = createServer(options)
     server.listen(options.port, () => {
-      console.log(`server started on port ${options.port}`)
+      logger.info(`server started on port ${options.port}`)
     })
-  }).catch((err) => console.log(err))
+  } catch (err) {
+    logger.error(err)
+  }
 }
 
 /**

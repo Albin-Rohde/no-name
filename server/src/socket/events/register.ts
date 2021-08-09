@@ -17,7 +17,8 @@ import { normalizeGameResponse } from "./response";
 import { getGameFromUser } from "../../db/game/services";
 import { GameRuleError } from "../error";
 import { SocketWithSession } from "../index";
-import {authSocketUser} from "../authenticate";
+import {authSocketUser, loggerMiddleware} from "../authenticate";
+import {logger} from "../../logger";
 
 /**
  * Register events to the socket
@@ -62,6 +63,13 @@ const addListenerWithGame = <T>(
 ): void => {
   async function eventCallback(...args: T[]) {
     try {
+      loggerMiddleware(socket, {
+        eventName: event,
+        eventMethod: eventFn.name,
+        arguments: args,
+        userId: socket.request.session.user.id,
+        gameId: socket.request.session.user.game_fk,
+      })
       const user = await authSocketUser(socket)
       const g = await getGameFromUser(user.id)
       await eventFn(g, ...args)
@@ -98,6 +106,13 @@ const addListener = <T>(
 ): void => {
   async function eventCallback(...args: T[]) {
     try {
+      loggerMiddleware(socket, {
+        eventName: event,
+        eventMethod: eventFn.name,
+        arguments: args,
+        userId: socket.request.session.user.id,
+        gameId: socket.request.session.user.game_fk,
+      })
       await eventFn(io, socket, ...args)
         .then((game) => game ? emitUpdateEvent(io, game) : null)
     } catch (err) {
@@ -139,9 +154,10 @@ const emitRemovedEvent = async (io: Server, socket: SocketWithSession, game: Gam
  */
 const handleError = (err: Error, socket: SocketWithSession) => {
   if (err instanceof GameRuleError) {
+    logger.warn(err)
     socket.emit('rule_error', err.message)
   } else {
-    console.error(err)
+    logger.error('socket_server_error', err)
     socket.emit('server_error', 'Internal Server Error')
   }
 }

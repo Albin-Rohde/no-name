@@ -81,7 +81,7 @@ export default {
     production && terser(),
     replace({
       'process.env.API_BASE_URL': `"${process.env.API_BASE_URL}"`,
-      'process.env.API_EXTENSION': `"${process.env.API_EXTENSION}"`,
+      'process.env.API_SOCKET_URL': `"${process.env.API_SOCKET_URL}"`,
     })
   ],
   watch: {

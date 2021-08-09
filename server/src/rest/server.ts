@@ -8,6 +8,8 @@ import userRoute from "./user/route";
 import gameRouter from "./game/route";
 import {User} from "../db/user/models/User";
 import cardRouter from "./card/route";
+import {expressLogger} from "../logger";
+import logRouter from "./logs/route";
 
 export const userSession = session({
   name: 'sid',
@@ -47,6 +49,7 @@ export function createRestServer(options: ServerOptions) {
     next()
   })
   app.use(userSession)
+  app.use(expressLogger)
 
   /**
    * Register routes
@@ -54,5 +57,6 @@ export function createRestServer(options: ServerOptions) {
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
   app.use('/card', cardRouter)
+  app.use('/logs', logRouter)
   return app
 }

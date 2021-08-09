@@ -2,9 +2,9 @@ import { Server } from "socket.io";
 import { userSession } from "../rest/server";
 import http from "http";
 import { ServerOptions } from "../app";
-import { authSocketUser } from "./authenticate";
 import { registerSocketEvents } from "./events/register";
 import { SocketWithSession } from "./index";
+import {logger} from "../logger";
 
 /**
  * Creates a socket.io websocket server
@@ -29,7 +29,7 @@ export function createSocketServer(server: http.Server, options: ServerOptions) 
       socket.emit('connected')
     })
   } catch (err) {
-    console.error(err)
+    logger.error(err)
   }
   return io
 }

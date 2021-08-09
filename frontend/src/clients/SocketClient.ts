@@ -21,7 +21,7 @@ enum Events {
 }
 
 export class SocketClient {
-  private readonly baseUrl: string = process.env.API_BASE_URL
+  private readonly baseUrl: string = process.env.API_SOCKET_URL
   public socket: Socket
   private game: Game
 

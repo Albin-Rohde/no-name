@@ -51,8 +51,8 @@ Read more about the server [here](./server/README.md).
 ### Environments
 Both dev production and live require environments variables to run.
 These are stored and accessed from a `.env` file. to create them run:
-- `cp frontend/.env.schema frontend/.env`
-- `cp server/.env.schema server/.env`
+- `cp frontend/.env.schema frontend/.env` # for development only
+- `cp server/.env.schema server/.env` # for development only
 - `cp .env.schema .env`
 
 To run in live, there are some changes needed to the `.env` file, more on
@@ -61,38 +61,42 @@ that further down.
 ### Dev
 - Run the following commands:
   - From root
-    - `docker-compose up -d db redis nginx`
+    - `docker-compose up -d db redis`
   - From frontend root:
     - `npm run dev`
   - From server root:
     - `npm run typeorm migration:run`
     - `npm run dev`
 
-- frontend will start on `app.localhost`
-- backend will start on `api.localhost`
+- frontend will start on `http://localhost:3000`
+- backend will start on `http://localhost:5000`
 - In dev mode, the app will reload changes, the app does not need to be restarted between changes to source code.
 
 ### Production
 - Run `docker-compose up`
-- The app will now run on `https://app.localhost`, running the app like this is as close to the live set up as possible.
+- The app will now run on `http://app.localhost`, running the app like this is as close to the live set up as possible.
+- Backend can be accessed on `http://app.localhost/api/<endpoint>`
+- Log server can be accessed on `http://admin.localhost`
 
 ### Deploy live
 Latest master is always running in live. If a new commit/push/merge occurs on 
 the master branch. The app will reload (up to 1min) and host the new version.
 
-The live version can be accessed on yobotics.club
+The live version can be accessed on app.yobotics.club
 
 ### Live configuration
 - Alter these lines in `.env` located in the root (same directory as this readme).
   ```
-  API_BASE_URL=https://yobotics.club
-  CLIENT_URL=https://yobotics.club
+  API_BASE_URL=https://app.yobotics.club/api
+  CLIENT_URL=https://app.yobotics.club
   NGINX_CONF_FILE=nginx.live.conf
   NGINX_STAGE=0
+  dns_cloudflare_api_token=super_secret_token
   ```
 - Then run `docker-compose up`
 Note. Deploying live like this is only possible from the public ip `81.170.195.205`.
 And the local router must be forwarding port `443` and `80` to the machines local address.
+The `dns_cloudflare_api_token` is needed to retrieve and renew tsl/ssl certificate.
 
 ## How to play
 Begin by signing up or signing in. When logged in one is greeted by the "dashboard", from here the player can create a
