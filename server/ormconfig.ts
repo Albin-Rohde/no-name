@@ -11,12 +11,12 @@ module.exports = {
     process.env.TYPEORM_ENTITIES
   ],
   "migrations": [
-    "build/src/db/migrations/*.js"
+    "build/src/migrations/*.js"
   ],
   "subscribers": [
     "build/src/subscriber/**/*.js"
   ],
   "cli": {
-    "migrationsDir": "src/db/migrations"
+    "migrationsDir": "src/migrations"
   }
 }
