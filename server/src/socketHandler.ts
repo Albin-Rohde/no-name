@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
-import { SocketWithSession } from "./globalTypes";
-import { EventFunction, EventFunctionWithGame, Events } from "./socket/events/event-handler";
+import { SocketWithSession, EventFunction, EventFunctionWithGame } from "./globalTypes";
+import { Events } from "./app";
 import { normalizeGameResponse } from "./socketResponse";
 import { authSocketUser, loggerMiddleware } from "./middlewares";
 import { Game } from "./game/models/Game";

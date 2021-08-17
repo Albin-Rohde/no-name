@@ -12,7 +12,7 @@ import session from "express-session";
 import {User} from "./user/models/User";
 import userRoute from "./user/controller";
 import gameRouter from "./game/controller";
-import cardRouter from "./card/controller";
+import cardDeckRouter from "./cardDeck/controller";
 import logRouter from "./logger/controller";
 import {Server} from "socket.io";
 import {addListener, addListenersWithGame} from "./socketHandler"
@@ -111,7 +111,8 @@ async function startServer() {
 function registerRoutes(app: Application) {
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
-  app.use('/card', cardRouter)
+  // TODO: rename this route to card-deck or something
+  app.use('/card', cardDeckRouter)
   app.use('/logs', logRouter)
 }
 

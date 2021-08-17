@@ -3,11 +3,11 @@ import {loginRequired, handleRestError} from '../middlewares'
 import {RestResponse} from "../globalTypes";
 import {CardDeck} from "./models/CardDeck";
 
-const cardRouter = Router()
+const cardDeckRouter = Router()
 
-cardRouter.use(loginRequired)
+cardDeckRouter.use(loginRequired)
 
-cardRouter.get('/decks', async (req: Request, res: Response) => {
+cardDeckRouter.get('/decks', async (req: Request, res: Response) => {
   const decks = await CardDeck.find()
   const response: RestResponse<CardDeck[]> = {
     ok: true,
@@ -17,4 +17,4 @@ cardRouter.get('/decks', async (req: Request, res: Response) => {
   return res.json(response)
 })
 
-export default cardRouter
+export default cardDeckRouter
