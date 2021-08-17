@@ -1,12 +1,11 @@
 import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm"
 import {User} from "../../user/models/User"
 import {GameTurn} from "./GameTurn"
+import {NotFoundError} from "../../error";
 import {createBlackCardRef, createWhiteCardRef, getUnusedBlackCard, getUnusedWhiteCards} from "../../card/services";
 import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
-import {NotFoundError} from "../../error";
 import {CardDeck} from "../../card/models/CardDeck";
 import {BlackCardRef, BlackCardState} from "../../card/models/BlackCardRef";
-import {logger} from "../../../logger";
 
 @Entity()
 

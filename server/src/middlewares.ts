@@ -1,10 +1,12 @@
-import {User} from "../db/user/models/User";
-import {NextFunction, Request, Response} from "express";
-import {AuthenticationError, ExpectedError, GameRequiredError} from "./error";
-import {NotFoundError} from "../db/error";
-import {RestResponse} from "./types";
-import {GameRuleError} from "../socket";
-import {logger} from "../logger";
+// fix user import
+import { User } from "./user/models/User";
+
+import { NextFunction, Request, Response } from "express";
+import { AuthenticationError, ExpectedError, GameRequiredError } from "./error";
+import { NotFoundError } from "./error";
+import { RestResponse } from "./rest-types";
+import { GameRuleError } from "./error";
+import { logger } from "./logger";
 
 const authUser = async (sessionUser: User) => {
   if(!sessionUser) {

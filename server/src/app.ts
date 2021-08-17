@@ -2,9 +2,20 @@ import * as http from "http";
 import "reflect-metadata";
 import dotenv from 'dotenv'
 import { createSocketServer } from "./socket";
-import { createRestServer } from "./rest";
 import { createConnection } from "typeorm";
-import { logger } from "./logger";
+import { logger, expressLogger } from "./logger/logger";
+import express, {Application} from "express";
+import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import session from "express-session";
+
+import {User} from "./user/models/User";
+
+import userRoute from "./user/controller";
+import gameRouter from "./game/controller";
+import cardRouter from "./card/controller";
+import logRouter from "./logger/controller";
 
 dotenv.config({path: '.env'})
 
@@ -12,6 +23,28 @@ export interface ServerOptions {
   port: number
   clientUrl: string
 }
+
+export const userSession = session({
+  name: 'sid',
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false,
+    maxAge: 864000,
+    httpOnly: false,
+    sameSite: false,
+  }
+})
+
+declare module 'express-session' {
+  export interface SessionData {
+    user: User
+    destroy: () => void
+    save: () => void
+  }
+}
+
 
 /**
  * Start the web server
@@ -27,7 +60,9 @@ async function startServer() {
     await createConnection()
     logger.info('Connected to db')
     logger.debug(options)
-    const server = createServer(options)
+    const app = createRestServer(options)
+    const server = http.createServer(app)
+    createSocketServer(server, options)
     server.listen(options.port, () => {
       logger.info(`server started on port ${options.port}`)
     })
@@ -36,21 +71,28 @@ async function startServer() {
   }
 }
 
-/**
- * Returns a configured server instance to run
- * an express rest app and a socket io
- * websocket server
- */
-function createServer(options: ServerOptions): http.Server {
+function createRestServer(options: ServerOptions) {
+  const app: Application = express()
+  app.use(bodyParser.urlencoded({extended: false}))
+  app.use(bodyParser.json())
+  app.use(cookieParser())
+  app.set('trust proxy', true)
+  app.use(cors({origin: options.clientUrl, credentials: true}))
+  app.use((_req, res, next) => {
+    res.header({'Access-Control-Allow-Headers': options.clientUrl})
+    next()
+  })
+  app.use(userSession)
+  app.use(expressLogger)
+
   /**
-   * app: Configured express app for rest
-   * server: http server that will run everything
-   * io: websocket server
+   * Register routes
    */
-  const app = createRestServer(options)
-  const server = http.createServer(app)
-  createSocketServer(server, options)
-  return server
+  app.use('/user', userRoute)
+  app.use('/game', gameRouter)
+  app.use('/card', cardRouter)
+  app.use('/logs', logRouter)
+  return app
 }
 
 /**

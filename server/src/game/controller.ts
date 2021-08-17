@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express'
-import {loginRequired, gameRequired, handleRestError} from '../authenticate'
-import {createNewGame, deleteGameFromUser, getGameFromUser, getGameWithRelations} from '../../db/game/services'
-import {RestResponse} from "../types";
-import {Game} from "../../db/game/models/Game";
-import {User} from "../../db/user/models/User";
+import {loginRequired, gameRequired, handleRestError} from '../middlewares'
+import {createNewGame, deleteGameFromUser, getGameWithRelations} from './services'
+import {RestResponse} from "../rest-types";
+import {Game} from "./models/Game";
+import {User} from "../user/models/User";
 import {ExpectedError} from "../error";
 
 const gameRouter = Router()

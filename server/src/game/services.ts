@@ -1,12 +1,12 @@
 import { User } from "../user/models/User"
 import { Game } from "./models/Game"
-import { NotFoundError } from "../error";
+import { NotFoundError, GameRuleError, BadRequestError } from "../error";
 import {v4 as uuidv4} from "uuid";
 import {GameTurn} from "./models/GameTurn";
-import {GameRuleError} from "../../socket";
+
+// fix model import
 import {WhiteCardRef} from "../card/models/WhiteCardRef";
 import {CardDeck} from "../card/models/CardDeck";
-import {BadRequestError} from "../../rest/error";
 import {BlackCardRef} from "../card/models/BlackCardRef";
 
 
@@ -124,7 +124,7 @@ export async function deleteGameFromUser (user: User): Promise<void> {
     .delete()
   // TODO: can any of this be executed in paralell?
   await deleteWcr.execute(),
-  await resetUser.execute()
+    await resetUser.execute()
   await deleteGame.execute()
   await deleteGameRound.execute()
   await deleteBcr.execute()

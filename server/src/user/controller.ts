@@ -1,8 +1,8 @@
 import { Router, Request, Response } from 'express'
-import {handleRestError, loginRequired} from '../authenticate'
-import { createUser } from '../../db/user/services'
-import {RestResponse} from "../types";
-import {User} from "../../db/user/models/User";
+import {handleRestError, loginRequired} from '../middlewares'
+import { createUser } from './services'
+import {RestResponse} from "../rest-types";
+import {User} from "./models/User";
 import {AuthenticationError, BadRequestError} from "../error";
 import bcrypt from "bcrypt";
 

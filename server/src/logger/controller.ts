@@ -1,13 +1,11 @@
 import { Router, Request, Response } from 'express'
-import {loginRequired, gameRequired, handleRestError} from '../authenticate'
-import {RestResponse} from "../types";
-import * as fs from 'fs';
-import {getLogs, logger} from "../../logger";
-import * as readline from "readline";
+import {loginRequired, handleRestError} from '../middlewares'
+import {RestResponse} from "../rest-types";
+import {getLogs} from "./logger";
 
 const logRouter = Router()
 
-//logRouter.use(loginRequired)
+logRouter.use(loginRequired)
 
 logRouter.get('/combined', async (req: Request, res: Response) => {
   try {

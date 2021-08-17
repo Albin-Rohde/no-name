@@ -1,5 +1,5 @@
 import { User } from './models/User'
-import {BadRequestError, CreateError} from "../../rest/error";
+import {BadRequestError, CreateError} from "../error";
 import bcrypt from "bcrypt";
 
 /**

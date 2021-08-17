@@ -49,3 +49,38 @@ export class CreateError extends ExpectedError {
     this.message = message
   }
 }
+
+export class DbError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
+
+export class NotFoundError extends DbError{
+  constructor(message: string) {
+    super(message);
+    this.name = this.constructor.name
+  }
+}
+
+export class GameRuleError extends ExpectedError {
+  constructor(message: string) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
+
+export class NotAllowedError extends GameRuleError {
+  constructor(message: string) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
+
+export class GameStateError extends GameRuleError {
+  constructor(message: string) {
+    super(message)
+    this.name = this.constructor.name
+  }
+}
