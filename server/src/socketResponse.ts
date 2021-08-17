@@ -1,8 +1,8 @@
-import {CardState, WhiteCardRef} from '../../db/card/models/WhiteCardRef'
-import {User} from '../../db/user/models/User'
-import {Game} from '../../db/game/models/Game'
-import {GameTurn} from '../../db/game/models/GameTurn'
-import {BlackCardRef} from "../../db/card/models/BlackCardRef";
+import {CardState, WhiteCardRef} from "./card/models/WhiteCardRef";
+import {User} from "./user/models/User";
+import {GameTurn} from "./game/models/GameTurn";
+import {BlackCardRef} from "./card/models/BlackCardRef";
+import {Game} from "./game/models/Game";
 
 interface GameResponse {
   key: string

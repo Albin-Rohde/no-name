@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
 import {handleRestError, loginRequired} from '../middlewares'
 import { createUser } from './services'
-import {RestResponse} from "../rest-types";
+import {RestResponse} from "../globalTypes";
 import {User} from "./models/User";
 import {AuthenticationError, BadRequestError} from "../error";
 import bcrypt from "bcrypt";

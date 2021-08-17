@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
 import {loginRequired, gameRequired, handleRestError} from '../middlewares'
 import {createNewGame, deleteGameFromUser, getGameWithRelations} from './services'
-import {RestResponse} from "../rest-types";
+import {RestResponse} from "../globalTypes";
 import {Game} from "./models/Game";
 import {User} from "../user/models/User";
 import {ExpectedError} from "../error";

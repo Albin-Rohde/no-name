@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express'
 import {loginRequired, handleRestError} from '../middlewares'
-import {RestResponse} from "../rest-types";
+import {RestResponse} from "../globalTypes";
 import {CardDeck} from "./models/CardDeck";
 
 const cardRouter = Router()

@@ -1,47 +1,12 @@
-import {Server} from "socket.io";
-import {
-  deleteGameEvent,
-  EventFunction,
-  EventFunctionWithGame,
-  Events,
-  flipCardEvent,
-  getGameEvent,
-  joinGameEvent,
-  leaveGameEvent,
-  playCardEvent,
-  startGameEvent,
-  voteCardEvent,
-  playAgainEvent
-} from './event-handler'
-import { Game } from "../../db/game/models/Game";
-import { normalizeGameResponse } from "./response";
-import { getGameFromUser } from "../../db/game/services";
-import { GameRuleError } from "../error";
-import { SocketWithSession } from "../index";
-import {authSocketUser, loggerMiddleware} from "../authenticate";
-import {logger} from "../../logger";
-import {nextRoundEvent} from "./event-handler/game";
-
-/**
- * Register events to the socket
- *
- * Handles any error the eventHandler might throw
- *
- * @param io Socket.io Server instance
- * @param socket Socket.io Socket
- */
-export const registerSocketEvents = (io: Server, socket: SocketWithSession) => {
-  addListener<string>(io, socket, Events.JOIN_GAME, joinGameEvent)
-  addListener(io, socket, Events.GET_GAME, getGameEvent)
-  addListener(io, socket, Events.PLAY_AGAIN, playAgainEvent)
-  addListenersWithGame(io, socket, Events.START_GAME, [startGameEvent])
-  addListenersWithGame(io, socket, Events.LEAVE_GAME, [leaveGameEvent])
-  addListenersWithGame(io, socket, Events.DELETE_GAME, [deleteGameEvent])
-
-  addListenersWithGame<number>(io, socket, Events.PLAY_CARD, [playCardEvent])
-  addListenersWithGame<number>(io, socket, Events.FLIP_CARD, [flipCardEvent])
-  addListenersWithGame<number>(io, socket, Events.VOTE_CARD, [voteCardEvent, nextRoundEvent])
-}
+import { Server } from "socket.io";
+import { SocketWithSession } from "./globalTypes";
+import { EventFunction, EventFunctionWithGame, Events } from "./socket/events/event-handler";
+import { normalizeGameResponse } from "./socketResponse";
+import { authSocketUser, loggerMiddleware } from "./middlewares";
+import { Game } from "./game/models/Game";
+import { GameRuleError } from "./error";
+import { logger } from "./logger/logger";
+import { getGameFromUser } from "./game/services";
 
 /**
  * takes an eventFunction(s) wrap it in an error handler
@@ -60,7 +25,7 @@ export const registerSocketEvents = (io: Server, socket: SocketWithSession) => {
  * @param event event string to listen for
  * @param eventFns eventHandlerFunctions
  */
-const addListenersWithGame = <T>(
+export const addListenersWithGame = <T>(
   io: Server,
   socket: SocketWithSession,
   event: Events,
@@ -100,7 +65,7 @@ const addListenersWithGame = <T>(
  * @param event event string to listen for
  * @param eventFn eventHandlerFunction
  */
-const addListener = <T>(
+export const addListener = <T>(
   io: Server,
   socket: SocketWithSession,
   event: Events,
@@ -131,7 +96,7 @@ const addListener = <T>(
  * @param io
  * @param game
  */
-const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
+export const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
   await Promise.all(game.users.map(u => u.save()))
   await game.save()
   io.in(game.key).emit('update', normalizeGameResponse(game))
@@ -144,7 +109,7 @@ const emitUpdateEvent = async (io: Server, game: Game): Promise<void> => {
  * @param socket
  * @param game
  */
-const emitRemovedEvent = async (io: Server, socket: SocketWithSession, game: Game): Promise<void> => {
+export const emitRemovedEvent = async (io: Server, socket: SocketWithSession, game: Game): Promise<void> => {
   socket.leave(game.key)
   io.in(game.key).emit('removed', game.key)
 }
@@ -154,7 +119,7 @@ const emitRemovedEvent = async (io: Server, socket: SocketWithSession, game: Gam
  * @param err
  * @param socket
  */
-const handleError = (err: Error, socket: SocketWithSession) => {
+export const handleError = (err: Error, socket: SocketWithSession) => {
   if (err instanceof GameRuleError) {
     logger.warn(err)
     socket.emit('rule_error', err.message)
