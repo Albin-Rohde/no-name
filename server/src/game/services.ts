@@ -1,13 +1,11 @@
 import { User } from "../user/models/User"
 import { Game } from "./models/Game"
 import { NotFoundError, GameRuleError, BadRequestError } from "../error";
-import {v4 as uuidv4} from "uuid";
-import {GameTurn} from "./models/GameTurn";
-
-// fix model import
-import {WhiteCardRef} from "../card/models/WhiteCardRef";
-import {CardDeck} from "../card/models/CardDeck";
-import {BlackCardRef} from "../card/models/BlackCardRef";
+import { v4 as uuidv4 } from "uuid";
+import { GameTurn } from "./models/GameTurn";
+import { WhiteCardRef } from "../card/models/WhiteCardRef";
+import { BlackCardRef } from "../card/models/BlackCardRef";
+import { CardDeck } from "../cardDeck/models/CardDeck";
 
 
 /**

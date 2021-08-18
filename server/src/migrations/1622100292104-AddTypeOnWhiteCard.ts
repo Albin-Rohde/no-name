@@ -1,5 +1,5 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
-import {addCardsToDb} from "../../scripts/populateSwedish";
+import {addCardsToDb} from "../scripts/populateSwedish";
 
 export class AddTypeOnWhiteCard1622100292104 implements MigrationInterface {
     name = 'AddTypeOnWhiteCard1622100292104'

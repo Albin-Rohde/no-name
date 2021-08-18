@@ -4,7 +4,7 @@ import {GameTurn} from "./GameTurn"
 import {NotFoundError} from "../../error";
 import {createBlackCardRef, createWhiteCardRef, getUnusedBlackCard, getUnusedWhiteCards} from "../../card/services";
 import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
-import {CardDeck} from "../../card/models/CardDeck";
+import {CardDeck} from "../../cardDeck/models/CardDeck";
 import {BlackCardRef, BlackCardState} from "../../card/models/BlackCardRef";
 
 @Entity()

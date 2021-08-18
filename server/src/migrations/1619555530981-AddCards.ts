@@ -1,5 +1,5 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
-import {addCardsToDb} from "../../scripts/populate";
+import {addCardsToDb} from "../scripts/populate";
 
 export class AddCards1619555530981 implements MigrationInterface {
   name = 'AddCards1619555530981'

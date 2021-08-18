@@ -1,5 +1,5 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
-import {addCardsToDb} from "../../scripts/populateGeneric";
+import {addCardsToDb} from "../scripts/populateGeneric";
 
 export class AddGenerciDeck1623532602064 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
