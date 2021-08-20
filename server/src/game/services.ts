@@ -121,8 +121,8 @@ export async function deleteGameFromUser (user: User): Promise<void> {
     .where('game_key_fk = :gameKey', {gameKey})
     .delete()
   // TODO: can any of this be executed in paralell?
-  await deleteWcr.execute(),
-    await resetUser.execute()
+  await deleteWcr.execute()
+  await resetUser.execute()
   await deleteGame.execute()
   await deleteGameRound.execute()
   await deleteBcr.execute()
