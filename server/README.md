@@ -33,3 +33,25 @@ Add new migration
 - Create migration `npm run typeorm migration:generate -- -n <NameOfMigration>`
 - Migrations are created in .ts, so we need to build `npm run build`
 - Now we can run our new migration `npm run migrate:latest`
+
+## Coding guidelines
+This backend server is built with the MVC design pattern in mind. Read more about it here https://help.hcltechsw.com/commerce/9.1.0/developer/concepts/csdmvcdespat.html
+
+#### Domain
+Each domain should have its ORM-mapper models contained within the domains `models` folder. Only models bound
+to the domain should live inside the domain.
+
+In addition, the Domain should handle its rest-server logic within the domain, in a file called `controller.ts`
+since it is the control interface for that specific domain. Events that can happen due to socket-events should
+live int the `events.ts` file of the domain. The events and controller should only hold functionality directly 
+affecting the domain or underlying Domain Models.
+
+#### Models
+Models are the link between the Domain and database. These should be contained in the `models` folder of the domain.
+Models are mutable but as a principle the should only be manipulated or mutated within the domain, either via 
+working directly on the domain, or via services methods. Models should not have methods that manipulate itself.
+These should rather live as a service method. Models are however allowed to have hybrid properties, getters 
+and setters if necessary.
+
+#### Services
+Services are where we put general handlers for a domain, or crud methods for the domains models.
