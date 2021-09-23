@@ -120,7 +120,7 @@ export async function deleteGameFromUser (user: User): Promise<void> {
   const deleteGameRound = GameTurn.createQueryBuilder()
     .where('game_key_fk = :gameKey', {gameKey})
     .delete()
-  // TODO: can any of this be executed in paralell?
+  // TODO: can any of this be executed in parallel?
   await deleteWcr.execute()
   await resetUser.execute()
   await deleteGame.execute()

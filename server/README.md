@@ -35,31 +35,7 @@ Add new migration
 - Now we can run our new migration `npm run migrate:latest`
 
 ## Coding guidelines
-This backend server is built with DDD in mind. Domain Driven Development, wikipedia has an article about the high
-level concepts when implementing software in a DDD architecture. https://en.wikipedia.org/wiki/Domain-driven_design.
-This codebase is diveded into domains, where each domain holds its own context. I.e the User domain which holds the
-User model and services.
-
-### Core high level concepts and practises of DDD
-- #### Domain
-    Context in which part of the business logic lives, these domains should be encapsulated and contained. 
-    A domain should handle its own routing (express), and its own events (socket.io).
-- #### Domain model
-    A model within the domain holding abstractions to the store layer (pg in this instance). The Model should in 
-    general be contained to its domain. Manipulation to the Domain Model should generally not be done 
-    outside the domain.
-- #### Entity
-    In our case we use an ORM (typeOrm) so our entities are instances of the orm models.
-- #### Value object
-    When passing data between Domains, one should work with value-objects, immutable objects holding attributes.
-    These should not hold any methods.
-- #### Services
-    Parts of code that not directly bind to a Domain model should live as a service.
-
-### This server
-This server is not following DDD strictly as defined in the wikipedia article or as described in 
-Evans Domain Driven Design book. We rather take inspiration from parts that make sense to implement in a
-2021 node codebase.
+This backend server is built with the MVC design pattern in mind. Read more about it here https://help.hcltechsw.com/commerce/9.1.0/developer/concepts/csdmvcdespat.html
 
 #### Domain
 Each domain should have its ORM-mapper models contained within the domains `models` folder. Only models bound
