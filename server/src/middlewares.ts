@@ -16,7 +16,7 @@ import {Events} from "./app";
 
 const authUser = async (sessionUser: User) => {
   if(!sessionUser) {
-    throw new AuthenticationError('NO_SESSION_USER')
+    throw new AuthenticationError('You are not logged in.')
   }
   const user = await User.findOne(sessionUser.id, {relations: ['game', 'game._users']})
   if(!user) {
@@ -42,7 +42,7 @@ export const gameRequired = async (req: Request, res: Response, next: NextFuncti
   try {
     const user = await authUser(req.session.user)
     if(!user.game) {
-      res.status(401).json(new GameRequiredError(`No game on <User> with id ${user.id}`))
+      throw new GameRequiredError(`Could not find game on user`)
     }
     req.session.user = user
     req.session.save(() => null)
