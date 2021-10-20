@@ -32,7 +32,7 @@ export class SocketClient {
     autoBind(this)
   }
 
-  public connect = async (rerenderCb: RerenderCallback): Promise<void> => {
+  public connect = async (rerenderCb: RerenderCallback, onErrorCb: (msg: string) => any): Promise<void> => {
     this.socket = io(this.baseUrl, {
       withCredentials: true,
       transports: ['websocket'],
@@ -60,12 +60,15 @@ export class SocketClient {
     })
     this.socket.on('connection_error', (err: string) => {
       console.error('connection error: ', err)
+      onErrorCb(err);
     })
     this.socket.on('server_error', (err: string) => {
       console.error('server_error: ', err)
+      onErrorCb(err);
     })
     this.socket.on('rule_error', (err: string) => {
       console.error('rule_error: ', err)
+      onErrorCb(err);
     })
     return new Promise(resolve => {
       this.socket.on('connected', () => {

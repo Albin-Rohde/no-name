@@ -1,12 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react'
 import {Box, Button, Container, Grid, TextField, Typography} from "@mui/material";
 import {Link, useHistory} from 'react-router-dom';
-import { GameHandlerContext } from "../App";
+import {GameHandlerContext} from "../App";
 
-const Register = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const Login = () => {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const state = useContext(GameHandlerContext);
   const history = useHistory();
 
@@ -30,16 +29,6 @@ const Register = () => {
         <Grid item xs={8} sm={6} md={4}>
           <Box sx={{display: 'flex', justifyContent: 'center'}}>
             <Grid item xs={12} md={10}>
-              <TextField
-                value={name}
-                variant='standard'
-                onChange={(e) => {
-                  e.preventDefault()
-                  setName((e.target.value))
-                }}
-                style={{width: '100%', marginBottom: '2vh'}}
-                placeholder="Username"
-              />
               <TextField
                 value={email}
                 variant='standard'
@@ -65,9 +54,9 @@ const Register = () => {
           </Box>
           <Box sx={{display: 'flex', justifyContent: 'center'}}>
             <Grid item xs={12} md={10}>
-              <Button variant="outlined" style={{width: '100%', marginTop: '1vh'}} onClick={() => state.register(email, password, name)}>Register</Button>
+              <Button variant="outlined" style={{width: '100%', marginTop: '1vh'}} onClick={() => state.login(email, password)}>Login</Button>
               <Typography variant='body1' align='left' sx={{marginTop: '3vh', color: 'white'}}>
-                Have an account? <Link style={{cursor: 'pointer', color: '#799ac7'}} to={'/login'}>Login</Link>
+                Dont have an account yet? <Link style={{cursor: 'pointer', color: '#799ac7'}} to={'/register'}>Register</Link>
               </Typography>
             </Grid>
           </Box>
@@ -78,4 +67,4 @@ const Register = () => {
   )
 }
 
-export default Register;
+export default Login;
