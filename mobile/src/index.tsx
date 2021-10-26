@@ -6,6 +6,8 @@ import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import {createTheme, ThemeProvider} from "@mui/material";
+import {Provider} from "react-redux";
+import { store } from './redux/redux';
 
 config()
 
@@ -20,7 +22,9 @@ ReactDOM.render(
   <Router >
   <React.StrictMode>
     <ThemeProvider theme={darkTheme}>
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </ThemeProvider>
   </React.StrictMode>
   </Router>,

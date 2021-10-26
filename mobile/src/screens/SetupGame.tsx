@@ -1,10 +1,8 @@
 import React, {useState, useContext, useEffect} from "react";
-import { useHistory} from 'react-router-dom'
 
-import {GameHandlerContext, SetErrorContext} from "../App";
 import {Box, Button, Divider, Grid, Paper, Typography} from "@mui/material";
 import SliderInput from "../components/SliderInput";
-import {CardDeckResponse, GameResponse} from "../clients/ResponseTypes";
+import {GameResponse} from "../clients/ResponseTypes";
 import RestClient from "../clients/RestClient";
 import SelectInputField from "../components/SelectInputField";
 
@@ -14,27 +12,9 @@ const SetupGame = () => {
   const [playerLimit, setPlayerLimit] = useState(3);
   const [rounds, setRounds] = useState(5);
   const [cardLimit, setCardLimit] = useState(6);
-  const [loading, setLoading] = useState(true);
-
-  const state = useContext(GameHandlerContext);
-  const setError = useContext(SetErrorContext);
-  const history = useHistory();
   const rest = new RestClient();
 
-  useEffect(() => {
-    (async () => {
-      try {
-        await state.userRequired();
-        setLoading(false);
-        const d = await rest.makeRequest<CardDeckResponse>({method: 'get', route: 'card', action: 'decks'});
-        setDecks(d);
-        setDeck(d[0].id)
-      } catch (err) {
-        setError(err.message);
-        history.push('/register')
-      }
-    })()
-  }, [state.user])
+
 
   const createGame = async () => {
     try {
@@ -55,15 +35,11 @@ const SetupGame = () => {
         // do something
         console.log('game create failed')
       }
-      history.push(`/lobby`)
     } catch (err) {
       console.log('errror', err)
     }
   }
 
-  if (loading) {
-    return (<h1>Loading...</h1>)
-  }
   return (
     <React.Fragment>
       <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '25vh'}}>

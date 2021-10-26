@@ -15,7 +15,7 @@ interface RestRequestOptions {
 }
 
 export default class RestClient {
-  private readonly baseUrl = 'http://localhost:5000';
+  private readonly baseUrl = 'http://192.168.1.78:5000';
   public async makeRequest<T>(option: RestRequestOptions): Promise<T> {
     option.action = option.action ? `/${option.action}` : ''
     const res: RestResponse<T> = await axios({

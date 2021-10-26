@@ -22,7 +22,7 @@ enum Events {
 }
 
 export class SocketClient {
-  private readonly baseUrl: string = 'http://localhost:5000'
+  private readonly baseUrl: string = 'http://192.168.1.78:5000'
   private game: Game
   public socket: Socket
   public nextGameKey: string

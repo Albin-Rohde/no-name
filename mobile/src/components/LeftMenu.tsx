@@ -8,17 +8,17 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import {Avatar} from "@mui/material";
 import {Logout} from "@mui/icons-material";
-import {useContext} from "react";
-import {GameHandlerContext} from "../App";
+import {UserData} from "../clients/ResponseTypes";
 
 interface LeftMenuProps {
   open: boolean;
   setOpen: (open: boolean) => any;
+  deleteGame?: () => any;
+  user: UserData;
   logout: () => any;
 }
 
 export default function LeftMenu(props: LeftMenuProps) {
-  const state = useContext(GameHandlerContext);
   const list = () => (
     <Box
       sx={{ width: 250 }}
@@ -26,13 +26,13 @@ export default function LeftMenu(props: LeftMenuProps) {
       onClick={props.setOpen(false)}
       onKeyDown={props.setOpen(false)}
     >
-      {state.user ? (
+      {props.user ? (
         <List>
           <ListItem button key='profile'>
             <ListItemIcon>
               <Avatar/>
             </ListItemIcon>
-            <ListItemText primary={state.user.username} />
+            <ListItemText primary={props.user.username} />
           </ListItem>
           <Divider/>
           <ListItem button key='logout' onClick={props.logout}>
@@ -41,6 +41,11 @@ export default function LeftMenu(props: LeftMenuProps) {
             </ListItemIcon>
             <ListItemText primary='Logout' />
           </ListItem>
+          {props.deleteGame && (
+            <ListItem button key='delete-game' onClick={props.deleteGame}>
+              <ListItemText primary='Delete Game' />
+            </ListItem>
+          )}
         </List>
       ): (null)}
     </Box>
