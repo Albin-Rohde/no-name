@@ -4,13 +4,20 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import {useContext, useState} from "react";
-import {GameHandlerContext} from "../App";
+import {useState} from "react";
 import LeftMenu from "./LeftMenu";
+import Game from "../clients/Game";
+import {SocketClient} from "../clients/SocketClient";
+import {UserData} from "../clients/ResponseTypes";
 
-export default function MenuAppBar() {
+interface MenuProps {
+  user: UserData;
+  game: Game;
+  socket: SocketClient;
+  logout: () => Promise<void>;
+}
+export default function MenuAppBar(props: MenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const state = useContext(GameHandlerContext);
   const toggleDrawer =
     (open: boolean) =>
       (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -23,12 +30,23 @@ export default function MenuAppBar() {
         }
         setMenuOpen(open);
       };
+
+  const deleteGameFn = () => {
+    if (props.game) {
+      if (props.game.currentUser?.isHost) {
+        return props.socket.deleteGame;
+      }
+    }
+    return undefined
+  }
   return (
     <Box sx={{ flexGrow: 1 }}>
       <LeftMenu
         open={menuOpen}
         setOpen={toggleDrawer}
-        logout={state.logout}
+        logout={props.logout}
+        deleteGame={deleteGameFn()}
+        user={props.user}
       />
       <AppBar position="static">
         <Toolbar>
@@ -39,7 +57,7 @@ export default function MenuAppBar() {
             aria-label="menu"
             sx={{ mr: 2 }}
           >
-            {state.user ? (
+            {props.user ? (
               <MenuIcon onClick={() => setMenuOpen(!menuOpen)} />
             ): (null)}
           </IconButton>

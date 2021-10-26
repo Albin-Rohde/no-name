@@ -1,22 +1,11 @@
 import React, {useState, useContext, useEffect} from "react";
 
-import { GameHandlerContext } from "../App";
 import { Box, Button, Grid, TextField, Tooltip } from "@mui/material";
 import {useHistory} from "react-router-dom";
 
 const Home = () => {
   const [joinKey, setJoinKey] = useState('');
-  const state = useContext(GameHandlerContext);
   const history = useHistory();
-
-  useEffect(() => {
-    if (!state.user) {
-      history.push('/register');
-    }
-    if (state.game) {
-      history.push('/lobby')
-    }
-  }, [state.game, state.user])
 
   return (
     <React.Fragment>
@@ -37,7 +26,7 @@ const Home = () => {
       <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '0vh'}}>
         <Grid item xs={8} sm={3} md={2}>
           <Tooltip title="it is also possible to join via invite link">
-            <Button variant={'outlined'} sx={{width: '100%'}}>Join Game</Button>
+            <Button variant={'outlined'} sx={{width: '100%'}} onClick={() => console.log('join game')}>Join Game</Button>
           </Tooltip>
         </Grid>
       </Box>

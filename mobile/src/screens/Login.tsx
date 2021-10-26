@@ -1,23 +1,18 @@
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import {Box, Button, Container, Grid, TextField, Typography} from "@mui/material";
-import {Link, useHistory} from 'react-router-dom';
-import {GameHandlerContext} from "../App";
 
-const Login = () => {
+interface LoginProps {
+  login: (email: string, password: string) => Promise<void>;
+  navigate: (screen: string) => void;
+}
+
+const Login = (props: LoginProps) => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const state = useContext(GameHandlerContext);
-  const history = useHistory();
 
-  useEffect(() => {
-    (async () => {
-      try {
-        if (state.user) {
-          history.push('/');
-        }
-      } catch (err) {};
-    })()
-  }, [state.user])
+  const handleLogin = () => {
+    props.login(email, password)
+  }
 
   return(
     <Container>
@@ -54,9 +49,9 @@ const Login = () => {
           </Box>
           <Box sx={{display: 'flex', justifyContent: 'center'}}>
             <Grid item xs={12} md={10}>
-              <Button variant="outlined" style={{width: '100%', marginTop: '1vh'}} onClick={() => state.login(email, password)}>Login</Button>
+              <Button variant="outlined" style={{width: '100%', marginTop: '1vh'}} onClick={handleLogin}>Login</Button>
               <Typography variant='body1' align='left' sx={{marginTop: '3vh', color: 'white'}}>
-                Dont have an account yet? <Link style={{cursor: 'pointer', color: '#799ac7'}} to={'/register'}>Register</Link>
+                Dont have an account yet? <Typography variant='body1' style={{cursor: 'pointer', color: '#799ac7'}} onClick={() => props.navigate('register')}>Register</Typography>
               </Typography>
             </Grid>
           </Box>

@@ -26,7 +26,6 @@ export default class User extends RestClient {
     }
   }
 
-  @HandleError
   public async login(email: string = this.email, password: string = this.password) {
     this.email = email
     this.password = password
@@ -44,9 +43,9 @@ export default class User extends RestClient {
     this.password = userData.password
     this.username = userData.username
     this.isActive = true
+    return
   }
 
-  @HandleError
   public async register() {
     console.log(this.email);
     const userData = await this.makeRequest<UserData>({
@@ -67,7 +66,6 @@ export default class User extends RestClient {
     }
   }
 
-  @HandleError
   public async logout() {
     await this.makeRequest({
       method: 'post',
@@ -81,7 +79,6 @@ export default class User extends RestClient {
     this.isActive = false
   }
 
-  @HandleError
   public async getSessionUser() {
     //TODO: make this endpoint more "restfull"
     const userData = await this.makeRequest<UserData>({method: 'get', route: 'user', action: 'get'})
