@@ -28,10 +28,10 @@ services:
     env_file:
       - '.env'
 
-  frontend:
-    container_name: frontend
+  mobile:
+    container_name: mobile
     restart: always
-    build: ./frontend
+    build: ./mobile
     networks:
       - local
     ports:
@@ -41,7 +41,7 @@ services:
     env_file:
       - '.env'
     volumes:
-      - './frontend/src:/usr/src/frontend/src'
+      - './mobile/src:/usr/src/frontend/src'
 
   log-client:
     container_name: log-client
@@ -75,7 +75,7 @@ services:
     depends_on:
       - db
       - redis
-      - frontend
+      - mobile
       - server
     networks:
       - local
