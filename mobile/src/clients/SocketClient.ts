@@ -22,7 +22,7 @@ enum Events {
 }
 
 export class SocketClient {
-  private readonly baseUrl: string = 'http://192.168.1.78:5000'
+  private readonly baseUrl: string = process.env.REACT_APP_API_BASE_URL
   private game: Game
   public socket: Socket
   public nextGameKey: string
@@ -78,7 +78,7 @@ export class SocketClient {
   }
 
   public get gameData(): Game {
-    return this.game
+    return new Game(this.game.currentUser, this.game);
   }
 
   @HandleError

@@ -1,20 +1,28 @@
 import React, {useState, useContext, useEffect} from "react";
 
 import {Box, Button, Divider, Grid, Paper, Typography} from "@mui/material";
-import SliderInput from "../components/SliderInput";
-import {GameResponse} from "../clients/ResponseTypes";
-import RestClient from "../clients/RestClient";
-import SelectInputField from "../components/SelectInputField";
+import SliderInput from "../../components/SliderInput";
+import {CardDeckResponse, GameResponse} from "../../clients/ResponseTypes";
+import RestClient from "../../clients/RestClient";
+import SelectInputField from "../../components/SelectInputField";
+import {useDispatch, useSelector} from "react-redux";
+import {ReduxState, setError, updateGame, updateScreen} from "../../redux/redux";
+import Game from "../../clients/Game";
+import User from "../../clients/User";
 
-const SetupGame = () => {
+interface SetupGameProps {
+  setScreen: (screen: 'home' | 'create-game') => void;
+}
+const SetupGame = (props: SetupGameProps) => {
   const [decks, setDecks] = useState(null);
   const [deck, setDeck] = useState('0');
   const [playerLimit, setPlayerLimit] = useState(3);
   const [rounds, setRounds] = useState(5);
   const [cardLimit, setCardLimit] = useState(6);
+  const user = useSelector<ReduxState, User | undefined>((state) => state.user);
   const rest = new RestClient();
 
-
+  const dispatch = useDispatch();
 
   const createGame = async () => {
     try {
@@ -25,20 +33,35 @@ const SetupGame = () => {
         private: true,
         cardDeck: deck,
       }
-      const game = await rest.makeRequest<GameResponse>({
+      const g = await rest.makeRequest<GameResponse>({
         method: 'post',
         route: 'game',
-        action: '',
         data: gameOptions,
       })
-      if (!game) {
-        // do something
-        console.log('game create failed')
+      if (!g) {
+        dispatch(setError('Failed creating game'));
       }
+      const newGame = new Game(user.getData());
+      dispatch(updateGame(newGame))
     } catch (err) {
-      console.log('errror', err)
+      dispatch(setError(err.message));
     }
   }
+  const fetchDecks = async () => {
+    try {
+      const decks = await rest.makeRequest<CardDeckResponse[]>({method: 'get', route: 'card', action: 'decks'});
+      setDecks(decks);
+      if (decks[0]) {
+        setDeck(decks[0].id.toString())
+      }
+    } catch (err) {
+      dispatch(setError(err.message));
+    }
+  }
+
+  useEffect(() => {
+    fetchDecks();
+  }, [])
 
   return (
     <React.Fragment>
@@ -74,7 +97,10 @@ const SetupGame = () => {
             />
             <SelectInputField decks={decks} value={deck} setValue={setDeck}/>
             <Box width={250} sx={{marginTop: '3vh'}}>
-              <Button variant={'outlined'} sx={{width: '100%'}} onClick={createGame}>Create Game</Button>
+              <Button color='success' variant={'outlined'} sx={{width: '100%'}} onClick={createGame}>Create Game</Button>
+            </Box>
+            <Box width={250} sx={{marginTop: '1vh'}}>
+              <Button color='error' variant={'outlined'} sx={{width: '100%'}} onClick={() => props.setScreen('home')}>Cancel</Button>
             </Box>
           </Grid>
         </Paper>

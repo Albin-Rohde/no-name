@@ -5,6 +5,8 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import {useContext, useEffect} from "react";
 import {SetErrorContext} from "../App";
+import {useDispatch} from "react-redux";
+import {setError} from "../redux/redux";
 
 const ErrorAlert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -19,7 +21,7 @@ interface ErrorSnackProps {
 }
 export default function ErrorSnack(props: ErrorSnackProps) {
   const [open, setOpen] = React.useState(props.open);
-  const setError = useContext(SetErrorContext);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setOpen(props.open)
@@ -30,7 +32,7 @@ export default function ErrorSnack(props: ErrorSnackProps) {
       return;
     }
     setOpen(false);
-    setError('');
+    dispatch(setError(''));
   };
 
   return (

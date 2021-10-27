@@ -7,7 +7,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import {UserData} from "../clients/ResponseTypes";
+import {useSelector} from "react-redux";
+import {ReduxState} from "../redux/redux";
+import Game from "../clients/Game";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -32,24 +34,25 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-interface DataTableProps {
-  users: UserData[];
-}
-
-export default function DataTable(props: DataTableProps) {
+export default function DataTable() {
+  const game = useSelector<ReduxState, Game>((state) => state.game);
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{marginBottom: '4vh'}}>
       <Table aria-label="customized table">
         <TableHead>
           <TableRow>
-            <StyledTableCell align={'center'}>Players</StyledTableCell>
+            <StyledTableCell align={'left'}>Players</StyledTableCell>
+            <StyledTableCell align={'left'}>Score</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.users.map((user) => (
+          {game.users.map((user) => (
             <StyledTableRow key={user.id}>
-              <StyledTableCell component="th" scope="row">
+              <StyledTableCell align={'left'} component="th" scope="row">
                 {user.username}
+              </StyledTableCell>
+              <StyledTableCell align={'left'} component="th" scope="row">
+                {user.score}
               </StyledTableCell>
             </StyledTableRow>
           ))}
