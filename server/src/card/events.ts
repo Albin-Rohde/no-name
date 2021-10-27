@@ -1,3 +1,8 @@
+import {EventFunctionWithGame} from "../globalTypes";
+import {Game} from "../game/models/Game";
+import {GameStateError, NotAllowedError} from "../error";
+import {CardState} from "./models/WhiteCardRef";
+
 /**
  * Play card event
  * Will play the card on the game that the user
@@ -5,11 +10,6 @@
  * @param game
  * @param cardId - Card to play
  */
-import {EventFunctionWithGame} from "../globalTypes";
-import {Game} from "../game/models/Game";
-import {GameStateError, NotAllowedError} from "../error";
-import {CardState} from "./models/WhiteCardRef";
-
 export const playCardEvent: EventFunctionWithGame<number> = async(
   game,
   cardId: number
