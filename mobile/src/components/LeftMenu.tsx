@@ -9,16 +9,25 @@ import ListItemText from '@mui/material/ListItemText';
 import {Avatar} from "@mui/material";
 import {Logout} from "@mui/icons-material";
 import {UserData} from "../clients/ResponseTypes";
+import {useSelector} from "react-redux";
+import {ReduxState} from "../redux/redux";
+import Game from "../clients/Game";
 
 interface LeftMenuProps {
   open: boolean;
   setOpen: (open: boolean) => any;
   deleteGame?: () => any;
-  user: UserData;
-  logout: () => any;
+  user?: UserData;
+  logout?: () => any;
 }
 
 export default function LeftMenu(props: LeftMenuProps) {
+  const onLogout = () => {
+    if (props.logout) {
+      props.logout();
+    }
+  }
+  const game = useSelector<ReduxState, Game | null>((state) => state.game);
   const list = () => (
     <Box
       sx={{ width: 250 }}
@@ -26,7 +35,7 @@ export default function LeftMenu(props: LeftMenuProps) {
       onClick={props.setOpen(false)}
       onKeyDown={props.setOpen(false)}
     >
-      {props.user ? (
+      {props.user && (
         <List>
           <ListItem button key='profile'>
             <ListItemIcon>
@@ -35,19 +44,19 @@ export default function LeftMenu(props: LeftMenuProps) {
             <ListItemText primary={props.user.username} />
           </ListItem>
           <Divider/>
-          <ListItem button key='logout' onClick={props.logout}>
+          <ListItem button key='logout' onClick={onLogout}>
             <ListItemIcon>
               <Logout/>
             </ListItemIcon>
             <ListItemText primary='Logout' />
           </ListItem>
-          {props.deleteGame && (
+          {game && game.currentUser.isHost && props.deleteGame && (
             <ListItem button key='delete-game' onClick={props.deleteGame}>
               <ListItemText primary='Delete Game' />
             </ListItem>
           )}
         </List>
-      ): (null)}
+      )}
     </Box>
   );
 

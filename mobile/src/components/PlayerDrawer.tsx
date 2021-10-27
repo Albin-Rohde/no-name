@@ -8,13 +8,16 @@ import Typography from '@mui/material/Typography';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import {UserData} from "../clients/ResponseTypes";
 import {useEffect} from "react";
-import {List, ListItem} from "@mui/material";
+import {List, ListItem, Paper} from "@mui/material";
+import DataTable from "./DataTable";
+import {useSelector} from "react-redux";
+import {ReduxState} from "../redux/redux";
+import Game from "../clients/Game";
 
 const drawerBleeding = 56;
 
 interface Props {
   open: boolean,
-  users: UserData[],
 }
 
 const Root = styled('div')(({ theme }) => ({
@@ -38,6 +41,7 @@ const Puller = styled(Box)(({ theme }) => ({
 
 export default function SwipeableEdgeDrawer(props: Props) {
   const [open, setOpen] = React.useState(props.open);
+  const game = useSelector<ReduxState, Game>((state) => state.game);
 
   useEffect(() => {
     setOpen(props.open)
@@ -53,7 +57,7 @@ export default function SwipeableEdgeDrawer(props: Props) {
       <Global
         styles={{
           '.MuiDrawer-root > .MuiPaper-root': {
-            height: `calc(30% - ${drawerBleeding}px)`,
+            height: `calc(50% - ${drawerBleeding}px)`,
             overflow: 'visible',
           },
         }}
@@ -82,7 +86,7 @@ export default function SwipeableEdgeDrawer(props: Props) {
           }}
         >
           <Puller />
-          <Typography sx={{ p: 2, color: 'text.secondary' }}>players</Typography>
+          <Typography sx={{ p: 2, color: 'text.secondary' }}>Game info</Typography>
         </StyledBox>
         <StyledBox
           sx={{
@@ -92,17 +96,27 @@ export default function SwipeableEdgeDrawer(props: Props) {
             overflow: 'auto',
           }}
         >
-          <List>
-            {props.users.map((user) => {
-              return (
-                <ListItem>
-                  <Typography variant={'body1'}>
-                    {user.username}
-                  </Typography>
-                </ListItem>
-              )
-            })}
-          </List>
+          <Paper sx={{
+            paddingTop: '15px',
+            paddingBottom: '15px',
+            backgroundColor: '#282c36',
+            marginBottom: '3vh'
+          }}>
+            <Typography color='white' variant={'body1'} sx={{marginLeft: '3vw'}}>
+              Round {game.currentRound} of {game.gameOptions.rounds}
+            </Typography>
+          </Paper>
+          <Paper sx={{
+            paddingTop: '15px',
+            paddingBottom: '15px',
+            backgroundColor: '#282c36',
+            marginBottom: '3vh'
+          }}>
+            <Typography color='white' variant={'body1'} sx={{marginLeft: '3vw'}}>
+              Current Card wizz: {game.users.find(u => u.cardWizz).username}
+            </Typography>
+          </Paper>
+          <DataTable/>
         </StyledBox>
       </SwipeableDrawer>
     </Root>

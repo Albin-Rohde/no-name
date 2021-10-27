@@ -1,11 +1,17 @@
 import React, {useState, useContext, useEffect} from "react";
 
 import { Box, Button, Grid, TextField, Tooltip } from "@mui/material";
-import {useHistory} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {ReduxState, setError} from "../../redux/redux";
+import {UserData} from "../../clients/ResponseTypes";
 
-const Home = () => {
+interface HomeProps {
+  setScreen: (screen: 'home' | 'create-game') => void;
+}
+const Home = (props: HomeProps) => {
   const [joinKey, setJoinKey] = useState('');
-  const history = useHistory();
+  const user = useSelector<ReduxState, UserData | null>((state) => state.user);
+  const dispatch = useDispatch();
 
   return (
     <React.Fragment>
@@ -26,13 +32,21 @@ const Home = () => {
       <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '0vh'}}>
         <Grid item xs={8} sm={3} md={2}>
           <Tooltip title="it is also possible to join via invite link">
-            <Button variant={'outlined'} sx={{width: '100%'}} onClick={() => console.log('join game')}>Join Game</Button>
+            <Button
+              variant={'outlined'}
+              sx={{width: '100%'}}
+              onClick={() => dispatch(setError('Not implemented'))}
+            >Join Game</Button>
           </Tooltip>
         </Grid>
       </Box>
       <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '3vh'}}>
         <Grid item xs={8} sm={3} md={2}>
-          <Button variant={'outlined'} sx={{width: '100%'}} onClick={() => history.push('/create-game')}>Start Game</Button>
+          <Button
+            variant={'outlined'}
+            sx={{width: '100%'}}
+            onClick={() => props.setScreen('create-game')}
+          >Create Game</Button>
         </Grid>
       </Box>
     </React.Fragment>

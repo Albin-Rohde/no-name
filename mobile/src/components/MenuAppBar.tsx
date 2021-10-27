@@ -7,17 +7,19 @@ import MenuIcon from '@mui/icons-material/Menu';
 import {useState} from "react";
 import LeftMenu from "./LeftMenu";
 import Game from "../clients/Game";
-import {SocketClient} from "../clients/SocketClient";
 import {UserData} from "../clients/ResponseTypes";
+import {Typography} from "@mui/material";
+import {useSelector} from "react-redux";
+import {ReduxState} from "../redux/redux";
 
 interface MenuProps {
-  user: UserData;
-  game: Game;
-  socket: SocketClient;
-  logout: () => Promise<void>;
+  deleteGame?: () => void;
+  user?: UserData;
+  logout?: () => Promise<void>;
 }
 export default function MenuAppBar(props: MenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const game = useSelector<ReduxState, Game | null>((state) => state.game);
   const toggleDrawer =
     (open: boolean) =>
       (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -31,21 +33,37 @@ export default function MenuAppBar(props: MenuProps) {
         setMenuOpen(open);
       };
 
-  const deleteGameFn = () => {
-    if (props.game) {
-      if (props.game.currentUser?.isHost) {
-        return props.socket.deleteGame;
+  const onLogout = () => {
+    if (props.logout && props.user) {
+      props.logout();
+    }
+  }
+
+  const renderCardWizzText = (game) => {
+    if (game && game.active) {
+      if (game.currentUser.cardWizz) {
+        return (
+          <Typography variant={'body1'}>
+            You are the current card wizz
+          </Typography>
+        )
+      } else {
+        const currentCardWizz = game.users.find(user => user.cardWizz);
+        return (
+          <Typography variant={'body1'}>
+            {currentCardWizz.username} is the current card wizz
+          </Typography>
+        )
       }
     }
-    return undefined
   }
   return (
     <Box sx={{ flexGrow: 1 }}>
       <LeftMenu
         open={menuOpen}
         setOpen={toggleDrawer}
-        logout={props.logout}
-        deleteGame={deleteGameFn()}
+        logout={onLogout}
+        deleteGame={props.deleteGame}
         user={props.user}
       />
       <AppBar position="static">
@@ -57,10 +75,11 @@ export default function MenuAppBar(props: MenuProps) {
             aria-label="menu"
             sx={{ mr: 2 }}
           >
-            {props.user ? (
+            {props.user && (
               <MenuIcon onClick={() => setMenuOpen(!menuOpen)} />
-            ): (null)}
+            )}
           </IconButton>
+          {renderCardWizzText(game)}
         </Toolbar>
       </AppBar>
     </Box>

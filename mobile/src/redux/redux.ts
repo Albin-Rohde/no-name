@@ -3,42 +3,101 @@ import {
   createStore,
 } from 'redux';
 import Game from "../clients/Game";
-import {UserData} from "../clients/ResponseTypes";
-import RestClient from "../clients/RestClient";
+import {SocketClient} from "../clients/SocketClient";
+import User from "../clients/User";
 
+export const updateUser = (user: User) => ({
+  type: 'UPDATE_USER',
+  user,
+})
+
+export const updateScreen = (screen: Screens) => ({
+  type: 'NAVIGATE',
+  screen,
+})
 export const updateGame = (game: Game) => ({
   type: 'UPDATE_GAME',
   game,
-});
+})
+export const setSocket = (socket: SocketClient) => ({
+  type: 'SET_SOCKET',
+  socket,
+})
+export const setError = (error: string) => ({
+  type: 'SET_ERROR',
+  error,
+})
 
 // reducers.js
-export const game = (state = Game, action) => {
+export const user = (state: Game, action) => {
+  switch (action.type) {
+    case 'UPDATE_USER':
+      return action.user;
+    default:
+      return state ?? null;
+  }
+};
+export const screen = (state: Screens, action) => {
+  switch (action.type) {
+    case 'NAVIGATE':
+      return action.screen;
+    default:
+      return state ?? null;
+  }
+}
+export const game = (state: Game, action) => {
   switch (action.type) {
     case 'UPDATE_GAME':
       return action.game;
     default:
-      return state;
+      return state ?? null;
   }
-};
-export const user = (state: UserData, action) => {
+}
+export const socket = (state: SocketClient, action) => {
   switch (action.type) {
-    case 'UPDATE_USER':
-      return action.user
+    case 'SET_SOCKET':
+      return action.socket;
+    default:
+      return state ?? null;
+  }
+}
+export const error = (state: string, action) => {
+  switch (action.type) {
+    case 'SET_ERROR':
+      return action.error;
+    default:
+      return state ?? null;
   }
 }
 
 export const reducers = combineReducers({
-  game,
   user,
+  screen,
+  game,
+  socket,
+  error,
 });
 
-interface ReduxState {
-  game?: Game,
-  user?: UserData,
+export type Screens = 'home' | 'lobby' | 'game' | 'create-game'
+
+export interface ReduxState {
+  user: User | null;
+  game: Game | null;
+  socket: SocketClient | null;
+  screen: Screens;
+  error: string;
 }
 
-export function configureStore(initialState: ReduxState = {}) {
-  return createStore(reducers, initialState);
-};
+const defaultState: ReduxState = {
+  user: null,
+  game: null,
+  socket: null,
+  screen: 'home',
+  error: null,
+}
 
-export const store = configureStore();
+export function configureStore(initialState: ReduxState) {
+  return createStore(reducers, initialState);
+}
+
+export const store = configureStore(defaultState);

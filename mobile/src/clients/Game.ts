@@ -19,6 +19,7 @@ export default class Game {
   public currentUser: UserResponse
   public finished: boolean = false
   public nextGameKey: string
+  public connected: boolean = false;
 
   constructor(currentUser: UserResponse, game?: GameSocketResponse) {
     if(game) {
