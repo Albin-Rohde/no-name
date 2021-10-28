@@ -6,6 +6,7 @@ import {Game} from "./game/models/Game";
 
 interface GameResponse {
   key: string
+  joinKey: string
   gameOptions: GameOptionsResponse
   active: boolean
   currentTurn: number
@@ -78,6 +79,7 @@ const normalizeBlackCardResponse = (card: BlackCardRef): BlackCardResponse | und
  */
 export const normalizeGameResponse = (game: Game): GameResponse => ({
   key: game.key,
+  joinKey: game.joinKey,
   gameOptions: {
     deck: game.cardDeck.name,
     cardLimit: game.playCards,

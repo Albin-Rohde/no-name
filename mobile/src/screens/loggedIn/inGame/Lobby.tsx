@@ -43,7 +43,7 @@ const Lobby = (props: LobbyProps) => {
       <Box sx={{marginTop: '3vh', display: 'flex', justifyContent: 'center'}}>
         <Grid item xs={9} sm={7} md={4} sx={{marginTop: '7vh'}}>
           <TextField
-            value={game.key}
+            value={game.joinKey}
             variant='outlined'
             label='game key'
             style={{width: '70%', marginBottom: '2vh'}}
@@ -51,7 +51,7 @@ const Lobby = (props: LobbyProps) => {
           <Button
             variant={'outlined'}
             sx={{width: '29%', height: '56px'}}
-            onClick={() => copyText(game.key)}
+            onClick={() => copyText(game.joinKey)}
           >
             Copy
           </Button>

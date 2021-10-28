@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express'
 import {loginRequired, gameRequired, handleRestError} from '../middlewares'
-import {createNewGame, deleteGameFromUser, getGameWithRelations} from './services'
+import {createNewGame, deleteGameFromUser, getGameFromJoinKey} from './services'
 import {RestResponse} from "../globalTypes";
 import {Game} from "./models/Game";
 import {User} from "../user/models/User";
@@ -58,7 +58,7 @@ gameRouter.get('/join', async (req: Request, res: Response) => {
   try {
     const gameKey = req.query.key.toString()
     const user = req.session.user
-    const game = await getGameWithRelations(gameKey)
+    const game = await getGameFromJoinKey(gameKey)
     if (game.users.some(u => u.id === user.id)) {
       return res.redirect(process.env.CLIENT_URL)
     }

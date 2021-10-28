@@ -1,11 +1,12 @@
 import autoBind from "auto-bind";
 // @ts-ignore
-import * as process from "process";
 import { io, Socket } from "socket.io-client";
 import { HandleError } from "../utils/decorator";
 import Game from "./Game";
 import type { CardResponse, GameSocketResponse, UserResponse } from "./ResponseTypes";
 import { CardState } from "./ResponseTypes";
+import {config} from "dotenv";
+config()
 
 type RerenderCallback = (disconnect?: boolean) => any
 

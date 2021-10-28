@@ -55,6 +55,17 @@ interface GameSettings {
 }
 
 /**
+ * Retrieves a game with relation from a 5 character join key
+ * @param joinKey
+ */
+export async function getGameFromJoinKey(joinKey): Promise<Game> {
+  const game = await Game.createQueryBuilder('g')
+    .where('join_key =:joinKey', {joinKey})
+    .getOneOrFail()
+  return getGameWithRelations(game.key)
+}
+
+/**
  * Creates a new game and store it to db for later use
  *
  * The user supplied to this function will also be attached to the game
@@ -73,6 +84,7 @@ export async function createNewGame (user: User, options: GameSettings): Promise
   }
   const game = new Game()
   game.key = uuidv4()
+  game.joinKey = uuidv4().substr(0, 5)
   game.playCards = options.playCards
   game.playerLimit = options.playerLimit
   game.privateLobby = options.private
