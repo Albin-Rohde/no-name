@@ -11,6 +11,7 @@ export enum GameState {
 
 export default class Game {
   public key: string
+  public joinKey: string
   public gameOptions: GameOptionsResponse
   public blackCard?: BlackCardResponse
   public active: boolean
@@ -24,6 +25,7 @@ export default class Game {
   constructor(currentUser: UserResponse, game?: GameSocketResponse) {
     if(game) {
       this.key = game.key
+      this.joinKey = game.joinKey
       this.gameOptions = game.gameOptions
       this.blackCard = game.blackCard
       this.active = game.active
@@ -36,6 +38,7 @@ export default class Game {
 
   public update(data: GameSocketResponse) {
     this.key = data.key
+    this.joinKey = data.joinKey
     this.gameOptions = data.gameOptions
     this.blackCard = data.blackCard
     this.active = data.active

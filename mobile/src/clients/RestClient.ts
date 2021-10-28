@@ -1,8 +1,9 @@
 import axios from 'axios';
 // @ts-ignore
-import * as process from "process";
 import { AuthenticationError } from "./error";
 import type { RestResponse } from "./ResponseTypes";
+import {config} from "dotenv";
+config()
 
 type Routes = 'game' | 'user' | 'card'
 type HttpMethods = 'put' | 'get' | 'post' | 'delete'
@@ -17,6 +18,7 @@ interface RestRequestOptions {
 export default class RestClient {
   private readonly baseUrl = process.env.REACT_APP_API_BASE_URL || '/api';
   public async makeRequest<T>(option: RestRequestOptions): Promise<T> {
+    console.log('baseUrl: ', process.env.REACT_APP_API_BASE_URL)
     try {
       option.action = option.action ? `/${option.action}` : ''
       const res: RestResponse<T> = await axios({

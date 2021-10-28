@@ -1,4 +1,14 @@
-import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm"
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn
+} from "typeorm"
 import {User} from "../../user/models/User"
 import {GameTurn} from "./GameTurn"
 import {NotFoundError} from "../../error";
@@ -14,6 +24,10 @@ export class Game extends BaseEntity {
 
   @PrimaryGeneratedColumn('uuid')
   key: string
+
+  @Index()
+  @Column({unique: true, nullable: false, name: 'join_key', length: 5})
+  joinKey: string
 
   @Column({name: 'play_cards'})
   playCards: number

@@ -1,18 +1,25 @@
 import React, {useState, useContext, useEffect} from "react";
 
 import { Box, Button, Grid, TextField, Tooltip } from "@mui/material";
-import {useDispatch, useSelector} from "react-redux";
-import {ReduxState, setError} from "../../redux/redux";
-import {UserData} from "../../clients/ResponseTypes";
+import {useDispatch} from "react-redux";
+import {setError} from "../../redux/redux";
 
 interface HomeProps {
   setScreen: (screen: 'home' | 'create-game') => void;
 }
 const Home = (props: HomeProps) => {
   const [joinKey, setJoinKey] = useState('');
-  const user = useSelector<ReduxState, UserData | null>((state) => state.user);
   const dispatch = useDispatch();
 
+  const joinGame = () => {
+    if (joinKey.length !== 5) {
+      dispatch(setError('Game key must be 5 character'));
+      return;
+    }
+    const baseUrl = process.env.REACT_APP_API_BASE_URL || '/api';
+    const joinUrl = `${baseUrl}/game/join?key=${joinKey}`;
+    window.location.replace(joinUrl);
+  }
   return (
     <React.Fragment>
       <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '40vh'}}>
@@ -35,7 +42,7 @@ const Home = (props: HomeProps) => {
             <Button
               variant={'outlined'}
               sx={{width: '100%'}}
-              onClick={() => dispatch(setError('Not implemented'))}
+              onClick={joinGame}
             >Join Game</Button>
           </Tooltip>
         </Grid>

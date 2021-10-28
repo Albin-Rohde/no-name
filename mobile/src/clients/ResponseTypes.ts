@@ -6,6 +6,7 @@ export interface GameResponse {
   card_deck: string
   started: boolean
   key?: string
+  joinKey?: string
   users?: UserResponse[]
 }
 
@@ -17,6 +18,7 @@ export interface CardDeckResponse {
 
 export interface GameSocketResponse {
   key: string
+  joinKey: string
   gameOptions: GameOptionsResponse
   blackCard?: BlackCardResponse
   currentTurn: number
