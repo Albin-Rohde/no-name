@@ -97,7 +97,8 @@ const defaultState: ReduxState = {
 }
 
 export function configureStore(initialState: ReduxState) {
-  return createStore(reducers, initialState);
+  // @ts-ignore
+  return createStore(reducers, initialState, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 }
 
 export const store = configureStore(defaultState);

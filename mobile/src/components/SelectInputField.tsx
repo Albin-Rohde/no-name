@@ -1,8 +1,5 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import Slider from '@mui/material/Slider';
 import {FormControl, InputLabel, Select} from "@mui/material";
 import {CardDeckResponse, GameOptionsResponse} from "../clients/ResponseTypes";
 import MenuItem from "@mui/material/MenuItem";

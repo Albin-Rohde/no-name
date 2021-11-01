@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 
-import {CardResponse, GameResponse, UserData} from "../../../clients/ResponseTypes";
+import {GameResponse} from "../../../clients/ResponseTypes";
 import {SocketClient} from "../../../clients/SocketClient";
 import {useDispatch, useSelector} from "react-redux";
 import {ReduxState, setError, setSocket, updateGame} from "../../../redux/redux";

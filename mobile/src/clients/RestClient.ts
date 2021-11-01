@@ -18,7 +18,6 @@ interface RestRequestOptions {
 export default class RestClient {
   private readonly baseUrl = process.env.REACT_APP_API_BASE_URL;
   public async makeRequest<T>(option: RestRequestOptions): Promise<T> {
-    console.log('baseUrl: ', process.env.REACT_APP_API_BASE_URL)
     try {
       option.action = option.action ? `/${option.action}` : ''
       const res: RestResponse<T> = await axios({

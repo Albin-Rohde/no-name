@@ -16,6 +16,7 @@ export default class User extends RestClient {
     if(user) {
       this.id = user.id
       this.username = user.username
+      this.email = user.email
       this.cards = user.cards
       autoBind(this)
     }
