@@ -33,6 +33,7 @@ const LoggedIn = () => {
   const rest = new RestClient();
   const dispatch = useDispatch();
 
+  console.log('loggedIn rerender \nuser:', user);
   if (!user) {
     dispatch(setError('You are not logged in'))
   }
@@ -46,8 +47,11 @@ const LoggedIn = () => {
   }
   const handleLogout = async () => {
     try {
-      await rest.makeRequest({method: 'post', route: 'user', action: 'logout'})
+      console.log('log out request');
+      await rest.makeRequest({method: 'post', route: 'user', action: 'logout'});
+      console.log('dispatch null user');
       dispatch(updateUser(null));
+      console.log('user', user);
     } catch (err) {
       setError(err.message);
     }
