@@ -6,6 +6,7 @@ import Game from "./Game";
 import type { CardResponse, GameSocketResponse, UserResponse } from "./ResponseTypes";
 import { CardState } from "./ResponseTypes";
 import {config} from "dotenv";
+import {GameRuleError} from "./error";
 config()
 
 type RerenderCallback = (disconnect?: boolean) => any
@@ -33,7 +34,7 @@ export class SocketClient {
     autoBind(this)
   }
 
-  public connect = async (rerenderCb: RerenderCallback, onErrorCb: (msg: string) => any): Promise<void> => {
+  public connect = async (rerenderCb: RerenderCallback, onErrorCb: (err: unknown) => any): Promise<void> => {
     this.socket = io(this.baseUrl, {
       withCredentials: true,
       transports: ['websocket'],
@@ -61,15 +62,15 @@ export class SocketClient {
     })
     this.socket.on('connection_error', (err: string) => {
       console.error('connection error: ', err)
-      onErrorCb(err);
+      onErrorCb(new Error(err));
     })
     this.socket.on('server_error', (err: string) => {
       console.error('server_error: ', err)
-      onErrorCb(err);
+      onErrorCb(new Error(err));
     })
     this.socket.on('rule_error', (err: string) => {
       console.error('rule_error: ', err)
-      onErrorCb(err);
+      onErrorCb(new GameRuleError(err));
     })
     return new Promise(resolve => {
       this.socket.on('connected', () => {

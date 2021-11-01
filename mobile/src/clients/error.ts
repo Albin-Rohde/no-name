@@ -10,6 +10,13 @@ export class AuthenticationError extends ExpectedError {
   }
 }
 
+export class GameRuleError extends ExpectedError {
+  constructor(message: string) {
+    super(message);
+    this.name = 'GameRuleError';
+  }
+}
+
 export class InternalServerError extends Error {
   constructor(message: string) {
     super(message);
