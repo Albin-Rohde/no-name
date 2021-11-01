@@ -31,6 +31,7 @@ export default function LeftMenu(props: LeftMenuProps) {
   const list = () => (
     <Box
       sx={{ width: 250 }}
+      className={'drawer'}
       role="presentation"
       onClick={props.setOpen(false)}
       onKeyDown={props.setOpen(false)}

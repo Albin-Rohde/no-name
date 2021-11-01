@@ -8,7 +8,6 @@ import {useState} from "react";
 import LeftMenu from "./LeftMenu";
 import Game from "../clients/Game";
 import {UserData} from "../clients/ResponseTypes";
-import {Typography} from "@mui/material";
 import {useSelector} from "react-redux";
 import {ReduxState} from "../redux/redux";
 
@@ -39,24 +38,6 @@ export default function MenuAppBar(props: MenuProps) {
     }
   }
 
-  const renderCardWizzText = (game) => {
-    if (game && game.active) {
-      if (game.currentUser.cardWizz) {
-        return (
-          <Typography variant={'body1'}>
-            You are the current card wizz
-          </Typography>
-        )
-      } else {
-        const currentCardWizz = game.users.find(user => user.cardWizz);
-        return (
-          <Typography variant={'body1'}>
-            {currentCardWizz.username} is the current card wizz
-          </Typography>
-        )
-      }
-    }
-  }
   return (
     <Box sx={{ flexGrow: 1 }}>
       <LeftMenu
@@ -79,7 +60,6 @@ export default function MenuAppBar(props: MenuProps) {
               <MenuIcon onClick={() => setMenuOpen(!menuOpen)} />
             )}
           </IconButton>
-          {renderCardWizzText(game)}
         </Toolbar>
       </AppBar>
     </Box>
