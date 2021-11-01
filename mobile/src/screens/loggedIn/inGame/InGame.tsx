@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 import {GameResponse} from "../../../clients/ResponseTypes";
 import {SocketClient} from "../../../clients/SocketClient";
 import {useDispatch, useSelector} from "react-redux";
-import {ReduxState, setError, setSocket, updateGame} from "../../../redux/redux";
+import {ReduxState, setError, setSocket, setWarning, updateGame} from "../../../redux/redux";
 import User from "../../../clients/User";
 import * as GameClient from '../../../clients/Game';
 import RestClient from "../../../clients/RestClient";
@@ -11,6 +11,7 @@ import Spinner from "../../../components/Spinner";
 import Lobby from "./Lobby";
 import * as GameScreen from './Game';
 import MenuAppBar from "../../../components/MenuAppBar";
+import {GameRuleError} from "../../../clients/error";
 
 interface InGameProps {
   handleLogout: () => Promise<void>;
@@ -27,11 +28,16 @@ const InGame = (props: InGameProps) => {
   const dispatch = useDispatch();
   const rest = new RestClient();
 
-  const onSocketError = (msg: string) => {
-    console.log('socketErr')
-    console.log(msg);
-    dispatch(setError(msg));
+  const onSocketError = (err: unknown) => {
+    if (err instanceof Error) {
+      if (err instanceof GameRuleError && err.message) {
+        dispatch(setWarning(err.message));
+      } else if (err.message) {
+        dispatch(setError(err.message));
+      }
+    }
   }
+
   const createConnectedSocket = async (): Promise<SocketClient> => {
     try {
       const socket = new SocketClient(user);

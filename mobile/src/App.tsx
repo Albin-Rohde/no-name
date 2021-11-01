@@ -12,8 +12,7 @@ import {ReduxState, updateUser, setError, updateGame} from "./redux/redux";
 import { UserData} from "./clients/ResponseTypes";
 import User from "./clients/User";
 import LoggedIn from "./screens/loggedIn/LoggedIn";
-
-export const SetErrorContext = React.createContext(null);
+import WarningSnack from "./components/WarningSnack";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -21,6 +20,7 @@ function App() {
   const [longPollActive, setLongPollActive] = useState<boolean>(false);
   const user = useSelector<ReduxState, User | undefined>((state) => state.user);
   const error = useSelector<ReduxState, string>((state) => state.error);
+  const warning = useSelector<ReduxState, string>((state) => state.warning);
   const dispatch = useDispatch();
   const rest = new RestClient();
 
@@ -121,6 +121,7 @@ function App() {
     return (
       <React.Fragment>
         <ErrorSnack open={!!error} message={error}/>
+        <WarningSnack open={!!warning} message={warning}/>
         <LoggedIn/>
       </React.Fragment>
     )
