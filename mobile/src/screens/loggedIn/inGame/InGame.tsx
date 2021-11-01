@@ -14,6 +14,7 @@ import MenuAppBar from "../../../components/MenuAppBar";
 
 interface InGameProps {
   handleLogout: () => Promise<void>;
+  setLoading: (l: boolean) => void;
   setLoggedInScreen: (screen: 'home' | 'create-game') => void;
   setHasGame: (has: boolean) => void;
 }
@@ -41,6 +42,7 @@ const InGame = (props: InGameProps) => {
           dispatch(setSocket(null));
           props.setLoggedInScreen('home');
           props.setHasGame(false);
+          props.setLoading(false);
           return;
         }
         console.log('game updated')

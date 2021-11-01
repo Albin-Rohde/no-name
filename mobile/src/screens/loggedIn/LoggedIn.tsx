@@ -72,6 +72,7 @@ const LoggedIn = () => {
       handleLogout={handleLogout}
       setLoggedInScreen={setScreen}
       setHasGame={setHasGame}
+      setLoading={setLoading}
     />
   }
 
