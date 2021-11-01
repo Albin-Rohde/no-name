@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Box, Card, CardContent, Grid, Typography} from "@mui/material";
+import {Box, Card, CardContent, Grid, Paper, Typography} from "@mui/material";
 import PlayerDrawer from "../../../components/PlayerDrawer";
 import DataTable from "../../../components/DataTable";
 import ConfirmPlayModal from "../../../components/ConfirmPlayModal";
@@ -308,6 +308,16 @@ const Game = () => {
           <Grid item xs={2} sm={2} md={3} sx={{display: 'flex', justifyContent: 'center'}}>
             <Box sx={{width: '80%', marginTop: '5vh'}}>
               <DataTable/>
+              <Paper sx={{
+                paddingTop: '15px',
+                paddingBottom: '15px',
+                backgroundColor: '#282c36',
+                marginBottom: '3vh'
+              }}>
+                <Typography color='white' variant={'body1'} sx={{marginLeft: '3vw'}}>
+                  Current Card wizz: {game.users.find(u => u.cardWizz).username}
+                </Typography>
+              </Paper>
             </Box>
           </Grid> : <Grid item xs={2} sm={2} md={3}/>
         }
