@@ -1,10 +1,7 @@
 import * as React from 'react';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import {useContext, useEffect} from "react";
-import {SetErrorContext} from "../App";
+import {useEffect} from "react";
 import {useDispatch} from "react-redux";
 import {setError} from "../redux/redux";
 

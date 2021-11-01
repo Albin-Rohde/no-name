@@ -4,23 +4,15 @@ import {useDispatch, useSelector} from "react-redux";
 import {
   ReduxState,
   setError,
-  setSocket,
-  updateGame,
-  socket,
   updateUser,
-  Screens,
-  updateScreen
 } from "../../redux/redux";
-import {SocketClient} from "../../clients/SocketClient";
 import User from "../../clients/User";
 import Spinner from "../../components/Spinner";
 import RestClient from "../../clients/RestClient";
 import Game from "../../clients/Game";
 import {GameResponse} from "../../clients/ResponseTypes";
 import MenuAppBar from "../../components/MenuAppBar";
-import Lobby from "./inGame/Lobby";
 import Home from "./Home";
-import * as GameScreen from './inGame/Game';
 import SetupGame from "./SetupGame";
 import InGame from "./inGame/InGame";
 
@@ -33,7 +25,6 @@ const LoggedIn = () => {
   const rest = new RestClient();
   const dispatch = useDispatch();
 
-  console.log('loggedIn rerender \nuser:', user);
   if (!user) {
     dispatch(setError('You are not logged in'))
   }
