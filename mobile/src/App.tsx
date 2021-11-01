@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 
-import Home from "./screens/loggedIn/Home";
 import './App.css';
 import Register from "./screens/Register";
 import ErrorSnack from "./components/ErrorSnack";
@@ -9,7 +8,7 @@ import MenuAppBar from "./components/MenuAppBar";
 import RestClient from "./clients/RestClient";
 import Spinner from "./components/Spinner";
 import { useDispatch, useSelector } from "react-redux";
-import { ReduxState, updateUser, setError } from "./redux/redux";
+import {ReduxState, updateUser, setError, updateGame} from "./redux/redux";
 import { UserData} from "./clients/ResponseTypes";
 import User from "./clients/User";
 import LoggedIn from "./screens/loggedIn/LoggedIn";
@@ -19,6 +18,7 @@ export const SetErrorContext = React.createContext(null);
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const [screen, setScreen] = useState<'register' | 'login'>('register');
+  const [longPollActive, setLongPollActive] = useState<boolean>(false);
   const user = useSelector<ReduxState, User | undefined>((state) => state.user);
   const error = useSelector<ReduxState, string>((state) => state.error);
   const dispatch = useDispatch();
@@ -40,19 +40,6 @@ function App() {
         const u = new User(userData);
         dispatch(updateUser(u));
       }
-    } catch (err) {
-      dispatch(setError(err.message))
-    }
-  }
-
-  const logout = async () => {
-    try {
-      await rest.makeRequest({
-        method: 'post',
-        route: 'user',
-        action: 'logout',
-      })
-      dispatch(updateUser(null));
     } catch (err) {
       dispatch(setError(err.message))
     }
@@ -89,12 +76,42 @@ function App() {
     }
   }
 
+  const longPollUser = async () => {
+    let keepPolling = true;
+    while (keepPolling) {
+      await new Promise<void>(async (resolve) => {
+        setTimeout(async () => {
+          try {
+            const userData = await rest.makeRequest<UserData>({method: 'get', route: 'user', action: 'get'});
+            if (!userData || !userData.id) {
+              throw new Error('You are not logged in');
+            }
+            resolve();
+          } catch (err) {
+            dispatch(updateGame(null))
+            dispatch(updateUser(null))
+            dispatch(setError(err.message));
+            keepPolling = false;
+            resolve();
+          }
+        }, 10000);
+      })
+    }
+  }
+
   useEffect(() => {
     (async () => {
       await fetchUser();
       setLoading(false);
     })()
   }, []);
+
+  useEffect(() => {
+    if (user && user.id && !longPollActive) {
+      longPollUser();
+      setLongPollActive(true);
+    }
+  }, [user])
 
   if (loading) {
     return <Spinner/>;
@@ -103,6 +120,7 @@ function App() {
   if (user) {
     return (
       <React.Fragment>
+        <ErrorSnack open={!!error} message={error}/>
         <LoggedIn/>
       </React.Fragment>
     )
@@ -129,13 +147,3 @@ function App() {
 }
 
 export default App;
-/*
-  case 'home':
-    return <Home/>
-  case 'lobby':
-    return <Lobby game={game} socket={socket}/>
-  case 'create-game':
-    return <SetupGame />
-  case 'game':
-    return <GameScreen game={game} socket={socket} user={user}/>
-*/
