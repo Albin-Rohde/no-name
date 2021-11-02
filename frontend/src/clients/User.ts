@@ -1,14 +1,7 @@
-import type {UserData, UserResponse, CardResponse, RestResponse} from './ResponseTypes'
-// @ts-ignore
-import * as process from "process";
 import autoBind from "auto-bind";
-import {HandleError} from "../utils/decorator";
+import type { CardResponse, UserData, UserResponse } from './ResponseTypes';
 import RestClient from "./RestClient";
 
-interface LoginRequest {
-  email: string,
-  password: string,
-}
 
 export default class User extends RestClient {
   public id: number
@@ -23,66 +16,12 @@ export default class User extends RestClient {
     if(user) {
       this.id = user.id
       this.username = user.username
+      this.email = user.email
       this.cards = user.cards
       autoBind(this)
     }
   }
 
-  @HandleError
-  public async login(email: string = this.email, password: string = this.password) {
-    this.email = email
-    this.password = password
-    if(!this.email || !this.password) {
-      throw Error('<user.email> and <user.password> need to be set in order to login')
-    }
-    const userData = await this.makeRequest<UserData>({
-      method: 'post',
-      route: 'user',
-      data: {email: this.email, password: this.password} as LoginRequest,
-      action: 'login',
-    })
-    this.id = userData.id
-    this.email = userData.email
-    this.password = userData.password
-    this.username = userData.username
-    this.isActive = true
-  }
-
-  @HandleError
-  public async register() {
-    const userData = await this.makeRequest<UserData>({
-      method: 'post',
-      route: 'user',
-      data: {
-        email: this.email,
-        password: this.password,
-        username: this.username
-      },
-      action: 'register',
-    })
-    if(userData) {
-      this.id = userData.id
-      this.email = userData.email
-      this.password = userData.password
-      this.isActive = true
-    }
-  }
-
-  @HandleError
-  public async logout() {
-    await this.makeRequest({
-      method: 'post',
-      route: 'user',
-      action: 'logout',
-    })
-    this.id = undefined
-    this.email = undefined
-    this.password = undefined
-    this.username = undefined
-    this.isActive = false
-  }
-
-  @HandleError
   public async getSessionUser() {
     //TODO: make this endpoint more "restfull"
     const userData = await this.makeRequest<UserData>({method: 'get', route: 'user', action: 'get'})

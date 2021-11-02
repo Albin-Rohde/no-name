@@ -28,10 +28,10 @@ services:
     env_file:
       - '.env'
 
-  mobile:
-    container_name: mobile
+  frontend:
+    container_name: frontend
     restart: always
-    build: ./mobile
+    build: ./frontend
     networks:
       - local
     ports:
@@ -39,22 +39,7 @@ services:
     env_file:
       - '.env'
     volumes:
-      - './mobile/src:/usr/src/frontend/src'
-
-  #log-client:
-  #  container_name: log-client
-  #  restart: always
-  #  build: log-client
-  #  networks:
-  #    - local
-  #  ports:
-  #    - '3001:3001'
-  #  expose:
-  #    - '3001'
-  #  env_file:
-  #    - '.env'
-  #  volumes:
-  #    - './log-client/src:/usr/src/log-client/src'
+      - './frontend/src:/usr/src/frontend/src'
 
   redis:
     image: "redis:alpine"
