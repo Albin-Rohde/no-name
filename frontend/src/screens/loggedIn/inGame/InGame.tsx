@@ -12,6 +12,7 @@ import Lobby from "./Lobby";
 import * as GameScreen from './Game';
 import MenuAppBar from "../../../components/MenuAppBar";
 import {GameRuleError} from "../../../clients/error";
+import Victory from "./Victory";
 
 interface InGameProps {
   handleLogout: () => Promise<void>;
@@ -97,11 +98,13 @@ const InGame = (props: InGameProps) => {
   }
 
   const renderScreen = () => {
+    if (game && game.isFinished) {
+      return <Victory/>
+    }
     if (game && game.active) {
       return <GameScreen.default/>
-    } else {
-      return <Lobby setLoading={setLoading}/>
     }
+    return <Lobby setLoading={setLoading}/>
   }
 
   return (

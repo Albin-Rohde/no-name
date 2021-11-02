@@ -34,8 +34,17 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export default function DataTable() {
+interface DataTableProps {
+  sortByScore?: boolean
+}
+export default function DataTable(props: DataTableProps) {
   const game = useSelector<ReduxState, Game>((state) => state.game);
+  let users = [];
+  if (props.sortByScore) {
+    users = game.users.sort((a, b) => b.score - a.score);
+  } else {
+    users = game.users;
+  }
   return (
     <TableContainer component={Paper} sx={{marginBottom: '4vh'}}>
       <Table aria-label="customized table">
@@ -46,7 +55,7 @@ export default function DataTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {game.users.map((user) => (
+          {users.map((user) => (
             <StyledTableRow key={user.id}>
               <StyledTableCell align={'left'} component="th" scope="row">
                 {user.username}
