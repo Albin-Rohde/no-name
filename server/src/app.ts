@@ -69,9 +69,6 @@ async function startServer() {
   try {
     await createConnection()
     logger.info('Connected to db')
-    logger.debug(options)
-    logger.debug('react app url' + process.env.REACT_APP_API_BASE_URL + ';')
-
     const app: Application = express()
     app.use(bodyParser.urlencoded({extended: false}))
     app.use(bodyParser.json())
