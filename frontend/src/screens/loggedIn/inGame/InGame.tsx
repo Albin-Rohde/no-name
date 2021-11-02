@@ -43,15 +43,15 @@ const InGame = (props: InGameProps) => {
       const socket = new SocketClient(user);
       await socket.connect((disconnect) => {
         if (disconnect) {
-          setError('SOCKET DISCONNECT')
-          dispatch(updateGame(null));
-          dispatch(setSocket(null));
+          setLoading(true);
+          props.setHasGame(false);
           props.setLoggedInScreen('home');
           props.setHasGame(false);
           props.setLoading(false);
+          dispatch(updateGame(null));
+          dispatch(setSocket(null));
           return;
         }
-        console.log('game updated')
         dispatch(updateGame(socket.gameData));
         if (loading) {
           setLoading(false);

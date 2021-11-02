@@ -94,7 +94,7 @@ function App() {
             keepPolling = false;
             resolve();
           }
-        }, 10000);
+        }, 60000);
       })
     }
   }
