@@ -44,6 +44,9 @@ export class SocketClient {
     })
     // socket event listeners
     this.socket.on('update', (game: GameSocketResponse) => {
+      if (this.game.isFinished) {
+        return;
+      }
       this.game.update(game)
       rerenderCb()
     })
