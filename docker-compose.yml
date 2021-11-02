@@ -58,7 +58,7 @@ services:
     depends_on:
       - db
       - redis
-      - mobile
+      - frontend
       - server
     networks:
       - local
