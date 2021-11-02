@@ -49,7 +49,7 @@ const Game = () => {
   const renderPlaying = () => {
     if (isMobile) {
       return (
-        <Box sx={{marginTop: '10vh'}}>
+        <Box>
           <Typography color={'white'} variant={'body1'} align={'center'}>
             Your cards
           </Typography>
@@ -68,7 +68,7 @@ const Game = () => {
       )
     } else {
       return (
-        <Box sx={{marginTop: '18vh'}}>
+        <Box>
           <Typography color={'white'} variant={'body1'} align={'center'}>
             Your cards
           </Typography>
@@ -114,7 +114,7 @@ const Game = () => {
     }
     if (isMobile) {
       return (
-        <Box sx={{marginTop: game.currentUser.cardWizz ? '8vh' : '10vh'}}>
+        <Box>
           {renderHelpText()}
           <Typography color={'white'} variant={'body1'} align={'center'}>
             Flipped cards ({game.playedCards.filter(c => c.state === CardState.PLAYED_SHOW).length}/{game.players.length})
@@ -131,7 +131,7 @@ const Game = () => {
       )
     } else {
       return (
-        <Box sx={{marginTop: '18vh'}}>
+        <Box>
           {renderHelpText()}
           <Typography color={'white'} variant={'body1'} align={'center'}>
             Flipped cards ({game.playedCards.filter(c => c.state === CardState.PLAYED_SHOW).length}/{game.players.length})
@@ -167,7 +167,7 @@ const Game = () => {
     }
     if (isMobile) {
       return (
-        <Box sx={{marginTop: game.currentUser.cardWizz ? '8vh' : '10vh'}}>
+        <Box>
           {renderHelpText()}
           <Box sx={{
             display: 'flex',
@@ -181,7 +181,7 @@ const Game = () => {
       )
     } else {
       return (
-        <Box sx={{marginTop: '18vh'}}>
+        <Box>
           {renderHelpText()}
           <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '2vh'}}>
             {renderCards(game.playedCards, handleVoteClick)}
@@ -194,7 +194,7 @@ const Game = () => {
   const renderWin = () => {
     if (isMobile) {
       return (
-        <Box sx={{marginTop: '10vh'}}>
+        <Box>
           <Typography color={'white'} variant={'body1'} align={'center'}>
             {game.winningPlayer.username} won this round with the card:
           </Typography>
@@ -210,7 +210,7 @@ const Game = () => {
       )
     } else {
       return (
-        <Box sx={{marginTop: '18vh'}}>
+        <Box>
           <Typography color={'white'} variant={'body1'} align={'center'}>
             {game.winningPlayer.username} won this round with the card:
           </Typography>
@@ -301,9 +301,10 @@ const Game = () => {
     }
   }
 
+  const mainGridHeight = isMobile ? 'calc(94vh - 430px)' : 'calc(94vh - 400px)'
   return (
     <React.Fragment>
-      <Grid container sx={{width: '100%', marginTop: '6vh'}}>
+      <Grid container sx={{width: '100%', marginTop: '6vh', height: mainGridHeight}}>
         {!isMobile ?
           <Grid item xs={2} sm={2} md={3} sx={{display: 'flex', justifyContent: 'center'}}>
             <Box sx={{width: '80%', marginTop: '5vh'}}>
@@ -339,7 +340,12 @@ const Game = () => {
         </Grid>
         {isMobile && <PlayerDrawer open={false}/>}
       </Grid>
-      {renderCardsView()}
+      <Box sx={{
+        display: 'flex',
+        flexDirection: 'column',
+      }}>
+        {renderCardsView()}
+      </Box>
       <Grid item sm={3} md={4}/>
       <ConfirmPlayModal
         open={confirmPlayOpen}
