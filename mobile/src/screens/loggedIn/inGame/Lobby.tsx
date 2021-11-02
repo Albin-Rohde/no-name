@@ -1,9 +1,9 @@
 import React from "react";
 
-import {Box, Button, Card, Grid, Typography, Paper, TextField} from "@mui/material";
+import {Box, Button, Grid, Typography, TextField} from "@mui/material";
 import DataTable from "../../../components/DataTable";
-import {useDispatch, useSelector} from "react-redux";
-import {ReduxState, setError} from "../../../redux/redux";
+import {useSelector} from "react-redux";
+import {ReduxState} from "../../../redux/redux";
 import Game from "../../../clients/Game";
 import {SocketClient} from "../../../clients/SocketClient";
 
@@ -21,7 +21,6 @@ const Lobby = (props: LobbyProps) => {
   }
   const game = useSelector<ReduxState, Game>((state) => state.game);
   const socket = useSelector<ReduxState, SocketClient>((state) => state.socket);
-  const dispatch = useDispatch();
 
   const startGame = () => {
     props.setLoading(true);
