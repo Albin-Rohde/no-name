@@ -1,7 +1,6 @@
-import {Server, Socket} from "socket.io";
+import {Socket} from "socket.io";
 import http from "http";
 import {User} from "./user/models/User";
-import {Game} from "./game/models/Game";
 
 interface RestError {
   name: string
@@ -25,6 +24,3 @@ export type SocketWithSession = Modify<Socket, {
     }
   }>
 }>
-
-export type EventFunction<T> = (io: Server, socket: SocketWithSession, ...args: T[]) => Promise<Game | null>
-export type EventFunctionWithGame<T> = (game: Game, ...args: T[]) => Promise<Game | null>

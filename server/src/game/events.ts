@@ -1,29 +1,27 @@
 import { Server } from "socket.io";
 import { setTimeoutAsync } from "../util";
-import { SocketWithSession, EventFunction, EventFunctionWithGame } from "../globalTypes";
+import { SocketWithSession } from "../globalTypes";
 import { createNewGame, deleteGameFromUser, getGameFromUser, getGameRound, getGameWithRelations } from "./services";
 import { GameRuleError, GameStateError, NotFoundError } from "../error";
 import { getUserWithRelation } from "../user/services";
 import { normalizeGameResponse } from "../socketResponse";
 import { CardState } from "../card/models/WhiteCardRef";
-import { Game } from "./models/Game";
+import {emitRemovedEvent, emitUpdateEvent} from "../socketEmitters";
 
 /**
  * Gets a game if any is attached to the
  * user making the request.
- * @param io
- * @param socket
  */
-export const getGameEvent: EventFunction<never> = async(io: Server, socket: SocketWithSession) => {
+export async function getGameEvent(io: Server, socket: SocketWithSession): Promise<void> {
   try {
     const game = await getGameFromUser(socket.request.session.user.id)
     if(!socket.rooms.has(game.key)) {
       socket.join(game.key)
     }
-    return game
+    await emitUpdateEvent(io, game);
   } catch (err) {
     if (err instanceof NotFoundError) {
-      return null
+      return;
     }
     throw err
   }
@@ -31,11 +29,8 @@ export const getGameEvent: EventFunction<never> = async(io: Server, socket: Sock
 
 /**
  * Joins a game by gameKey
- * @param io - websocket server
- * @param socket - live socket
- * @param key - gameKey refering to the game to join
  */
-export const joinGameEvent: EventFunction<string> = async (io, socket, key) => {
+export async function joinGameEvent(io: Server, socket: SocketWithSession, key: string): Promise<void> {
   const game = await getGameWithRelations(key)
   const user = await getUserWithRelation(socket.request.session.user.id)
   if (game.active) {
@@ -48,15 +43,15 @@ export const joinGameEvent: EventFunction<string> = async (io, socket, key) => {
   user.hasPlayed = false
   game.addPlayer(user)
   socket.join(game.key)
-  return game
+  await emitUpdateEvent(io, game)
 }
 
 /**
  * Start game
  * Only the gameHost can do this action.
- * @param game
  */
-export const startGameEvent: EventFunctionWithGame<never> = async (game: Game) => {
+export async function startGameEvent(io: Server, socket: SocketWithSession): Promise<void> {
+  const game = await getGameFromUser(socket.request.session.user.id);
   if (game.active) {
     throw new GameStateError('Game already active')
   }
@@ -72,18 +67,16 @@ export const startGameEvent: EventFunctionWithGame<never> = async (game: Game) =
     game.assingCardWizz(),
     game.newBlackCard(),
   ])
-  return game
+  await emitUpdateEvent(io, game)
 }
 
 /**
  * Creates a new game, sending the key for the new game to all
  * players in the current game. This make it possible for them to use
  * that key to join the new game.
- * @param io
- * @param socket
  */
-export const playAgainEvent: EventFunction<never> = async (io, socket) => {
-  const game = await getGameFromUser(socket.request.session.user.id)
+export async function playAgainEvent(io: Server, socket: SocketWithSession): Promise<void> {
+  const game = await getGameFromUser(socket.request.session.user.id);
   if (game.active) {
     throw new GameStateError('Can not restart ongoing game')
   }
@@ -102,17 +95,17 @@ export const playAgainEvent: EventFunction<never> = async (io, socket) => {
   socket.join(newGame.key)
   socket.emit('update', normalizeGameResponse(newGame))
   io.in(game.key).emit('next-game', newGame.key)
-  return null
+  // TODO: should this emit anything else?
 }
 
 /**
  * Leaves the game that the requesting user
  * is attached to.
- * @param game
  */
-export const leaveGameEvent: EventFunctionWithGame<never> = async(game) => {
+export async function leaveGameEvent(io: Server, socket: SocketWithSession) {
+  const game = await getGameFromUser(socket.request.session.user.id);
   await game.removePlayer(game.currentUser)
-  return game
+  await emitUpdateEvent(io, game)
 }
 
 /**
@@ -121,11 +114,11 @@ export const leaveGameEvent: EventFunctionWithGame<never> = async(game) => {
  *
  * Additionally sends a removed event to remaining
  * players. Disconnecting them from the game.
- * @param game
  */
-export const deleteGameEvent: EventFunctionWithGame<never> = async(game) => {
+export async function deleteGameEvent(io: Server, socket: SocketWithSession) {
+  const game = await getGameFromUser(socket.request.session.user.id);
   await deleteGameFromUser(game.currentUser)
-  return null
+  await emitRemovedEvent(io, socket, game);
 }
 
 /**
@@ -135,13 +128,13 @@ export const deleteGameEvent: EventFunctionWithGame<never> = async(game) => {
  * - Hand out new white cards
  * - Next round with new card wizz
  * - Discards played cards as used
- * @param game
  */
-export const nextRoundEvent: EventFunctionWithGame<never> = async(game) => {
+export async function nextRoundEvent(io: Server, socket: SocketWithSession) {
   await setTimeoutAsync(6000)
+  const game = await getGameFromUser(socket.request.session.user.id);
   if (game.turn_number === game.rounds * game.users.length) {
     game.active = false
-    return game
+    await emitUpdateEvent(io, game);
   }
   const updateCards = game.allPlayerCards
     .filter((card) => {
@@ -171,5 +164,5 @@ export const nextRoundEvent: EventFunctionWithGame<never> = async(game) => {
     newPlayerCards,
   ])
   await nextTurn()
-  return game
+  await emitUpdateEvent(io, game);
 }
