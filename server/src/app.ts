@@ -14,8 +14,6 @@ import userRoute from "./user/controller";
 import gameRouter from "./game/controller";
 import cardDeckRouter from "./cardDeck/controller";
 import logRouter from "./logger/controller";
-import {Server} from "socket.io";
-import {addListener, addListenersWithGame} from "./socketHandler"
 import { flipCardEvent, playCardEvent, voteCardEvent } from "./card/events";
 import {
   deleteGameEvent,
@@ -26,6 +24,7 @@ import {
   playAgainEvent,
   startGameEvent
 } from "./game/events";
+import {SocketServer} from "./lib/socket/Socket";
 
 dotenv.config({path: '.env'})
 
@@ -83,7 +82,7 @@ async function startServer() {
     app.use(expressLogger)
     registerRoutes(app)
     const httpServer = http.createServer(app)
-    const io = new Server(httpServer, {
+    const io = new SocketServer(httpServer, {
       cors: {
         origin: options.clientUrl,
         methods: ["GET", "POST"],
@@ -93,10 +92,10 @@ async function startServer() {
       pingTimeout: 500,
       transports: ['websocket']
     })
-    io.use((socket: any, next: any) => userSession(socket.request, {} as any, next))
-    io.on('connection', async (socket: SocketWithSession) => {
-      registerSocketEvents(io, socket)
-      socket.emit('connected')
+    appendListeners(io)
+    io.on('connection', (socket: SocketWithSession) => {
+      io.subscribeListeners(socket)
+      io.emit('connected')
     })
     httpServer.listen(options.port, () => {
       logger.info(`server started on port ${options.port}`)
@@ -126,17 +125,16 @@ export enum Events {
   VOTE_CARD = 'vote-card',
 }
 
-export const registerSocketEvents = (io: Server, socket: SocketWithSession) => {
-  addListener<string>(io, socket, Events.JOIN_GAME, joinGameEvent)
-  addListener(io, socket, Events.GET_GAME, getGameEvent)
-  addListener(io, socket, Events.PLAY_AGAIN, playAgainEvent)
-  addListenersWithGame(io, socket, Events.START_GAME, [startGameEvent])
-  addListenersWithGame(io, socket, Events.LEAVE_GAME, [leaveGameEvent])
-  addListenersWithGame(io, socket, Events.DELETE_GAME, [deleteGameEvent])
-
-  addListenersWithGame<number>(io, socket, Events.PLAY_CARD, [playCardEvent])
-  addListenersWithGame<number>(io, socket, Events.FLIP_CARD, [flipCardEvent])
-  addListenersWithGame<number>(io, socket, Events.VOTE_CARD, [voteCardEvent, nextRoundEvent])
+export const appendListeners = (io: SocketServer) => {
+  io.addEventHandler(Events.JOIN_GAME, joinGameEvent)
+  io.addEventHandler(Events.GET_GAME, getGameEvent)
+  io.addEventHandler(Events.PLAY_AGAIN, playAgainEvent)
+  io.addEventHandler(Events.START_GAME, startGameEvent)
+  io.addEventHandler(Events.LEAVE_GAME, leaveGameEvent)
+  io.addEventHandler(Events.DELETE_GAME, deleteGameEvent)
+  io.addEventHandler(Events.PLAY_CARD, playCardEvent)
+  io.addEventHandler(Events.FLIP_CARD, flipCardEvent)
+  io.addEventHandler(Events.VOTE_CARD, voteCardEvent, nextRoundEvent)
 }
 
 startServer()
