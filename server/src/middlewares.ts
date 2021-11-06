@@ -75,7 +75,7 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
   return res.status(500).json(response)
 }
 
-export const authSocketUser = async (socket: SocketWithSession): Promise<User> => {
+export const authSocketUser = async (socket: SocketWithSession): Promise<void> => {
   if(!socket.request.session.user) {
     throw new AuthenticationError('User required on session')
   }
@@ -86,12 +86,11 @@ export const authSocketUser = async (socket: SocketWithSession): Promise<User> =
   } else {
     throw new AuthenticationError('Authentication for user failed.')
   }
-  return user
 }
 
 
 interface SocketEventInfo {
-  eventName: Events
+  eventName: string
   eventMethod: string
   arguments: any[]
   userId: number
