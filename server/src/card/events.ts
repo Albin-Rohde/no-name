@@ -1,19 +1,17 @@
-import {EventFunctionWithGame} from "../globalTypes";
-import {Game} from "../game/models/Game";
 import {GameStateError, NotAllowedError} from "../error";
 import {CardState} from "./models/WhiteCardRef";
+import {SocketWithSession} from "../globalTypes";
+import {Server} from "socket.io";
+import {emitUpdateEvent} from "../socketEmitters";
+import {getGameFromUser} from "../game/services";
 
 /**
  * Play card event
  * Will play the card on the game that the user
  * is attached to. If allowed by game rules.
- * @param game
- * @param cardId - Card to play
  */
-export const playCardEvent: EventFunctionWithGame<number> = async(
-  game,
-  cardId: number
-): Promise<Game> => {
+export async function playCardEvent(io: Server, socket: SocketWithSession, cardId: number) {
+  const game = await getGameFromUser(socket.request.session.user.id);
   if (!game.active) {
     throw new GameStateError('Can not play card in inactive game')
   }
@@ -23,20 +21,16 @@ export const playCardEvent: EventFunctionWithGame<number> = async(
   const card = game.currentUser.findCard(cardId)
   await card.play()
   game.currentUser.hasPlayed = true
-  return game
+  await emitUpdateEvent(io, game)
 }
 
 /**
  * Flip card event
  * Will flip the card on the game that the user
  * is attached to. If allowed by game rules.
- * @param game
- * @param cardId
  */
-export const flipCardEvent: EventFunctionWithGame<number> = async(
-  game,
-  cardId: number
-): Promise<Game> => {
+export async function flipCardEvent(io: Server, socket: SocketWithSession, cardId: number) {
+  const game = await getGameFromUser(socket.request.session.user.id);
   if (!game.active) {
     throw new GameStateError('Can not flip card in inactive game')
   }
@@ -51,17 +45,16 @@ export const flipCardEvent: EventFunctionWithGame<number> = async(
   }
   const card = game.findCard(cardId)
   await card.flip()
-  return game
+  await emitUpdateEvent(io, game)
 }
 
 /**
  * Vote card event
  * Will vote for a card in the game that the user it attached to
  * if allowed by game rules.
- * @param game
- * @param cardId
  */
-export const voteCardEvent: EventFunctionWithGame<number> = async(game,cardId: number): Promise<Game> => {
+export async function voteCardEvent(io: Server, socket: SocketWithSession, cardId: number) {
+  const game = await getGameFromUser(socket.request.session.user.id);
   if (!game.active) {
     throw new GameStateError('Game is not active')
   }
@@ -84,5 +77,5 @@ export const voteCardEvent: EventFunctionWithGame<number> = async(game,cardId: n
   const winningUser = game.findUser(card.user_id_fk)
   winningUser.score += 1
   await card.winner()
-  return game
+  await emitUpdateEvent(io, game)
 }
