@@ -40,7 +40,7 @@ export const userSession = session({
   saveUninitialized: false,
   cookie: {
     secure: false,
-    maxAge: 864000,
+    maxAge: 1000 * 60 * 60 * 24, // (24 hours)
     httpOnly: false,
     sameSite: false,
   }
