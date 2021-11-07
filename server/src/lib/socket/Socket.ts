@@ -27,7 +27,7 @@ export class SocketServer extends Server {
               userId: socket.request.session.user.id,
               gameId: socket.request.session.user.game_fk,
             })
-            await handler(this, socket, args);
+            await handler(this, socket, ...args);
           }
         } catch (err) {
           await emitErrorEvent(err, socket);
