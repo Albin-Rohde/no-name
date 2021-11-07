@@ -1,4 +1,4 @@
-import {SocketWithSession} from "../../globalTypes";
+import {SocketWithSession} from "../../types";
 import {Server, ServerOptions} from "socket.io";
 import * as http from "http";
 import {userSession} from "../../app";
