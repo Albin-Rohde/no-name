@@ -14,7 +14,7 @@ export class GameTurn extends BaseEntity {
   @Column({name: 'turn_number'})
   turn_number: number
 
-  @ManyToOne(type => User)
+  @ManyToOne(type => User, { eager: true })
   @JoinColumn({name: 'card_wizz_user_id_fk'})
   cardWizz: User
 
