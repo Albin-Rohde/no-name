@@ -3,20 +3,20 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import {useEffect} from "react";
 import {useDispatch} from "react-redux";
-import {setWarning} from "../redux/redux";
+import {setNotification} from "../redux/redux";
 
-const WarningAlert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+const NotificationAlert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
   ref,
 ) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-interface WarningSnackProps {
+interface NotificationProps {
   open: boolean
   message: string
 }
-export default function WarningSnack(props: WarningSnackProps) {
+export default function NotificationSnack(props: NotificationProps) {
   const [open, setOpen] = React.useState(props.open);
   const dispatch = useDispatch();
 
@@ -29,14 +29,14 @@ export default function WarningSnack(props: WarningSnackProps) {
       return;
     }
     setOpen(false);
-    dispatch(setWarning(null));
+    dispatch(setNotification(null));
   };
 
   return (
     <Snackbar open={open} autoHideDuration={4500} onClose={handleClose}>
-      <WarningAlert onClose={handleClose} severity="warning" sx={{ width: '100%' }}>
+      <NotificationAlert onClose={handleClose} severity="info" sx={{ width: '100%' }}>
         {props.message}
-      </WarningAlert>
+      </NotificationAlert>
     </Snackbar>
   );
 }
