@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express'
 import {loginRequired, handleRestError} from '../middlewares'
-import {RestResponse} from "../globalTypes";
+import {RestResponse} from "../types";
 import {getLogs} from "./logger";
 
 const logRouter = Router()
