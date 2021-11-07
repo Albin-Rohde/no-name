@@ -166,3 +166,12 @@ export async function nextRoundEvent(io: Server, socket: SocketWithSession) {
   await nextTurn()
   await emitUpdateEvent(io, game);
 }
+
+export async function notifyCardWizzEvent(io: Server, socket: SocketWithSession) {
+  const game = await getGameFromUser(socket.request.session.user.id);
+  if (game.active) {
+    const cardWizz = game.currentTurn.cardWizz;
+    const message = `${cardWizz.username} is card wizz this turn`
+    io.in(game.key).emit('notification', message);
+  }
+}

@@ -21,6 +21,7 @@ import {
   joinGameEvent,
   leaveGameEvent,
   nextRoundEvent,
+  notifyCardWizzEvent,
   playAgainEvent,
   startGameEvent
 } from "./game/events";
@@ -134,7 +135,7 @@ export const appendListeners = (io: SocketServer) => {
   io.addEventHandler(Events.DELETE_GAME, deleteGameEvent)
   io.addEventHandler(Events.PLAY_CARD, playCardEvent)
   io.addEventHandler(Events.FLIP_CARD, flipCardEvent)
-  io.addEventHandler(Events.VOTE_CARD, voteCardEvent, nextRoundEvent)
+  io.addEventHandler(Events.VOTE_CARD, voteCardEvent, nextRoundEvent, notifyCardWizzEvent)
 }
 
 startServer()
