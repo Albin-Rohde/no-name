@@ -1,9 +1,9 @@
 ## Config for live deployment
 - Alter these lines in `.env` located in the root (same directory as this readme).
   ```
-  REACT_APP_API_BASE_URL=https://app.yobotics/api
-  REACT_APP_SOCKET_BASE_URL=https://app.yobotics
-  CLIENT_URL=https://app.yobotics.club
+  REACT_APP_API_BASE_URL=https://fasoner.party/api
+  REACT_APP_SOCKET_BASE_URL=https://fasoner.party
+  CLIENT_URL=https://fasoner.party
   NGINX_CONF_FILE=nginx.live.conf
   NGINX_STAGE=0
   dns_cloudflare_api_token=<secret cloudlfalre token>
@@ -18,7 +18,6 @@
   certbot certonly \
     --dns-cloudflare \
     --dns-cloudflare-credentials .env \
-    -d yobotics.club \
-    -d www.yobotics.club \
-    -d app.yobotics.club
+    -d fasoner.party \
+    -d www.fasoner.party
   ```
