@@ -9,7 +9,7 @@ import {
   NotFoundError,
   GameRuleError
 } from "./error";
-import { RestResponse, SocketWithSession } from "./globalTypes";
+import { RestResponse, SocketWithSession } from "./types";
 import { logger, socketLogger } from "./logger/logger";
 import { getUserWithRelation } from "./user/services";
 import {Events} from "./app";

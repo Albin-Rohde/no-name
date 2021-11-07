@@ -1,6 +1,6 @@
 import {GameStateError, NotAllowedError} from "../error";
 import {CardState} from "./models/WhiteCardRef";
-import {SocketWithSession} from "../globalTypes";
+import {SocketWithSession} from "../types";
 import {Server} from "socket.io";
 import {emitUpdateEvent} from "../socketEmitters";
 import {getGameFromUser} from "../game/services";

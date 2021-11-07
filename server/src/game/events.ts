@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { setTimeoutAsync } from "../util";
-import { SocketWithSession } from "../globalTypes";
+import { SocketWithSession } from "../types";
 import { createNewGame, deleteGameFromUser, getGameFromUser, getGameRound, getGameWithRelations } from "./services";
 import { GameRuleError, GameStateError, NotFoundError } from "../error";
 import { getUserWithRelation } from "../user/services";

@@ -1,7 +1,7 @@
 import * as http from "http";
 import "reflect-metadata";
 import dotenv from 'dotenv'
-import { SocketWithSession } from "./globalTypes";
+import { SocketWithSession } from "./types";
 import { createConnection } from "typeorm";
 import { logger, expressLogger } from "./logger/logger";
 import express, {Application} from "express";
