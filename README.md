@@ -47,6 +47,7 @@ Read more about the server [here](./server/README.md).
   - docker
   - docker-compose
   - certbot
+  - certbot plugin dns_cloudflare
 
 ### Environments
 Both dev production and live require environments variables to run.
@@ -76,7 +77,6 @@ that further down.
 - Run `docker-compose up`
 - The app will now run on `http://app.localhost`, running the app like this is as close to the live set up as possible.
 - Backend can be accessed on `http://app.localhost/api/<endpoint>`
-- Log server can be accessed on `http://admin.localhost`
 
 ### Deploy live
 Latest master is always running in live. If a new commit/push/merge occurs on 
@@ -87,16 +87,27 @@ The live version can be accessed on app.yobotics.club
 ### Live configuration
 - Alter these lines in `.env` located in the root (same directory as this readme).
   ```
-  API_BASE_URL=https://app.yobotics.club/api
+  REACT_APP_API_BASE_URL=https://app.yobotics/api
+  REACT_APP_SOCKET_BASE_URL=https://app.yobotics
   CLIENT_URL=https://app.yobotics.club
   NGINX_CONF_FILE=nginx.live.conf
   NGINX_STAGE=0
-  dns_cloudflare_api_token=super_secret_token
+  dns_cloudflare_api_token=<secret cloudlfalre token>
   ```
 - Then run `docker-compose up`
 Note. Deploying live like this is only possible from the public ip `81.170.195.205`.
 And the local router must be forwarding port `443` and `80` to the machines local address.
 The `dns_cloudflare_api_token` is needed to retrieve and renew tsl/ssl certificate.
+
+- To set up the ssl certificate run the following command from root
+  ```shell
+  certbot certonly \
+    --dns-cloudflare \
+    --dns-cloudflare-credentials .env \
+    -d yobotics.club \
+    -d www.yobotics.club \
+    -d app.yobotics.club
+  ```
 
 ## How to play
 Begin by signing up or signing in. When logged in one is greeted by the "dashboard", from here the player can create a
