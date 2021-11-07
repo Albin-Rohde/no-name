@@ -31,6 +31,10 @@ export const setWarning = (warning: string) => ({
   type: 'SET_WARNING',
   warning
 })
+export const setNotification = (message: string) => ({
+  type: 'SET_NOTIFICATION',
+  message
+})
 
 // reducers.js
 export const user = (state: Game, action) => {
@@ -81,6 +85,14 @@ export const warning = (state: string, action) => {
       return state ?? null;
   }
 }
+export const notification = (state: string, action) => {
+  switch (action.type) {
+    case 'SET_NOTIFICATION':
+      return action.message;
+    default:
+      return state ?? null;
+  }
+}
 
 export const reducers = combineReducers({
   user,
@@ -89,6 +101,7 @@ export const reducers = combineReducers({
   socket,
   error,
   warning,
+  notification
 });
 
 export type Screens = 'home' | 'lobby' | 'game' | 'create-game'
@@ -100,6 +113,7 @@ export interface ReduxState {
   screen: Screens;
   error: string;
   warning: string;
+  notification: string;
 }
 
 const defaultState: ReduxState = {
@@ -109,6 +123,7 @@ const defaultState: ReduxState = {
   screen: 'home',
   error: null,
   warning: null,
+  notification: null,
 }
 
 export function configureStore(initialState: ReduxState) {

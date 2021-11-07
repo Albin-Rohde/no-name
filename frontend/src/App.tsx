@@ -8,11 +8,12 @@ import MenuAppBar from "./components/MenuAppBar";
 import RestClient from "./clients/RestClient";
 import Spinner from "./components/Spinner";
 import { useDispatch, useSelector } from "react-redux";
-import {ReduxState, updateUser, setError, updateGame} from "./redux/redux";
+import {ReduxState, updateUser, setError, updateGame, notification} from "./redux/redux";
 import { UserData} from "./clients/ResponseTypes";
 import User from "./clients/User";
 import LoggedIn from "./screens/loggedIn/LoggedIn";
 import WarningSnack from "./components/WarningSnack";
+import NotificationSnack from "./components/NotificationSnack";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -21,6 +22,7 @@ function App() {
   const user = useSelector<ReduxState, User | undefined>((state) => state.user);
   const error = useSelector<ReduxState, string>((state) => state.error);
   const warning = useSelector<ReduxState, string>((state) => state.warning);
+  const notification = useSelector<ReduxState, string>((state) => state.notification);
   const dispatch = useDispatch();
   const rest = new RestClient();
 
@@ -122,6 +124,7 @@ function App() {
       <React.Fragment>
         <ErrorSnack open={!!error} message={error}/>
         <WarningSnack open={!!warning} message={warning}/>
+        <NotificationSnack open={!!notification} message={notification}/>
         <LoggedIn/>
       </React.Fragment>
     )
@@ -141,6 +144,8 @@ function App() {
   return (
     <React.Fragment>
       <ErrorSnack open={!!error} message={error}/>
+      <WarningSnack open={!!warning} message={warning}/>
+      <NotificationSnack open={!!notification} message={notification}/>
       <MenuAppBar/>
       {renderScreen()}
     </React.Fragment>
