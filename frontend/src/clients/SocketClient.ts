@@ -1,5 +1,4 @@
 import autoBind from "auto-bind";
-// @ts-ignore
 import { io, Socket } from "socket.io-client";
 import { HandleError } from "../utils/decorator";
 import Game from "./Game";
@@ -7,6 +6,8 @@ import type { CardResponse, GameSocketResponse, UserResponse } from "./ResponseT
 import { CardState } from "./ResponseTypes";
 import {config} from "dotenv";
 import {GameRuleError} from "./error";
+import {setNotification, store} from "../redux/redux";
+
 config()
 
 type RerenderCallback = (disconnect?: boolean) => any
@@ -74,6 +75,9 @@ export class SocketClient {
     this.socket.on('rule_error', (err: string) => {
       console.error('rule_error: ', err)
       onErrorCb(new GameRuleError(err));
+    })
+    this.socket.on('notification', (message) => {
+      store.dispatch(setNotification(message));
     })
     return new Promise(resolve => {
       this.socket.on('connected', () => {
