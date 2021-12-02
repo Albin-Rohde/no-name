@@ -104,16 +104,6 @@ export default function SwipeableEdgeDrawer(props: Props) {
               Round {game.currentRound} of {game.gameOptions.rounds}
             </Typography>
           </Paper>
-          <Paper sx={{
-            paddingTop: '15px',
-            paddingBottom: '15px',
-            backgroundColor: '#282c36',
-            marginBottom: '3vh'
-          }}>
-            <Typography color='white' variant={'body1'} sx={{marginLeft: '3vw'}}>
-              Current Card wizz: {game.users.find(u => u.cardWizz).username}
-            </Typography>
-          </Paper>
           <DataTable/>
         </StyledBox>
       </SwipeableDrawer>
