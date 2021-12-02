@@ -21,6 +21,7 @@ export default class Game {
   public finished: boolean = false
   public nextGameKey: string
   public connected: boolean = false;
+  public lastFlipped?: CardResponse = undefined;
 
   constructor(currentUser: UserResponse, game?: GameSocketResponse) {
     if(game) {

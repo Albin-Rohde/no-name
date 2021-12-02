@@ -1,10 +1,8 @@
-import {
-  combineReducers,
-  createStore,
-} from 'redux';
+import {combineReducers, createStore,} from 'redux';
 import Game from "../clients/Game";
 import {SocketClient} from "../clients/SocketClient";
 import User from "../clients/User";
+import {CardResponse, CardState} from "../clients/ResponseTypes";
 
 export const updateUser = (user: User) => ({
   type: 'UPDATE_USER',
@@ -56,6 +54,13 @@ export const screen = (state: Screens, action) => {
 export const game = (state: Game, action) => {
   switch (action.type) {
     case 'UPDATE_GAME':
+      if (state?.currentTurn !== action.game?.currentTurn) {
+        return action.game
+      }
+      const prevFlipped: number[] = state.playedCards.filter(c => c.state === CardState.PLAYED_SHOW).map(c => c.id)
+      const currentFlipped: CardResponse[] = action.game.playedCards.filter(c => c.state === CardState.PLAYED_SHOW)
+      const lastFlipped: CardResponse | undefined = currentFlipped.find((c) => !prevFlipped.includes(c.id));
+      action.game.lastFlipped = lastFlipped;
       return action.game;
     default:
       return state ?? null;
