@@ -10,6 +10,8 @@ import Paper from '@mui/material/Paper';
 import {useSelector} from "react-redux";
 import {ReduxState} from "../redux/redux";
 import Game from "../clients/Game";
+import {UserResponse} from "../clients/ResponseTypes";
+import CrownIcon from "./CrownIcon";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -39,7 +41,7 @@ interface DataTableProps {
 }
 export default function DataTable(props: DataTableProps) {
   const game = useSelector<ReduxState, Game>((state) => state.game);
-  let users = [];
+  let users: UserResponse[] = [];
   if (props.sortByScore) {
     users = game.users.sort((a, b) => b.score - a.score);
   } else {
@@ -52,6 +54,7 @@ export default function DataTable(props: DataTableProps) {
           <TableRow>
             <StyledTableCell align={'left'}>Players</StyledTableCell>
             <StyledTableCell align={'left'}>Score</StyledTableCell>
+            <StyledTableCell width={'20px'} align={'left'}>Cardwizz</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -62,6 +65,9 @@ export default function DataTable(props: DataTableProps) {
               </StyledTableCell>
               <StyledTableCell align={'left'} component="th" scope="row">
                 {user.score}
+              </StyledTableCell>
+              <StyledTableCell align={'center'} component="th" scope="row">
+                {user.cardWizz && (<CrownIcon/>)}
               </StyledTableCell>
             </StyledTableRow>
           ))}
