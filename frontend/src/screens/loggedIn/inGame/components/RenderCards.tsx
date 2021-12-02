@@ -96,7 +96,7 @@ const RenderCards = (props: RenderCardsProps) => {
           marginTop: '2vh',
           scrollSnapType: 'x mandatory',
         }}>
-          <CardsList cards={state.cards} blackCard={state.blackCard} cardClickCb={state.cardClickCb}/>
+          <CardsList cards={state.cards} lastFlipped={props.game.lastFlipped} blackCard={state.blackCard} cardClickCb={state.cardClickCb}/>
         </Box>
       </Box>
     )
@@ -107,7 +107,7 @@ const RenderCards = (props: RenderCardsProps) => {
           {state.helpText}
         </Typography>
         <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '2vh'}}>
-          <CardsList cards={state.cards} blackCard={state.blackCard} cardClickCb={state.cardClickCb}/>
+          <CardsList cards={state.cards} lastFlipped={props.game.lastFlipped} blackCard={state.blackCard} cardClickCb={state.cardClickCb}/>
         </Box>
       </Box>
     )

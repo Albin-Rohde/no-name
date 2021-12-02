@@ -1,11 +1,12 @@
 import {Card, CardContent, Typography} from "@mui/material";
-import React from "react";
+import React, {useEffect} from "react";
 import {BlackCardResponse, CardResponse, CardState} from '../../../../clients/ResponseTypes';
 
 interface CardsListProps {
   cards: CardResponse[];
   blackCard: BlackCardResponse;
   cardClickCb: (card: CardResponse) => any;
+  lastFlipped: CardResponse;
 }
 
 const CARD_STYLE = {
@@ -37,6 +38,13 @@ const CARD_STYLE_DESKTOP = {
 const CardsList = (props: CardsListProps) => {
   const isMobile = window.screen.width < 800;
 
+  useEffect(() => {
+    if (!props.lastFlipped) {
+      return;
+    }
+    const cardRef = document.getElementById(props.lastFlipped.id.toString());
+    cardRef.scrollIntoView({behavior: 'smooth'});
+  }, [props.lastFlipped])
   const getCardText = (card: CardResponse) => {
     const mergedCardText = () => {
       const blackTextParts = props.blackCard.text.split('_');
@@ -58,6 +66,7 @@ const CardsList = (props: CardsListProps) => {
     const cardStyle = isMobile ? CARD_STYLE_MOBILE : CARD_STYLE_DESKTOP;
     return (
       <Card
+        id={card.id.toString()}
         sx={cardStyle}
         className='noSelect' // prevent some default behaviour regarding clickables.
         onClick={() => props.cardClickCb(card)}
