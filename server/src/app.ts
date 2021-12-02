@@ -36,7 +36,7 @@ export interface ServerOptions {
 
 export const userSession = session({
   name: 'sid',
-  secret: 'keyboard cat',
+  secret: 'keyboard cat', // TODO: add a more secure secret.
   resave: false,
   saveUninitialized: false,
   cookie: {
