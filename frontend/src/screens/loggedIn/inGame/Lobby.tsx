@@ -40,7 +40,7 @@ const Lobby = (props: LobbyProps) => {
         </Grid>
       </Grid>
       <Box sx={{marginTop: '3vh', display: 'flex', justifyContent: 'center'}}>
-        <Grid item xs={9} sm={7} md={4} sx={{marginTop: '7vh'}}>
+        <Grid item xs={9} sm={7} md={4} sx={{marginTop: '1.5vh'}}>
           <TextField
             value={game.joinKey}
             variant='outlined'
