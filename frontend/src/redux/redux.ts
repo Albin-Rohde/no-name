@@ -1,5 +1,5 @@
 import {combineReducers, createStore,} from 'redux';
-import Game from "../clients/Game";
+import Game, {GameState} from "../clients/Game";
 import {SocketClient} from "../clients/SocketClient";
 import User from "../clients/User";
 import {CardResponse, CardState} from "../clients/ResponseTypes";
@@ -54,6 +54,9 @@ export const screen = (state: Screens, action) => {
 export const game = (state: Game, action) => {
   switch (action.type) {
     case 'UPDATE_GAME':
+      if (!state || !state.active || state.state !== GameState.FLIPPING) {
+        return action.game
+      }
       if (state?.currentTurn !== action.game?.currentTurn) {
         return action.game
       }

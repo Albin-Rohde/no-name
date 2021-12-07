@@ -43,7 +43,7 @@ const CardsList = (props: CardsListProps) => {
       return;
     }
     const cardRef = document.getElementById(props.lastFlipped.id.toString());
-    cardRef.scrollIntoView({behavior: 'smooth'});
+    cardRef.scrollIntoView({behavior: 'smooth', block: 'center'});
   }, [props.lastFlipped])
   const getCardText = (card: CardResponse) => {
     const mergedCardText = () => {
@@ -68,7 +68,7 @@ const CardsList = (props: CardsListProps) => {
       <Card
         id={card.id.toString()}
         sx={cardStyle}
-        className='noSelect' // prevent some default behaviour regarding clickables.
+        className='noSelect playedCards' // prevent some default behaviour regarding clickables.
         onClick={() => props.cardClickCb(card)}
       >
         <CardContent>
