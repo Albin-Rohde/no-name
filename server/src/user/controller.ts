@@ -1,11 +1,16 @@
 import { Router, Request, Response } from 'express'
 import {handleRestError, loginRequired} from '../middlewares'
-import { createUser } from './services'
+import {createUser, updateUser} from './services'
 import {RestResponse} from "../types";
 import {User} from "./models/User";
 import {AuthenticationError, BadRequestError} from "../error";
 import bcrypt from "bcrypt";
+import {createClient} from "redis";
+import { v4 as uuid } from 'uuid';
+import sgMail from '@sendgrid/mail';
+import passwordReset from "../email-templates/password-reset";
 
+const redis = createClient();
 const userRouter = Router()
 
 
@@ -89,6 +94,60 @@ userRouter.post('/register', async (req: Request, res: Response) => {
     res.json(response)
   } catch(err) {
     handleRestError(req, res, err)
+  }
+})
+
+userRouter.post('/forgot', async (req: Request, res: Response) => {
+  try {
+    const user = await User.findOneOrFail({email: req.body.email});
+    const link = uuid();
+    await redis.set(link, user.id.toString(), 'EX', 60 * 60); // 1 hour
+    sgMail.setApiKey(process.env.SENDGRID_API_TOKEN);
+    const msg = {
+      to: user.email,
+      from: 'support@fasoner.party',
+      subject: 'Password reset',
+      html: passwordReset(user.username, link),
+    }
+    await sgMail.send(msg);
+    const response: RestResponse<null> = {
+      ok: true,
+      err: null,
+      data: null,
+    }
+    res.json(response);
+  } catch (err) {
+    handleRestError(req, res, err)
+  }
+});
+
+userRouter.get('reset/:id', async (req: Request, res: Response) => {
+  try {
+    const userId = await redis.get(req.params.id);
+    const user = await User.findOneOrFail(Number(userId));
+    const response: RestResponse<User> = {
+      ok: true,
+      err: null,
+      data: user,
+    }
+    res.json(response);
+  } catch (err) {
+    handleRestError(req, res, err);
+  }
+});
+
+userRouter.post('reset/:id', async (req: Request, res: Response) => {
+  try {
+    const userId = await redis.get(req.params.id);
+    await updateUser({...req.body, id: userId});
+    const response: RestResponse<null> = {
+      ok: true,
+      err: null,
+      data: null,
+    };
+    res.json(response);
+  } catch (err) {
+    handleRestError(req, res, err);
   }
 })
 

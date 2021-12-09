@@ -51,3 +51,26 @@ export async function createUser (body: CreateUserData) {
   await user.save()
   return user
 }
+
+type UpdateUserData = Partial<CreateUserData> & { id: number };
+
+export async function updateUser(input: UpdateUserData) {
+  if (!input.id) {
+    throw new BadRequestError('user id required to update user');
+  }
+  if (!input.email && !input.password && !input.username) {
+    throw new BadRequestError('email, password or username required to make update');
+  }
+  const updateQuery = User.createQueryBuilder('user')
+    .where('user.id = :id', { id: input.id })
+  if (input.email) {
+    updateQuery.update({email: input.email});
+  }
+  if (input.username) {
+    updateQuery.update({username: input.username});
+  }
+  if (input.password) {
+    updateQuery.update({password: input.password});
+  }
+  await updateQuery.execute();
+}
