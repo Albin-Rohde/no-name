@@ -1,5 +1,5 @@
 export default function (username: string, key: string) {
-  const link = `${process.env.CLIENT_URL}/user/reset/${key}`;
+  const link = `${process.env.CLIENT_URL}/reset/${key}`;
   return `
     <html>
     <head>
@@ -11,7 +11,7 @@ export default function (username: string, key: string) {
         Hi ${username}, You are recieving this email to reset your password on fasoner.party. 
         If you did not request this, please disregard this email.<br><br>
         
-        Reset your account password by followin this link <a href=${link}'>${link}</a>
+        Reset your account password by followin this link <a clicktracking="off" href=${link}>${link}</a>
         The link will expire in one hour.
       </div>
     </body>

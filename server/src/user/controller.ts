@@ -3,7 +3,7 @@ import {handleRestError, loginRequired} from '../middlewares'
 import {createUser, updateUser} from './services'
 import {RestResponse} from "../types";
 import {User} from "./models/User";
-import {AuthenticationError} from "../error";
+import {AuthenticationError, ExpectedError} from "../error";
 import bcrypt from "bcrypt";
 import { v4 as uuid } from 'uuid';
 import sgMail from '@sendgrid/mail';
@@ -104,7 +104,12 @@ userRouter.post('/register', async (req: Request, res: Response) => {
 userRouter.post('/send-reset', async (req: Request, res: Response) => {
   try {
     const { email } = emailSchema.validateSync(req.body);
-    const user = await User.findOneOrFail({email});
+    const user = await User.createQueryBuilder('user')
+      .where('LOWER(user.email) = :email', { email: email.toLowerCase() })
+      .getOne()
+    if (!user) {
+      throw new ExpectedError('No account with that email')
+    }
     const key = uuid();
     await redis.set(key, user.id.toString(), 60 * 60); // 1 hour
     sgMail.setApiKey(process.env.SENDGRID_API_TOKEN);
