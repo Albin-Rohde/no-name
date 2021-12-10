@@ -1,17 +1,30 @@
 import React, {useState} from 'react'
 import {Box, Button, Container, Grid, TextField, Typography} from "@mui/material";
+import RestClient from "../clients/RestClient";
+import {useDispatch} from "react-redux";
+import {setError, setNotification} from "../redux/redux";
 
-interface LoginProps {
-  login: (email: string, password: string) => Promise<void>;
+interface ForgotPasswordProps {
   navigate: (screen: string) => void;
 }
 
-const Login = (props: LoginProps) => {
+const ForgotPassword = (props: ForgotPasswordProps) => {
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const rest = new RestClient()
+  const dispatch = useDispatch();
 
-  const handleLogin = () => {
-    props.login(email, password)
+  const sendReset = async () => {
+    try {
+      await rest.makeRequest({
+        method: 'post',
+        route: 'user',
+        action: 'send-reset',
+        data: {email}
+      })
+      dispatch(setNotification('You will receive an email shortly'));
+    } catch (err) {
+      dispatch(setError(err.message));
+    }
   }
 
   return(
@@ -34,26 +47,14 @@ const Login = (props: LoginProps) => {
                 style={{width: '100%', marginBottom: '2vh'}}
                 placeholder="Email"
               />
-              <TextField
-                value={password}
-                variant='standard'
-                type='password'
-                onChange={(e) => {
-                  e.preventDefault()
-                  setPassword(e.target.value)
-                }}
-                style={{width: '100%', marginBottom: '2vh'}}
-                placeholder="Password"
-              />
             </Grid>
           </Box>
           <Box sx={{display: 'flex', justifyContent: 'center'}}>
             <Grid item xs={12} md={10}>
-              <Button variant="outlined" style={{width: '100%', marginTop: '1vh'}} onClick={handleLogin}>Login</Button>
+              <Button variant="outlined" style={{width: '100%', marginTop: '1vh'}} onClick={sendReset}>Send reset email</Button>
               <Typography variant='body1' align='left' sx={{marginTop: '3vh', color: 'white'}}>
                 Dont have an account yet? <Typography variant='body1' style={{cursor: 'pointer', color: '#799ac7'}} onClick={() => props.navigate('register')}>Register</Typography>
               </Typography>
-              <Typography variant='body1' style={{cursor: 'pointer', color: '#799ac7'}} onClick={() => props.navigate('forgot')}>I forgot my password</Typography>
             </Grid>
           </Box>
           <Grid item xs={2} sm={3} md={4}/>
@@ -63,4 +64,4 @@ const Login = (props: LoginProps) => {
   )
 }
 
-export default Login;
+export default ForgotPassword;

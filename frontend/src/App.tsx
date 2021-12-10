@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-
+import { Route, Switch } from "react-router-dom";
 import './App.css';
 import Register from "./screens/Register";
 import ErrorSnack from "./components/ErrorSnack";
@@ -14,10 +14,12 @@ import User from "./clients/User";
 import LoggedIn from "./screens/loggedIn/LoggedIn";
 import WarningSnack from "./components/WarningSnack";
 import NotificationSnack from "./components/NotificationSnack";
+import Reset from "./screens/Reset";
+import ForgotPassword from "./screens/ForgotPassword";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
-  const [screen, setScreen] = useState<'register' | 'login'>('register');
+  const [screen, setScreen] = useState<'register' | 'login' | 'forgot'>('register');
   const [longPollActive, setLongPollActive] = useState<boolean>(false);
   const user = useSelector<ReduxState, User | undefined>((state) => state.user);
   const error = useSelector<ReduxState, string>((state) => state.error);
@@ -26,7 +28,7 @@ function App() {
   const dispatch = useDispatch();
   const rest = new RestClient();
 
-  const navigate = (screen: 'login' | 'register') => {
+  const navigate = (screen: 'login' | 'register' | 'forgot') => {
     setScreen(screen)
   }
 
@@ -136,6 +138,8 @@ function App() {
         return <Register register={register} navigate={navigate}/>
       case 'login':
         return <Login login={login} navigate={navigate}/>
+      case 'forgot':
+        return <ForgotPassword navigate={navigate}/>
       default:
         return <Register register={register} navigate={navigate}/>
     }
@@ -147,7 +151,14 @@ function App() {
       <WarningSnack open={!!warning} message={warning}/>
       <NotificationSnack open={!!notification} message={notification}/>
       <MenuAppBar/>
-      {renderScreen()}
+      <Switch>
+        <Route path={"/reset"}>
+          <Reset/>
+        </Route>
+        <Route path={"/"}>
+          {renderScreen()}
+        </Route>
+      </Switch>
     </React.Fragment>
   )
 }
