@@ -12,7 +12,7 @@ import {
 import { RestResponse, SocketWithSession } from "./types";
 import { logger, socketLogger } from "./logger/logger";
 import { getUserWithRelation } from "./user/services";
-import {Events} from "./app";
+import {ValidationError} from "yup";
 
 const authUser = async (sessionUser: User) => {
   if(!sessionUser) {
@@ -62,12 +62,16 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
     data: null
   }
   if (err instanceof GameRuleError) {
-    logger.warn(err)
+    logger.warn(err);
     return res.status(200).json(response);
   }
   if (err instanceof ExpectedError) {
-    logger.error(err)
+    logger.error(err);
     return res.status(200).json(response);
+  }
+  if (err instanceof ValidationError) {
+    logger.warn(err);
+    return res.status(200).json(response)
   }
   // makes sure any unexpected error is not sent to client.
   logger.error(err)
