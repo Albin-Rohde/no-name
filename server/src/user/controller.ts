@@ -3,14 +3,16 @@ import {handleRestError, loginRequired} from '../middlewares'
 import {createUser, updateUser} from './services'
 import {RestResponse} from "../types";
 import {User} from "./models/User";
-import {AuthenticationError, BadRequestError} from "../error";
+import {AuthenticationError} from "../error";
 import bcrypt from "bcrypt";
-import {createClient} from "redis";
 import { v4 as uuid } from 'uuid';
 import sgMail from '@sendgrid/mail';
 import passwordReset from "../email-templates/password-reset";
+import {CreateInput, createSchema, LoginInput, loginSchema, emailSchema, updateSchema} from "./schema";
+import {Redis} from "../redis";
+import {logger} from "../logger/logger";
 
-const redis = createClient();
+const redis = new Redis();
 const userRouter = Router()
 
 
@@ -44,15 +46,14 @@ userRouter.post('/login', async (req: Request, res: Response) => {
     } as RestResponse<User>)
   }
   try {
-    if(!req.body.email || !req.body.password) {
-      throw new BadRequestError(`'email' and 'password' required on body`)
-    }
-    const user = await User.findOne({email: req.body.email})
+    const input: LoginInput = loginSchema.validateSync(req.body)
+    const user = await User.findOne({email: input.email})
     if(!user) {
-      throw new AuthenticationError(`Could not find <User> with email ${req.body.email}`)
+      throw new AuthenticationError(`Incorrect email or password`)
     }
-    if(!await bcrypt.compare(req.body.password, user.password)) {
-      throw new AuthenticationError('Incorrect password')
+    const passwordOk = await bcrypt.compare(input.password, user.password)
+    if (!passwordOk) {
+      throw new AuthenticationError('Incorrect email or password')
     }
     req.session.user = user
     req.session.save(() => null)
@@ -83,7 +84,8 @@ userRouter.post('/logout', loginRequired, async (req: Request, res: Response): P
  */
 userRouter.post('/register', async (req: Request, res: Response) => {
   try {
-    const user = await createUser(req.body)
+    const input: CreateInput = createSchema.validateSync(req.body)
+    const user = await createUser(input)
     req.session.user = user
     req.session.save(() => null)
     const response: RestResponse<User> = {
@@ -97,19 +99,25 @@ userRouter.post('/register', async (req: Request, res: Response) => {
   }
 })
 
-userRouter.post('/forgot', async (req: Request, res: Response) => {
+userRouter.post('/send-reset', async (req: Request, res: Response) => {
   try {
-    const user = await User.findOneOrFail({email: req.body.email});
-    const link = uuid();
-    await redis.set(link, user.id.toString(), 'EX', 60 * 60); // 1 hour
+    const { email } = emailSchema.validateSync(req.body);
+    const user = await User.findOneOrFail({email});
+    const key = uuid();
+    await redis.set(key, user.id.toString(), 60 * 60); // 1 hour
     sgMail.setApiKey(process.env.SENDGRID_API_TOKEN);
     const msg = {
       to: user.email,
       from: 'support@fasoner.party',
       subject: 'Password reset',
-      html: passwordReset(user.username, link),
+      html: passwordReset(user.username, key),
     }
-    await sgMail.send(msg);
+    if (process.env.CLIENT_URL.includes('localhost')) {
+      // Do not send email when running locally.
+      logger.info(`${process.env.CLIENT_URL}/reset/${key}`);
+    } else {
+      await sgMail.send(msg);
+    }
     const response: RestResponse<null> = {
       ok: true,
       err: null,
@@ -121,14 +129,22 @@ userRouter.post('/forgot', async (req: Request, res: Response) => {
   }
 });
 
-userRouter.get('reset/:id', async (req: Request, res: Response) => {
+userRouter.get('/reset/:key', async (req: Request, res: Response) => {
   try {
-    const userId = await redis.get(req.params.id);
+    const userId = await redis.get(req.params.key)
+    if (!userId) {
+      throw new AuthenticationError('incorrect reset link')
+    }
     const user = await User.findOneOrFail(Number(userId));
-    const response: RestResponse<User> = {
+    const userData = {
+      username: user.username,
+      email: user.email,
+      id: user.id,
+    }
+    const response: RestResponse<Pick<User, 'username' & 'email' & 'id'>> = {
       ok: true,
       err: null,
-      data: user,
+      data: userData,
     }
     res.json(response);
   } catch (err) {
@@ -136,10 +152,15 @@ userRouter.get('reset/:id', async (req: Request, res: Response) => {
   }
 });
 
-userRouter.post('reset/:id', async (req: Request, res: Response) => {
+userRouter.post('/reset/:key', async (req: Request, res: Response) => {
   try {
-    const userId = await redis.get(req.params.id);
-    await updateUser({...req.body, id: userId});
+    const userId = await redis.get(req.params.key);
+    if (!userId) {
+      throw new AuthenticationError('incorrect reset link')
+    }
+    const input = updateSchema.validateSync({...req.body, id: userId})
+    await updateUser(input);
+    await redis.del(req.params.key);
     const response: RestResponse<null> = {
       ok: true,
       err: null,

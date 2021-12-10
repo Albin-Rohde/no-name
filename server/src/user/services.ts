@@ -1,5 +1,5 @@
 import { User } from './models/User'
-import {BadRequestError, CreateError} from "../error";
+import {CreateError} from "../error";
 import bcrypt from "bcrypt";
 
 /**
@@ -34,9 +34,6 @@ interface CreateUserData {
  * @param body
  */
 export async function createUser (body: CreateUserData) {
-  if(!body.email || !body.password || !body.username) {
-    throw new BadRequestError(`'email', 'password' and 'username' required on body`)
-  }
   const existingUser = await User.createQueryBuilder('user')
     .where('user.email = :email', {email: body.email})
     .orWhere('user.username = :username', {username: body.username})
@@ -55,22 +52,15 @@ export async function createUser (body: CreateUserData) {
 type UpdateUserData = Partial<CreateUserData> & { id: number };
 
 export async function updateUser(input: UpdateUserData) {
-  if (!input.id) {
-    throw new BadRequestError('user id required to update user');
-  }
-  if (!input.email && !input.password && !input.username) {
-    throw new BadRequestError('email, password or username required to make update');
-  }
-  const updateQuery = User.createQueryBuilder('user')
-    .where('user.id = :id', { id: input.id })
+  const user = await User.findOneOrFail(input.id);
   if (input.email) {
-    updateQuery.update({email: input.email});
+    user.email = input.email;
   }
   if (input.username) {
-    updateQuery.update({username: input.username});
+    user.username = input.username;
   }
   if (input.password) {
-    updateQuery.update({password: input.password});
+    user.password = await bcrypt.hash(input.password, 10)
   }
-  await updateQuery.execute();
+  await user.save();
 }
