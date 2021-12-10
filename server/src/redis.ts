@@ -3,7 +3,7 @@ import {createClient, RedisClient} from "redis";
 export class Redis {
   private client: RedisClient = null;
   constructor() {
-    this.client = createClient();
+    this.client = createClient({host: process.env.REDIS_HOST || '127.0.0.1'});
   }
 
   async set(key: string, value: string, ttl?: number): Promise<void> {
