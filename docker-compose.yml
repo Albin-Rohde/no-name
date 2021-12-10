@@ -63,6 +63,9 @@ services:
     networks:
       - local
       - public
+    links:
+      - server
+      - frontend
     ports:
       - 80:80
       - 443:443
