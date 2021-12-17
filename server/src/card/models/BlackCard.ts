@@ -1,5 +1,5 @@
 import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique} from "typeorm";
-import {CardDeck} from "../../cardDeck/models/CardDeck";
+import {CardDeck} from "./CardDeck";
 
 @Entity('black_card')
 
