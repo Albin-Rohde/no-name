@@ -1,6 +1,6 @@
 import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinColumn, ManyToOne, Unique, OneToMany} from "typeorm"
 import { WhiteCardRef } from "./WhiteCardRef"
-import {CardDeck} from "../../cardDeck/models/CardDeck";
+import {CardDeck} from "./CardDeck";
 
 export enum WhiteCardType {
   NOUN='noun',

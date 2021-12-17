@@ -12,7 +12,7 @@ import session from "express-session";
 import {User} from "./user/models/User";
 import userRoute from "./user/controller";
 import gameRouter from "./game/controller";
-import cardDeckRouter from "./cardDeck/controller";
+import cardRouter from "./card/controller";
 import logRouter from "./logger/controller";
 import { flipCardEvent, playCardEvent, voteCardEvent } from "./card/events";
 import {
@@ -110,7 +110,7 @@ function registerRoutes(app: Application) {
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
   // TODO: rename this route to card-deck or something
-  app.use('/card', cardDeckRouter)
+  app.use('/card', cardRouter)
   app.use('/logs', logRouter)
 }
 

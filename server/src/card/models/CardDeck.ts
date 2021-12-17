@@ -1,6 +1,6 @@
 import {BaseEntity, Column, Entity, Index, JoinColumn, OneToMany, PrimaryGeneratedColumn, Unique} from "typeorm";
-import {BlackCard} from "../../card/models/BlackCard";
-import {WhiteCard} from "../../card/models/WhiteCard";
+import {BlackCard} from "./BlackCard";
+import {WhiteCard} from "./WhiteCard";
 
 @Entity('card_deck')
 @Unique(['name'])
