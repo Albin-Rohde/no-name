@@ -5,6 +5,7 @@ import {RestResponse} from "../types";
 import {Game} from "./models/Game";
 import {User} from "../user/models/User";
 import {ExpectedError} from "../error";
+import {CreateInput, createSchema, joinSchema} from "./schema";
 
 const gameRouter = Router()
 
@@ -21,7 +22,8 @@ gameRouter.get('/', gameRequired, async (req: Request, res: Response) => {
 
 gameRouter.post('/', async (req: Request, res: Response) => {
   try{
-    const game = await createNewGame(req.session.user, req.body)
+    const input: CreateInput = createSchema.validateSync(req.body);
+    const game = await createNewGame(req.session.user, input)
     req.session.user.game = game
     req.session.save(() => null)
     const response: RestResponse<Game> = {
@@ -56,9 +58,9 @@ gameRouter.get('/users', gameRequired, async (req: Request, res: Response) => {
 
 gameRouter.get('/join', async (req: Request, res: Response) => {
   try {
-    const gameKey = req.query.key.toString()
+    const { key } = joinSchema.validateSync(req.query)
     const user = req.session.user
-    const game = await getGameFromJoinKey(gameKey)
+    const game = await getGameFromJoinKey(key)
     if (game.users.some(u => u.id === user.id)) {
       return res.redirect(process.env.CLIENT_URL)
     }
