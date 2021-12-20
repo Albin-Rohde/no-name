@@ -112,24 +112,22 @@ userRouter.post('/send-reset', async (req: Request, res: Response) => {
     }
     const key = uuid();
     await redis.set(key, user.id.toString(), 60 * 60); // 1 hour
-    sgMail.setApiKey(process.env.SENDGRID_API_TOKEN);
+    const response: RestResponse<null> = {
+      ok: true,
+      err: null,
+      data: null,
+    }
+    if (process.env.CLIENT_URL.includes('localhost')) {
+      logger.info(`${process.env.CLIENT_URL}/reset/${key}`);
+      return res.json(response);
+    }
     const msg = {
       to: user.email,
       from: 'support@fasoner.party',
       subject: 'Password reset',
       html: passwordReset(user.username, key),
     }
-    if (process.env.CLIENT_URL.includes('localhost')) {
-      // Do not send email when running locally.
-      logger.info(`${process.env.CLIENT_URL}/reset/${key}`);
-    } else {
-      await sgMail.send(msg);
-    }
-    const response: RestResponse<null> = {
-      ok: true,
-      err: null,
-      data: null,
-    }
+    await sgMail.send(msg);
     res.json(response);
   } catch (err) {
     handleRestError(req, res, err)
