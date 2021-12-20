@@ -50,9 +50,9 @@ const Lobby = (props: LobbyProps) => {
           <Button
             variant={'outlined'}
             sx={{width: '29%', height: '56px'}}
-            onClick={() => copyText(game.joinKey)}
+            onClick={() => copyText(`${process.env.REACT_APP_CLIENT_URL}/join/${game.joinKey}`)}
           >
-            Copy
+            Copy link
           </Button>
         </Grid>
       </Box>

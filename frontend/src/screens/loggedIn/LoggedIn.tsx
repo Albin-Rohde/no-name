@@ -15,6 +15,8 @@ import MenuAppBar from "../../components/MenuAppBar";
 import Home from "./Home";
 import SetupGame from "./SetupGame";
 import InGame from "./inGame/InGame";
+import JoinGame from "./inGame/JoinGame";
+import {Route} from "react-router-dom";
 
 const LoggedIn = () => {
   const [screen, setScreen] = useState<'home' | 'create-game'>('home');
@@ -83,7 +85,12 @@ const LoggedIn = () => {
   return (
     <React.Fragment>
       <MenuAppBar user={user} logout={handleLogout}/>
-      {renderScreen()}
+      <Route path={"/join"}>
+        <JoinGame/>
+      </Route>
+      <Route path={"/"}>
+        {renderScreen()}
+      </Route>
     </React.Fragment>
   );
 }

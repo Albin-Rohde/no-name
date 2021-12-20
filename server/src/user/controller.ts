@@ -117,6 +117,7 @@ userRouter.post('/send-reset', async (req: Request, res: Response) => {
       err: null,
       data: null,
     }
+    // Do not send email when running locally.
     if (process.env.CLIENT_URL.includes('localhost')) {
       logger.info(`${process.env.CLIENT_URL}/reset/${key}`);
       return res.json(response);

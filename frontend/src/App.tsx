@@ -16,6 +16,7 @@ import WarningSnack from "./components/WarningSnack";
 import NotificationSnack from "./components/NotificationSnack";
 import Reset from "./screens/Reset";
 import ForgotPassword from "./screens/ForgotPassword";
+import JoinGame from "./screens/loggedIn/inGame/JoinGame";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -154,6 +155,9 @@ function App() {
       <Switch>
         <Route path={"/reset"}>
           <Reset/>
+        </Route>
+        <Route path={"/join"}>
+          <JoinGame/>
         </Route>
         <Route path={"/"}>
           {renderScreen()}
