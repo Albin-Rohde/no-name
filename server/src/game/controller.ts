@@ -4,8 +4,9 @@ import {createNewGame, deleteGameFromUser, getGameFromJoinKey} from './services'
 import {RestResponse} from "../types";
 import {Game} from "./models/Game";
 import {User} from "../user/models/User";
-import {ExpectedError} from "../error";
+import {ExpectedError, NotFoundError} from "../error";
 import {CreateInput, createSchema, joinSchema} from "./schema";
+import {EntityNotFoundError} from "typeorm";
 
 const gameRouter = Router()
 
@@ -61,16 +62,24 @@ gameRouter.get('/join', async (req: Request, res: Response) => {
     const { key } = joinSchema.validateSync(req.query)
     const user = req.session.user
     const game = await getGameFromJoinKey(key)
+    const response: RestResponse<null> = {
+      ok: true,
+      err: null,
+      data: null,
+    }
     if (game.users.some(u => u.id === user.id)) {
-      return res.redirect(process.env.CLIENT_URL)
+      return res.json(response);
     }
     if (user.game_fk) {
       throw new ExpectedError('User is already connected to a different game')
     }
     game.addPlayer(user)
     await game.save()
-    res.redirect(process.env.CLIENT_URL)
+    res.json(response);
   } catch (err) {
+    if (err instanceof EntityNotFoundError) {
+      err = new ExpectedError('Incorrect game key')
+    }
     handleRestError(req, res, err)
   }
 })
