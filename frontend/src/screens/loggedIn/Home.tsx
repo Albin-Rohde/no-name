@@ -16,8 +16,8 @@ const Home = (props: HomeProps) => {
       dispatch(setError('Game key must be 5 character'));
       return;
     }
-    const baseUrl = process.env.REACT_APP_API_BASE_URL || '/api';
-    const joinUrl = `${baseUrl}/game/join?key=${joinKey}`;
+    const baseUrl = process.env.REACT_APP_CLIENT_URL;
+    const joinUrl = `${baseUrl}/join/${joinKey}`;
     window.location.replace(joinUrl);
   }
   return (
