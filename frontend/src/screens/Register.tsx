@@ -13,7 +13,7 @@ const Register = (props: RegisterProps) => {
   return(
     <Container>
       <Typography variant='h4' style={{color: 'white', textAlign: 'center', marginTop: '20vh'}}>
-        No-Name Game
+        No-Name Game2
       </Typography>
       <Grid container marginTop='18vh'>
         <Grid item xs={2} sm={3} md={4}/>
