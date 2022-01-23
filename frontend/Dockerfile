@@ -9,5 +9,6 @@ RUN npm install
 
 EXPOSE 3000
 COPY . .
+RUN chmod +x ./post-receive.sh
 
 CMD ["npm", "run", "deploy"]
