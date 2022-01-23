@@ -6,7 +6,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN chmod +x ./post-receive.sh
+RUN chmod +x ./deploy.sh
 
 
 EXPOSE 5000
