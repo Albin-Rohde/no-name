@@ -3,6 +3,7 @@ import * as expressWinston from 'express-winston'
 import {silly} from "winston";
 import fs from "fs";
 import readline from "readline";
+import Sentry from 'winston-sentry'
 
 /**
  * Custom Json formatter for formatting winston log files to json
@@ -35,6 +36,11 @@ const winstonConsoleFormat = winston.format.combine(
 export const expressLogger = expressWinston.logger({
   transports: [
     new winston.transports.File({ filename: 'requests.log' }),
+    new Sentry({
+      level: 'error',
+      dsn: process.env.SENTRY_DSN,
+      tags: { key: 'express-logger' },
+    })
   ],
   format: winstonFileFormat,
   expressFormat: true,
@@ -53,7 +59,13 @@ export const socketLogger = winston.createLogger({
   transports: [
     new winston.transports.Console({ format: winstonConsoleFormat }),
     new winston.transports.File({ filename: 'socket.log' }),
+    new Sentry({
+      level: 'error',
+      dsn: process.env.SENTRY_DSN,
+      tags: { key: 'socket-logger' },
+    })
   ],
+
 })
 
 /**
@@ -66,6 +78,11 @@ export const logger = winston.createLogger({
     new winston.transports.Console({ format: winstonConsoleFormat, level: 'silly' }),
     new winston.transports.File({ filename: 'error.log', level: 'error' }),
     new winston.transports.File({ filename: 'combined.log',level: 'info' }),
+    new Sentry({
+      level: 'error',
+      dsn: process.env.SENTRY_DSN,
+      tags: { key: 'logger' },
+    })
   ],
 })
 
