@@ -3,7 +3,7 @@ version: '3'
 services:
   server:
     container_name: server
-    restart: always
+    restart: unless-stopped
     build: ./server
     networks:
       - local
@@ -20,7 +20,7 @@ services:
   db:
     container_name: pg_db
     image: postgres
-    restart: always
+    restart: unless-stopped
     networks:
       - local
     ports:
@@ -30,7 +30,7 @@ services:
 
   frontend:
     container_name: frontend
-    restart: always
+    restart: unless-stopped
     build: ./frontend
     networks:
       - local
