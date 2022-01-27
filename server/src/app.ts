@@ -107,7 +107,9 @@ async function startServer() {
 }
 
 function registerRoutes(app: Application) {
-  app.get('/health', (_req, res) => res.send('OK2'))
+  app.get('/health', (_req, res) => {
+    res.status(200).send("OK");
+  })
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
   // TODO: rename this route to card-deck or something
