@@ -66,7 +66,7 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
     return res.status(200).json(response);
   }
   if (err instanceof ExpectedError) {
-    logger.error(err);
+    logger.warn(err);
     return res.status(200).json(response);
   }
   if (err instanceof ValidationError) {
