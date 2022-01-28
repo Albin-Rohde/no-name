@@ -35,14 +35,13 @@ const winstonConsoleFormat = winston.format.combine(
  */
 export const expressLogger = expressWinston.logger({
   transports: [
-    new winston.transports.File({ filename: 'requests.log' }),
+    new winston.transports.Console({ format: winstonConsoleFormat }),
     new Sentry({
       level: 'error',
       dsn: process.env.SENTRY_DSN,
       tags: { key: 'express-logger' },
     })
   ],
-  format: winstonFileFormat,
   expressFormat: true,
   colorize: false,
   ignoreRoute: function (req, res) {
@@ -58,7 +57,6 @@ export const socketLogger = winston.createLogger({
   defaultMeta: {service: 'socket'},
   transports: [
     new winston.transports.Console({ format: winstonConsoleFormat }),
-    new winston.transports.File({ filename: 'socket.log' }),
     new Sentry({
       level: 'error',
       dsn: process.env.SENTRY_DSN,
@@ -72,12 +70,9 @@ export const socketLogger = winston.createLogger({
  * All purpose logger, user for logging errors and other info's
  */
 export const logger = winston.createLogger({
-  format: winstonFileFormat,
   defaultMeta: {service: 'Server'},
   transports: [
     new winston.transports.Console({ format: winstonConsoleFormat, level: 'silly' }),
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log',level: 'info' }),
     new Sentry({
       level: 'error',
       dsn: process.env.SENTRY_DSN,
