@@ -28,9 +28,6 @@ import {
 import {SocketServer} from "./lib/socket/Socket";
 import * as Sentry from "@sentry/node";
 
-// Importing @sentry/tracing patches the global hub for tracing to work.
-import * as Tracing from "@sentry/tracing";
-
 /** Sentry config **/
 // This allows TypeScript to detect our global value
 declare global {

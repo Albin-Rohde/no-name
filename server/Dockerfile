@@ -15,4 +15,5 @@ EXPOSE 5000
 RUN npm run build
 
 ## From then on only run the node process, do not rebuild when container restarts
+ENV NODE_ENV=production
 CMD ["node", "/usr/src/server/build/src/app.js"]
