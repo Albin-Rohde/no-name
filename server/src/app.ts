@@ -26,7 +26,10 @@ import {
   startGameEvent
 } from "./game/events";
 import {SocketServer} from "./lib/socket/Socket";
+import * as Sentry from "@sentry/node";
 
+// Importing @sentry/tracing patches the global hub for tracing to work.
+import * as Tracing from "@sentry/tracing";
 
 /** Sentry config **/
 // This allows TypeScript to detect our global value
@@ -39,6 +42,10 @@ declare global {
 }
 global.__rootdir__ = __dirname || process.cwd();
 
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  tracesSampleRate: 1.0,
+});
 
 dotenv.config({path: '.env'})
 
