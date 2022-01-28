@@ -46,7 +46,7 @@ Sentry.init({
   dsn: process.env.SENTRY_DSN,
   tracesSampleRate: 1.0,
 });
-//Raven.config(process.env.SENTRY_DSN).install();
+Raven.config(process.env.SENTRY_DSN).install();
 
 export interface ServerOptions {
   port: number
@@ -98,9 +98,11 @@ async function startServer() {
       res.header({'Access-Control-Allow-Headers': options.clientUrl})
       next()
     })
+    app.use(Raven.requestHandler())
     app.use(userSession)
     app.use(expressLogger)
     registerRoutes(app)
+    app.use(Raven.errorHandler());
     const httpServer = http.createServer(app)
     const io = new SocketServer(httpServer, {
       cors: {
@@ -127,7 +129,7 @@ async function startServer() {
 
 function registerRoutes(app: Application) {
   app.get('/health', (_req, res) => {
-    res.status(200).send("OK2");
+    res.status(200).send("OK");
   })
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
