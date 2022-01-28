@@ -27,6 +27,9 @@ import {
 } from "./game/events";
 import {SocketServer} from "./lib/socket/Socket";
 import * as Sentry from "@sentry/node";
+import Raven from 'raven'
+
+dotenv.config({path: '.env'})
 
 /** Sentry config **/
 // This allows TypeScript to detect our global value
@@ -43,8 +46,7 @@ Sentry.init({
   dsn: process.env.SENTRY_DSN,
   tracesSampleRate: 1.0,
 });
-
-dotenv.config({path: '.env'})
+//Raven.config(process.env.SENTRY_DSN).install();
 
 export interface ServerOptions {
   port: number
