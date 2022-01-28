@@ -108,7 +108,7 @@ async function startServer() {
 
 function registerRoutes(app: Application) {
   app.get('/health', (_req, res) => {
-    res.status(200).send("OK");
+    res.status(200).send("OK2");
   })
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
