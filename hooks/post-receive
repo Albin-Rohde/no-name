@@ -1,3 +1,9 @@
 #!/bin/bash
 
-docker exec frontend ./deploy.sh & docker exec server ./deploy.sh && docker restart server
+## Rebuild containers
+cd ..
+docker-compose build server frontend
+## Restart containers
+docker-compose restart server frontend
+## Run migration in new container
+docker exec server sh -c "npm run migrate:latest"
