@@ -9,6 +9,7 @@ RUN npm install
 
 EXPOSE 3000
 COPY . .
-RUN chmod +x ./deploy.sh
 
-CMD ["npm", "run", "deploy"]
+RUN npm run build
+ENV NODE_ENV=production
+CMD ["npm", "run", "production"]
