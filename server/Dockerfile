@@ -6,14 +6,11 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN chmod +x ./deploy.sh
-
-
 EXPOSE 5000
 
 ## build app when container is created.
 RUN npm run build
 
-## From then on only run the node process, do not rebuild when container restarts
+## run the node process
 ENV NODE_ENV=production
 CMD ["node", "/usr/src/server/build/src/app.js"]
