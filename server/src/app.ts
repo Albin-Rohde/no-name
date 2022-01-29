@@ -28,6 +28,8 @@ import {
 import {SocketServer} from "./lib/socket/Socket";
 import * as Sentry from "@sentry/node";
 import Raven from 'raven'
+import redis from 'redis'
+import connectRedis from 'connect-redis'
 
 dotenv.config({path: '.env'})
 
@@ -52,10 +54,22 @@ export interface ServerOptions {
   port: number
   clientUrl: string
 }
+const RedisStore = connectRedis(session)
+const redisClient = redis.createClient({
+  host: process.env.REDIS_HOST,
+  port: 6379
+})
+redisClient.on('error', function (err) {
+  logger.error('Could not establish a connection with redis.' + err);
+});
+redisClient.on('connect', function (err) {
+  logger.info('Connected to redis successfully');
+});
 
 export const userSession = session({
+  store: new RedisStore({ client: redisClient }),
   name: 'sid',
-  secret: 'keyboard cat', // TODO: add a more secure secret.
+  secret: process.env.COOKIE_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
