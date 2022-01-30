@@ -33,7 +33,7 @@ export default class RestClient {
       if (!res.ok) {
         if(res.err?.name === 'AuthenticationError') {
           throw new AuthenticationError(res.err.message)
-        } else if (res.err.message) {
+        } else if (res.err?.message) {
           throw new Error(res.err.message);
         } else {
           throw new Error('Unknown internal error')

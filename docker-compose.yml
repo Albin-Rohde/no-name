@@ -31,7 +31,12 @@ services:
   frontend:
     container_name: frontend
     restart: unless-stopped
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        - REACT_APP_API_BASE_URL
+        - REACT_APP_SOCKET_BASE_URL
+        - REACT_APP_CLIENT_URL
     networks:
       - local
     ports:

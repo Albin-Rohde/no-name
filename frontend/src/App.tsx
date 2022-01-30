@@ -65,7 +65,10 @@ function App() {
       const u = new User(userData);
       dispatch(updateUser(u));
     } catch (err) {
-      dispatch(setError(err.message))
+      if (err.message) {
+        dispatch(setError(err.message))
+      }
+      throw err;
     }
   }
 
