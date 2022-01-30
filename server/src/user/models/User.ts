@@ -31,7 +31,7 @@ export class User extends BaseEntity {
   password: string
 
   @Index('username_idx')
-  @Column({name: "username"})
+  @Column({name: "username", length: 20})
   username: string
 
   @ManyToOne(type => Game, game => game._users, {

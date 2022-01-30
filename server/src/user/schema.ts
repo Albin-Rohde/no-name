@@ -9,7 +9,7 @@ export interface LoginInput extends yup.Asserts<typeof loginSchema> {}
 export const createSchema = yup.object({
   email: yup.string().email('Not a valid email').required(),
   password: yup.string().required(),
-  username: yup.string().required(),
+  username: yup.string().required().max(20),
 })
 export interface CreateInput extends yup.Asserts<typeof createSchema> {}
 
