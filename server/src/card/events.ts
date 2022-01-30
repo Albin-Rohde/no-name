@@ -15,6 +15,9 @@ export async function playCardEvent(io: Server, socket: SocketWithSession, cardI
   if (!game.active) {
     throw new GameStateError('Can not play card in inactive game')
   }
+  if (game.currentUser.isCardWizz) {
+    throw new NotAllowedError('You can not play a card as card  wizz')
+  }
   if (game.isFinished) {
     throw new GameStateError('Can not play card in finished game')
   }
