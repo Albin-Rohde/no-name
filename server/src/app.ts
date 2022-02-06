@@ -3,7 +3,7 @@ import "reflect-metadata";
 import dotenv from 'dotenv'
 import { SocketWithSession } from "./types";
 import { createConnection } from "typeorm";
-import { logger, expressLogger } from "./logger/logger";
+import { logger } from "./logger/logger";
 import express, {Application} from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
@@ -29,6 +29,7 @@ import * as Sentry from "@sentry/node";
 import Raven from 'raven'
 import redis from 'redis'
 import connectRedis from 'connect-redis'
+import {expressLoggingMiddleware} from "./middlewares";
 
 dotenv.config({path: '.env'})
 
@@ -59,9 +60,9 @@ const redisClient = redis.createClient({
   port: 6379
 })
 redisClient.on('error', function (err) {
-  logger.error('Could not establish a connection with redis.' + err);
+  logger.error('Could not establish a connection with redis.', err);
 });
-redisClient.on('connect', function (err) {
+redisClient.on('connect', function (_err) {
   logger.info('Connected to redis successfully');
 });
 
@@ -113,7 +114,7 @@ async function startServer() {
     })
     app.use(Raven.requestHandler())
     app.use(userSession)
-    app.use(expressLogger)
+    app.use(expressLoggingMiddleware)
     registerRoutes(app)
     app.use(Raven.errorHandler());
     const httpServer = http.createServer(app)
@@ -136,7 +137,7 @@ async function startServer() {
       logger.info(`server started on port ${options.port}`)
     })
   } catch (err) {
-    logger.error(err)
+    logger.error("Error", err)
   }
 }
 
