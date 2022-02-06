@@ -75,8 +75,12 @@ userRouter.post('/login', async (req: Request, res: Response) => {
  * Which will make then de-authenticated for subsequent calls
  */
 userRouter.post('/logout', loginRequired, async (req: Request, res: Response): Promise<void> => {
-  req.session.destroy(() => res.json({ok: true, err: null, data: {}} as RestResponse<any>))
-  return
+  try {
+    req.session.destroy(() => res.json({ok: true, err: null, data: {}} as RestResponse<any>))
+    return
+  } catch (err) {
+    handleRestError(req, res, err);
+  }
 })
 
 
