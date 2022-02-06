@@ -1,36 +1,45 @@
-import {SocketWithSession} from "../../types";
-import {Server, ServerOptions} from "socket.io";
+import {Server, ServerOptions, Socket} from "socket.io";
 import * as http from "http";
-import {userSession} from "../../app";
-import {EventFunction} from "./types";
-import {authSocketUser, loggerMiddleware} from "../../middlewares";
-import {emitErrorEvent} from "../../socketEmitters";
+import {EventFunction, Middleware, OnceMiddleware, OnErrorHandler} from "./types";
+
+interface Options {
+  once?: OnceMiddleware[],
+  beforeAll?: Middleware[],
+  beforeEach?: Middleware[],
+  onError?: OnErrorHandler,
+}
 
 export class SocketServer extends Server {
   private eventHandlerMap = new Map<string, EventFunction[]>();
+  private readonly beforeAll: Middleware[];
+  private readonly beforeEach: Middleware[];
+  private readonly onError: OnErrorHandler;
 
-  constructor(srv?: http.Server, opts?: Partial<ServerOptions>) {
+  constructor(srv?: http.Server, opts?: Partial<ServerOptions>, options?: Options) {
     super(srv, opts);
-    this.use((socket: any, next: any) => userSession(socket.request, {} as any, next))
+    for (const once of options.once) {
+      this.use(once);
+    }
+    this.beforeAll = options.beforeAll;
+    this.beforeEach = options.beforeEach;
+    this.onError = options.onError;
   }
 
-  public subscribeListeners(socket: SocketWithSession): void {
+  public subscribeListeners(socket: Socket): void {
     this.eventHandlerMap.forEach((handlers, event) => {
       socket.on(event, async (...args: unknown[]) => {
         try {
-          await authSocketUser(socket);
+          for (const middleware of this.beforeAll) {
+            await middleware(socket, {args, event});
+          }
           for (const handler of handlers) {
-            loggerMiddleware(socket, {
-              eventName: event,
-              eventMethod: handler.name,
-              arguments: args,
-              userId: socket.request.session.user.id,
-              gameId: socket.request.session.user.game_fk,
-            })
+            for (const middleware of this.beforeEach) {
+              await middleware(socket, {args, event, handler: handler.name});
+            }
             await handler(this, socket, ...args);
           }
         } catch (err) {
-          await emitErrorEvent(err, socket);
+          await this.onError(socket, err);
         }
       });
     });
