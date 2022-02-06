@@ -13,7 +13,6 @@ import {User} from "./user/models/User";
 import userRoute from "./user/controller";
 import gameRouter from "./game/controller";
 import cardRouter from "./card/controller";
-import logRouter from "./logger/controller";
 import { flipCardEvent, playCardEvent, voteCardEvent } from "./card/events";
 import {
   deleteGameEvent,
@@ -149,7 +148,6 @@ function registerRoutes(app: Application) {
   app.use('/game', gameRouter)
   // TODO: rename this route to card-deck or something
   app.use('/card', cardRouter)
-  app.use('/logs', logRouter)
 }
 
 export enum Events {
