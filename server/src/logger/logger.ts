@@ -1,8 +1,5 @@
 import * as winston from 'winston'
-import * as expressWinston from 'express-winston'
-import {silly} from "winston";
-import fs from "fs";
-import readline from "readline";
+import WinstonGraylog2 from 'winston-graylog2';
 import Sentry from 'winston-sentry'
 
 /**
@@ -27,6 +24,13 @@ const winstonFileFormat = winston.format.combine(
 const winstonConsoleFormat = winston.format.combine(
   winston.format.errors({ stack: true }),
   winston.format.prettyPrint(),
+  winston.format.colorize(),
+)
+
+const graylogFormat = winston.format.combine(
+  winston.format.errors({ stack: true }),
+  winston.format.metadata(),
+  winston.format.prettyPrint(),
 )
 
 /**
@@ -36,6 +40,15 @@ const winstonConsoleFormat = winston.format.combine(
 export const expressLogger = expressWinston.logger({
   transports: [
     new winston.transports.Console({ format: winstonConsoleFormat }),
+    new WinstonGraylog2({
+      level: 'debug',
+      name: 'express',
+      format: graylogFormat,
+      graylog: {
+        servers: [{host: process.env.GRAYLOG_HOST, port: 12201}],
+        facility: "express"
+      }
+    }),
     new Sentry({
       level: 'error',
       dsn: process.env.SENTRY_DSN,
@@ -56,7 +69,16 @@ export const socketLogger = winston.createLogger({
   format: winstonFileFormat,
   defaultMeta: {service: 'socket'},
   transports: [
-    new winston.transports.Console({ format: winstonConsoleFormat }),
+    new winston.transports.Console({ format: winstonConsoleFormat, level: 'silly' }),
+    new WinstonGraylog2({
+      level: 'silly',
+      format: graylogFormat,
+      name: 'socket',
+      graylog: {
+        servers: [{host: process.env.GRAYLOG_HOST, port: 12201}],
+        facility: "server"
+      }
+    }),
     new Sentry({
       level: 'error',
       dsn: process.env.SENTRY_DSN,
@@ -73,6 +95,15 @@ export const logger = winston.createLogger({
   defaultMeta: {service: 'Server'},
   transports: [
     new winston.transports.Console({ format: winstonConsoleFormat, level: 'silly' }),
+    new WinstonGraylog2({
+      level: 'silly',
+      name: 'logger',
+      format: graylogFormat,
+      graylog: {
+        servers: [{host: process.env.GRAYLOG_HOST, port: 12201}],
+        facility: "server"
+      }
+    }),
     new Sentry({
       level: 'error',
       dsn: process.env.SENTRY_DSN,
