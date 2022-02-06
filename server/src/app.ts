@@ -1,7 +1,6 @@
 import * as http from "http";
 import "reflect-metadata";
 import dotenv from 'dotenv'
-import { SocketWithSession } from "./types";
 import { createConnection } from "typeorm";
 import { logger } from "./logger/logger";
 import express, {Application} from "express";
@@ -30,6 +29,7 @@ import Raven from 'raven'
 import redis from 'redis'
 import connectRedis from 'connect-redis'
 import {authSocketUser, loggerMiddleware, expressLoggingMiddleware} from "./middlewares";
+import {Socket} from "socket.io";
 
 dotenv.config({path: '.env'})
 
@@ -88,6 +88,16 @@ declare module 'express-session' {
   }
 }
 
+declare module 'http' {
+  export interface IncomingMessage {
+    session: {
+      user: User
+      save: (...args: any[]) => void
+      destroy: (...args: any[]) => void
+    }
+  }
+}
+
 
 /**
  * Start the web server
@@ -139,7 +149,7 @@ async function startServer() {
       }
     )
     appendListeners(io)
-    io.on('connection', (socket: SocketWithSession) => {
+    io.on('connection', (socket: Socket) => {
       io.subscribeListeners(socket)
       io.emit('connected')
     })
