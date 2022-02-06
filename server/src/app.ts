@@ -29,7 +29,7 @@ import * as Sentry from "@sentry/node";
 import Raven from 'raven'
 import redis from 'redis'
 import connectRedis from 'connect-redis'
-import {expressLoggingMiddleware} from "./middlewares";
+import {authSocketUser, loggerMiddleware, expressLoggingMiddleware} from "./middlewares";
 
 dotenv.config({path: '.env'})
 
@@ -118,16 +118,26 @@ async function startServer() {
     registerRoutes(app)
     app.use(Raven.errorHandler());
     const httpServer = http.createServer(app)
-    const io = new SocketServer(httpServer, {
-      cors: {
-        origin: options.clientUrl,
-        methods: ["GET", "POST"],
-        allowedHeaders: [options.clientUrl, "user"],
-        credentials: true,
+
+    const addUserSessionToSocket = (socket: any, next: any) => userSession(socket.request, {} as any, next)
+    const io = new SocketServer(
+      httpServer,
+      {
+        cors: {
+          origin: options.clientUrl,
+          methods: ["GET", "POST"],
+          allowedHeaders: [options.clientUrl, "user"],
+          credentials: true,
+        },
+        pingTimeout: 500,
+        transports: ['websocket']
       },
-      pingTimeout: 500,
-      transports: ['websocket']
-    })
+      {
+        once: [addUserSessionToSocket],
+        beforeAll: [authSocketUser],
+        beforeEach: [loggerMiddleware],
+      }
+    )
     appendListeners(io)
     io.on('connection', (socket: SocketWithSession) => {
       io.subscribeListeners(socket)
