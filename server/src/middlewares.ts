@@ -13,6 +13,8 @@ import { RestResponse, SocketWithSession } from "./types";
 import {expressLogger, logger, socketLogger} from "./logger/logger";
 import { getUserWithRelation } from "./user/services";
 import {ValidationError} from "yup";
+import {Socket} from "socket.io";
+import {MiddlewareMetaData} from "./lib/socket/types";
 
 const authUser = async (sessionUser: User) => {
   if(!sessionUser) {
@@ -31,7 +33,7 @@ const authUser = async (sessionUser: User) => {
 export const loginRequired = async (req: Request, res: Response, next: NextFunction) => {
   try {
     req.session.user = await authUser(req.session.user)
-    req.session.save(() => null)
+    req.session.save()
     next()
   } catch(err) {
     handleRestError(req, res, err)
@@ -45,7 +47,7 @@ export const gameRequired = async (req: Request, res: Response, next: NextFuncti
       throw new GameRequiredError(`Could not find game on user`)
     }
     req.session.user = user
-    req.session.save(() => null)
+    req.session.save()
     return next()
   } catch(err) {
     handleRestError(req, res, err)
@@ -79,7 +81,7 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
   return res.status(500).json(response)
 }
 
-export const authSocketUser = async (socket: SocketWithSession): Promise<void> => {
+export const authSocketUser = async (socket: Socket): Promise<void> => {
   if(!socket.request.session.user) {
     throw new AuthenticationError('User required on session')
   }
@@ -100,7 +102,14 @@ interface SocketEventInfo {
   userId: number
   gameId?: string
 }
-export const loggerMiddleware = (socket: SocketWithSession, info: SocketEventInfo): void => {
+export const loggerMiddleware = (socket: SocketWithSession, meta: MiddlewareMetaData): void => {
+  const info: SocketEventInfo = {
+    arguments: meta.args,
+    eventMethod: meta.handler,
+    eventName: meta.event,
+    gameId: socket.request.session.user.game_fk,
+    userId: socket.request.session.user.id,
+  }
   socketLogger.info('Received socket event', info)
 }
 
