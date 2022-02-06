@@ -10,7 +10,7 @@ import {
   GameRuleError
 } from "./error";
 import { RestResponse, SocketWithSession } from "./types";
-import { logger, socketLogger } from "./logger/logger";
+import {expressLogger, logger, socketLogger} from "./logger/logger";
 import { getUserWithRelation } from "./user/services";
 import {ValidationError} from "yup";
 
@@ -74,7 +74,7 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
     return res.status(200).json(response)
   }
   // makes sure any unexpected error is not sent to client.
-  logger.error(err)
+  logger.error("Rest Error", err)
   response.err = {name: 'INTERNAL_ERROR', message: 'UNKNOWN_INTERNAL_ERROR'}
   return res.status(500).json(response)
 }
@@ -102,4 +102,27 @@ interface SocketEventInfo {
 }
 export const loggerMiddleware = (socket: SocketWithSession, info: SocketEventInfo): void => {
   socketLogger.info('Received socket event', info)
+}
+
+export const expressLoggingMiddleware = (req: Request, _res: Response, next: NextFunction) => {
+  let body = undefined
+  if (!(req.path.startsWith('/user') && req.method == "POST")) {
+    body = req.body
+  }
+  let message = `${req.method} ${req.path}`
+  if (req.session?.user?.id) {
+    message += ` user: ${req.session.user.id}`
+  }
+  expressLogger.debug(message, {
+    body,
+    url: req.url,
+    method: req.method,
+    query: req.query,
+    userId: req.session?.user?.id,
+    ip: req.ip,
+    params: req.params,
+    path: req.path,
+    headers: req.headers,
+  })
+  next();
 }
