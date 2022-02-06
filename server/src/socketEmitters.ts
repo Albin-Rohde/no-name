@@ -5,8 +5,6 @@ import { Game } from "./game/models/Game";
 import { GameRuleError } from "./error";
 import { logger } from "./logger/logger";
 
-
-
 /**
  * Emits an update event with the game supplied
  * Saves the updated game to db before exit.
@@ -31,10 +29,10 @@ export async function emitRemovedEvent(io: Server, socket: SocketWithSession, ga
  */
 export async function emitErrorEvent(err: Error, socket: SocketWithSession): Promise<void> {
   if (err instanceof GameRuleError) {
-    logger.warn(err)
+    logger.warn('Socket Error', err)
     socket.emit('rule_error', err.message)
   } else {
-    logger.error('socket_server_error', err)
+    logger.error('Socket Error', err)
     socket.emit('server_error', 'Internal Server Error')
   }
 }
