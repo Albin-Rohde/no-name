@@ -13,7 +13,7 @@ do
   ## Rebuild containers.
   docker-compose build frontend server
   ## Restart containers.
-  docker-compose restart server frontend
+  docker-compose up -d server frontend
   ## Run migration in new container
   docker exec server sh -c "npm run migrate:latest"
 done
