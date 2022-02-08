@@ -110,7 +110,7 @@ export const loggerMiddleware = (socket: SocketWithSession, meta: MiddlewareMeta
     gameId: socket.request.session.user.game_fk,
     userId: socket.request.session.user.id,
   }
-  socketLogger.info('Received socket event', info)
+  socketLogger.info(`WS ${info.eventName} user: ${info.userId}`, info)
 }
 
 export const expressLoggingMiddleware = (req: Request, _res: Response, next: NextFunction) => {
