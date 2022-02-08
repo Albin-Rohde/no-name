@@ -128,7 +128,7 @@ export const expressLoggingMiddleware = (req: Request, _res: Response, next: Nex
     method: req.method,
     query: req.query,
     userId: req.session?.user?.id,
-    ip: req.ip,
+    ip: req.headers["cf-connecting-ip"],
     params: req.params,
     path: req.path,
     headers: req.headers,
