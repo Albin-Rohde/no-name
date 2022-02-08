@@ -51,7 +51,7 @@ export const socketLogger = winston.createLogger({
       name: 'socket',
       graylog: {
         servers: [{host: process.env.GRAYLOG_HOST, port: 12201}],
-        facility: "server"
+        facility: "socket"
       }
     }),
     new Sentry({
