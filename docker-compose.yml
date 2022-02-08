@@ -47,6 +47,7 @@ services:
       - './frontend/src:/usr/src/frontend/src'
 
   redis:
+    container_name: redis
     image: "redis:alpine"
     command: redis-server
     networks:
@@ -57,9 +58,9 @@ services:
       - REDIS_REPLICATION_MODE=master
 
   nginx:
+    container_name: nginx
     image: nginx:latest
     restart: unless-stopped
-    container_name: production_nginx
     depends_on:
       - db
       - redis
@@ -80,6 +81,7 @@ services:
 
 #### GRAYLOG SERVICES ####
   mongodb:
+    container_name: graylog_mongodb
     image: "mongo:4.2"
     volumes:
       - "mongodb_data:/data/db"
@@ -88,6 +90,7 @@ services:
       - local
 
   elasticsearch:
+    container_name: graylog_elastic
     environment:
       ES_JAVA_OPTS: "-Xms1g -Xmx1g -Dlog4j2.formatMsgNoLookups=true"
       bootstrap.memory_lock: "true"
@@ -106,6 +109,7 @@ services:
       - local
 
   graylog:
+    container_name: graylog
     image: "graylog/graylog:4.2"
     depends_on:
       - elasticsearch
