@@ -43,6 +43,8 @@ services:
       - '3000:3000'
     env_file:
       - '.env'
+    environment:
+      - REACT_APP_SENTRY_DSN=${SENTRY_DSN}
     volumes:
       - './frontend/src:/usr/src/frontend/src'
 
