@@ -4,10 +4,9 @@
   "description": "",
   "main": "innit.js",
   "scripts": {
-    "deploy": "npm run migrate:latest && NODE_ENV=production node build/src/app.js",
-    "predeploy": "npm run build",
-    "dev": "nodemon",
-    "build": "rimraf ./build && tsc -p tsconfig.prod.json",
+    "prod": "NODE_ENV=production node ./build/src/app.js",
+    "dev": "NODE_ENV=development nodemon",
+    "build": "rimraf ./build && tsc",
     "typeorm": "node ./node_modules/typeorm/cli.js",
     "migrate:latest": "npm run typeorm migration:run"
   },
@@ -20,7 +19,7 @@
   "bugs": {
     "url": "https://github.com/albinr99salt/no-name/issues"
   },
-  "homepage": "yobotics.club",
+  "homepage": "fasoner.party",
   "dependencies": {
     "@sendgrid/mail": "^7.6.0",
     "@sentry/node": "^6.17.2",

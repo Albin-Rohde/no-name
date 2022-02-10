@@ -12,5 +12,4 @@ EXPOSE 5000
 RUN npm run build
 
 ## run the node process
-ENV NODE_ENV=production
-CMD ["node", "/usr/src/server/build/src/app.js"]
+CMD ["npm", "run", "prod"]
