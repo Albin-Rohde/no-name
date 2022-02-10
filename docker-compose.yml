@@ -153,10 +153,28 @@ services:
     networks:
       - local
 
+  postgres-exporter:
+    container_name: postgres-exporter
+    image: prometheuscommunity/postgres-exporter
+    environment:
+      - DATA_SOURCE_URI=${POSTGRES_HOST}/${POSTGRES_DB}?sslmode=disable
+      - DATA_SOURCE_USER=${POSTGRES_USER}
+      - DATA_SOURCE_PASS=${POSTGRES_PASSWORD}
+
+    networks:
+      - local
+    depends_on:
+      - db
+    restart: unless-stopped
+
+
   prometheus:
     container_name: prometheus
     image: prom/prometheus:latest
     restart: unless-stopped
+    depends_on:
+      - node-exporter
+      - postgres-exporter
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
