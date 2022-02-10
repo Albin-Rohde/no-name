@@ -5,15 +5,14 @@ services:
     container_name: server
     restart: unless-stopped
     build: ./server
-    networks:
-      - local
-    ports:
-      - '5000:5000'
-    env_file:
-      - '.env'
-    links:
+    depends_on:
       - db
       - redis
+    networks:
+      - local
+      - public
+    env_file:
+      - '.env'
     volumes:
       - './server/src:/usr/src/server/src'
 
@@ -24,7 +23,7 @@ services:
     networks:
       - local
     ports:
-      - '5432:5432'
+      - 5432:5432
     env_file:
       - '.env'
 
@@ -39,8 +38,7 @@ services:
         - REACT_APP_CLIENT_URL
     networks:
       - local
-    ports:
-      - '3000:3000'
+      - public
     env_file:
       - '.env'
     volumes:
@@ -52,8 +50,6 @@ services:
     command: redis-server
     networks:
       - local
-    ports:
-      - '6379:6379'
     environment:
       - REDIS_REPLICATION_MODE=master
 
@@ -62,16 +58,12 @@ services:
     image: nginx:latest
     restart: unless-stopped
     depends_on:
-      - db
-      - redis
       - frontend
       - server
+      - graylog
+      - grafana
     networks:
-      - local
       - public
-    links:
-      - server
-      - frontend
     ports:
       - 80:80
       - 443:443
@@ -125,11 +117,10 @@ services:
       GRAYLOG_MONGODB_URI: "mongodb://mongodb:27017/graylog"
     networks:
       - local
-    ports:
-      - "9000:9000/tcp"   # Server API
+      - public
     volumes:
-      - "graylog_data:/usr/share/graylog/data/data"
-      - "graylog_journal:/usr/share/graylog/data/journal"
+      - graylog_data:/usr/share/graylog/data/data
+      - graylog_journal:/usr/share/graylog/data/journal
     restart: "on-failure"
     healthcheck:
       test: "curl localhost:9000"
@@ -148,8 +139,6 @@ services:
       - '--path.rootfs=/rootfs'
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    expose:
-      - 9100
     networks:
       - local
 
@@ -184,8 +173,6 @@ services:
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--web.enable-lifecycle'
-    ports:
-      - 9090:9090
     networks:
       - local
 
@@ -195,10 +182,8 @@ services:
     user: "472"
     depends_on:
       - prometheus
-    ports:
-      - 3001:3000
     volumes:
-      - ./grafana/provisioning/:/etc/grafana/provisioning/
+      - grafana_data:/etc/grafana/provisioning/
     env_file:
       - .env
     networks:
