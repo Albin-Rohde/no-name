@@ -2,5 +2,5 @@
   "watch": ["src"],
   "ext": "ts,json",
   "ignore": [],
-  "exec": "TYPEORM_ENTITIES=src/**/models/*.ts ts-node src/app.ts -- "
+  "exec": "ts-node src/app.ts -- "
 }
