@@ -40,7 +40,7 @@ export class User extends BaseEntity {
   @JoinColumn({name: 'game_fk'})
   game: Game
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'uuid'})
   game_fk: string | null
 
   @OneToMany(type => WhiteCardRef, card => card.user)
