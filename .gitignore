@@ -1,9 +1,6 @@
 # dotenv environment variables file
 *.env
 *.env.test
-*.env.docker
-# config
-*config
 
 # Postgres data
 *postgres-data/
