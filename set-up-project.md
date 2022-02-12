@@ -1,51 +1,62 @@
 # Set up project
 
-### Requirements
-- development
-  - node 14.16.1
-  - docker
-  - docker-compose
-- production
-  - docker
-  - docker-compose
-  - certbot
-  - certbot plugin dns_cloudflare
+## Init the project
+Before starting the project, make sure npm, node, docker and docker-compose is installed.
+requirements:
+- node 14.16.1
+- docker
+- docker-compose 1.25^
+
+Along with this project is a Makefile. The most common commands are located in the makefile to make it easier to 
+getting started.
+When requirements are met run `make init` from root.
+This will prepare everything that's needed in order to run the project.
+`make init` will copy all .env files to correct directories and pull/build all docker images.
+
+## Starting in development mode
+Development mode will spin up backend(server) and frontend with autoreload to make development as easy as possible.
+easiest way to start project in development mode is to run `make dev`.
+- Frontend will start on localhost:3000
+- Backend will start on localhost:5000
+- postgres will start on localhost:5432
+
+After starting the app for the first time you will want to run the migrations
+`make migrate`
+
+## Starting in production mode
+Production mode spins up everything behind nginx, this is the exact same setup as the live server.
+Spinning up in production mode is a great way to test that everything works as expected locally before merge to master.
+
+Easiest way to start in production mode is with the make command `make prod`.
+- Frontend will start on localhost
+- Backend will start on localhost/api
+- graylog will start on logs.localhost
+- grafana will start on grafana.localhost
+
+## Migration
+### running migrations
+Whenever there are changes to the database schema/tables one will need to run the migrations.
+Easiest way to run the migrations are yet again through make command. `make migrate`.
+
+### Creating new migration
+To create new migration, first make the changes to the model(s). When you are happy with the alterations run 
+`make migration name=<name of migration>`. This will create a migration in `server/src/migrations`. 
+Check that it looks and acts correct before committing/pushing the new migration. 
+A new created migration will not be applied until the actuall migration is ran. to run the migration `make migrate`.
+
+## Running app outside docker
+It is possible to run the app outside of docker, however the database is easiest ran through docker.
+To start the server on host go to server root (`./server`) and run `npm run dev`.
+To start the frontend on host go to frontend root (`./frontend`) and run `npm run dev`
 
 
-### Step 1 - Set up .env files
-Both dev production and live require environments variables to run.
-These are stored and accessed from a `.env` file. to create them run:
-- `cp frontend/.env.schema frontend/.env` # for development only
-- `cp server/.env.schema server/.env` # for development only
-- `cp .env.schema .env`
-
-### Step 2 - install dependencies
-To run the app both frontend and server dependencies need 
-to be installed.
-- from `./frontned` run `npm install`
-- from `./server` run `npm install`
-
-### Step 3 - init db and run migrations
-In this project the db is always intended to run in docker.
-Start by starting the pg instance and then run the migrations
-from server.
-- `docker-compose up -d db`
-- from server root `npm run build && npm run migrate:latest`
-
-### Step 4 - start the app
-Running the app in development mode in not done through docker.
-The database and redis instance will run in docker, but the actual
-services themselves will run on the host system.
-- Make sure postgresql and redis is running `docker-compose up -d db redis`
-- Start frontend by running `npm run start` from frontend root.
-- Start server by running `npm run dev` from server root.
-
-frontend will start on `http://localhost:3000`\
-backend will start on `http://localhost:5000`\
-In dev mode, the app will reload changes, the app does not need to be restarted between changes to source code.
-
-
-### Step 5 - start the app in production mode
-- Run `docker-compose build && docker-compose up`
-- The app will now run on `http://app.localhost`, running the app like this is as close to the live set up as possible.
-- Backend can be accessed on `http://app.localhost/api/<endpoint>`
+## Make commands summary
+| Command           | Description                                        |
+|-------------------|----------------------------------------------------|
+| `make init`         | Set ups the project                                |
+| `make dev`          | Starts the app in development mode                 |
+| `make dev-stop`     | Stops the app from dev mode (compose stop)         |
+| `make prod-build`   | Build the production images                        |
+| `make prod-up`      | Starts the app in production mode                  |
+| `make prod-migrate` | Migrates from within production container          |
+| `make prod`         | prod-build + prod-up + prod-migrate, in that order |
