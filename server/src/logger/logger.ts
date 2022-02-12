@@ -14,28 +14,35 @@ const graylogFormat = winston.format.combine(
   winston.format.prettyPrint(),
 )
 
+function getTransports(name: string): (winston.transport | WinstonGraylog2)[] {
+  const console = new winston.transports.Console({ format: winstonConsoleFormat, level: 'silly' })
+  const transports: (winston.transport | WinstonGraylog2)[] = [console];
+  const graylog = new WinstonGraylog2({
+    level: 'silly',
+    name,
+    format: graylogFormat,
+    graylog: {
+      servers: [{host: process.env.GRAYLOG_HOST, port: 12201}],
+      facility: name
+    }
+  })
+  const sentry = new Sentry({
+    level: 'error',
+    dsn: process.env.SENTRY_DSN,
+    tags: { key: name },
+  })
+  if (process.env.NODE_ENV == "production") {
+    transports.push(graylog, sentry)
+  }
+  return transports;
+}
+
 /**
  * Logger for express, specifically requests. Will pick upp all requests from
  * express and log it to the requests.log file.
  */
 export const expressLogger = winston.createLogger({
-  transports: [
-    new winston.transports.Console({ format: winstonConsoleFormat }),
-    new WinstonGraylog2({
-      level: 'debug',
-      name: 'express',
-      format: graylogFormat,
-      graylog: {
-        servers: [{host: process.env.GRAYLOG_HOST, port: 12201}],
-        facility: "express"
-      }
-    }),
-    new Sentry({
-      level: 'error',
-      dsn: process.env.SENTRY_DSN,
-      tags: { key: 'express-logger' },
-    })
-  ],
+  transports: getTransports('express') as winston.transport[],
 })
 
 /**
@@ -43,24 +50,7 @@ export const expressLogger = winston.createLogger({
  */
 export const socketLogger = winston.createLogger({
   defaultMeta: {service: 'socket'},
-  transports: [
-    new winston.transports.Console({ format: winstonConsoleFormat, level: 'silly' }),
-    new WinstonGraylog2({
-      level: 'silly',
-      format: graylogFormat,
-      name: 'socket',
-      graylog: {
-        servers: [{host: process.env.GRAYLOG_HOST, port: 12201}],
-        facility: "socket"
-      }
-    }),
-    new Sentry({
-      level: 'error',
-      dsn: process.env.SENTRY_DSN,
-      tags: { key: 'socket-logger' },
-    })
-  ],
-
+  transports: getTransports('socket') as winston.transport[],
 })
 
 /**
@@ -68,21 +58,5 @@ export const socketLogger = winston.createLogger({
  */
 export const logger = winston.createLogger({
   defaultMeta: {service: 'Server'},
-  transports: [
-    new winston.transports.Console({ format: winstonConsoleFormat, level: 'silly' }),
-    new WinstonGraylog2({
-      level: 'silly',
-      name: 'logger',
-      format: graylogFormat,
-      graylog: {
-        servers: [{host: process.env.GRAYLOG_HOST, port: 12201}],
-        facility: "server"
-      }
-    }),
-    new Sentry({
-      level: 'error',
-      dsn: process.env.SENTRY_DSN,
-      tags: { key: 'logger' },
-    })
-  ],
+  transports: getTransports('Server') as winston.transport[],
 })
