@@ -67,6 +67,7 @@ function App() {
     } catch (err) {
       if (err.message) {
         dispatch(setError(err.message))
+        return
       }
       throw err;
     }
