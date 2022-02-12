@@ -126,6 +126,7 @@ services:
   prometheus:
     container_name: prometheus
     image: prom/prometheus:latest
+    user: root
     restart: unless-stopped
     depends_on:
       - node-exporter

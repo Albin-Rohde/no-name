@@ -41,6 +41,10 @@ prod-stop:
 prod-migrate:
 	${compose-prod} exec server sh -c "npm run migrate:latest"
 
-prod: prod-build prod-up prod-migrate
+prod-up-frontend-server:
+	${compose-prod} up -d frontend server
+
 stop: prod-stop dev-stop
+prod: prod-build prod-up prod-migrate
+redeploy: prod-build prod-up-frontend-server prod-migrate
 
