@@ -1,19 +1,9 @@
 #!/bin/bash
 
-## Move to correct path
+## Move to correct path (root of project)
 cd ..
 ## Populate shell env with REACT_ env from .env file.
 set -o allexport; cat .env | grep "^REACT_APP_*" > .env.tmp; source .env.tmp; set +o allexport; rm -rf .env.tmp;
 
-while read oldrev newrev ref
-do
-  #checkout pushed branch
-  branch=`echo $ref | cut -d/ -f3`
-  git checkout $branch
-  ## Rebuild containers.
-  docker-compose build frontend server
-  ## Restart containers.
-  docker-compose up -d server frontend
-  ## Run migration in new container
-  docker exec server sh -c "npm run migrate:latest"
-done
+## Redeploy server and frontend
+make redeploy
