@@ -1,0 +1,15 @@
+FROM node:14.16.1
+
+WORKDIR /usr/src/server
+
+COPY . .
+
+## Install dependecies
+RUN npm install
+
+## build app when image is created.
+RUN npm run build
+
+EXPOSE 5000
+## run the node process
+CMD ["npm", "run", "prod"]
