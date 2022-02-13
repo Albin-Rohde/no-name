@@ -165,8 +165,8 @@ export async function nextRoundEvent(io: Server, socket: SocketWithSession) {
     game.turn_number++
     game.currentTurn = await getGameRound(game.key, game.turn_number)
   }
+  await Promise.all(updateCards);
   await Promise.all([
-    ...updateCards,
     ...updateUsers,
     newBlackCard,
     newPlayerCards,
