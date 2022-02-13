@@ -2,7 +2,7 @@ version: '3'
 
 services:
   server:
-    container_name: server_prod
+    container_name: server
     build:
       context: ./server
       dockerfile: Dockerfile.prod
@@ -10,7 +10,7 @@ services:
       - graylog
 
   frontend:
-    container_name: frontend_prod
+    container_name: frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod

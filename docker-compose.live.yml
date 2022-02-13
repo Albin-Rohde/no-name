@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  server:
+    image: ghcr.io/albinr99salt/no-name_server:latest
+
+  frontend:
+    image: ghcr.io/albinr99salt/no-name_frontend:latest

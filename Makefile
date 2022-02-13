@@ -1,3 +1,5 @@
+compose-prod = @docker-compose -f docker-compose.yml -f docker-compose.prod.yml
+compose-live = @docker-compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.live.yml
 
 all:
 	@echo "not implemented"
@@ -13,9 +15,8 @@ init:
 	@cd ./frontend && npm i && cd ../server && npm i && cd ../
 	@npm i -g ts-node typeorm
 	@echo "pulling docker images for prod"
-	@docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull
+	${compose-prod} pull
 
-compose-prod = @docker-compose -f docker-compose.yml -f docker-compose.prod.yml
 
 migrate:
 	@cd ./server && npm run build && npm run migrate:latest && cd ../
@@ -41,10 +42,14 @@ prod-stop:
 prod-migrate:
 	${compose-prod} exec server sh -c "npm run migrate:latest"
 
-prod-up-frontend-server:
-	${compose-prod} up -d frontend server
+live-deploy:
+	${compose-live} pull frontend server
+	${compose-live} up -d frontend server
+
+live-migrate:
+	${compose-live} exec server sh -c "npm run migrate:latest"
 
 stop: prod-stop dev-stop
 prod: prod-build prod-up prod-migrate
-redeploy: prod-build prod-up-frontend-server prod-migrate
+redeploy: live-deploy live-migrate
 
