@@ -28,5 +28,5 @@ jobs:
       run: |
         docker tag no-name_frontend ghcr.io/albinr99salt/no-name_frontend:latest
         docker tag no-name_server ghcr.io/albinr99salt/no-name_server:latest
-        docker push no-name_server
-        docker push no-name_frontend
+        docker push ghcr.io/albinr99salt/no-name_frontend
+        docker push ghcr.io/albinr99salt/no-name_frontend
