@@ -61,9 +61,31 @@ const CardsList = (props: CardsListProps) => {
         return '';
     }
   }
+  const getTotalTextLength = (card: CardResponse) => {
+    if (card.state === CardState.HAND) {
+      return card.text.length
+    }
+    if (card.state === CardState.PLAYED_HIDDEN) {
+      return 0;
+    }
+    return props.blackCard.text.length + card.text.length
+  }
+
+  const getFontSize = (card: CardResponse): string => {
+    const textLength = getTotalTextLength(card);
+    let fontSize = '1.3vw';
+    if (textLength > 78) {
+      fontSize = '1.2vw';
+    }
+    if (textLength > 85) {
+      fontSize = '1.1vw';
+    }
+    return fontSize;
+  }
 
   const cards = props.cards.map((card) => {
     const cardStyle = isMobile ? CARD_STYLE_MOBILE : CARD_STYLE_DESKTOP;
+    const textLength = getTotalTextLength(card);
     return (
       <Card
         id={card.id.toString()}
@@ -72,7 +94,7 @@ const CardsList = (props: CardsListProps) => {
         onClick={() => props.cardClickCb(card)}
       >
         <CardContent>
-          <Typography variant={'h5'}>
+          <Typography style={{fontSize: getFontSize(card)}}>
             {getCardText(card)}
           </Typography>
         </CardContent>
