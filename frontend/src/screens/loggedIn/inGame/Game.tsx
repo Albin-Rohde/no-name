@@ -71,7 +71,7 @@ const Game = () => {
             }}
           >
             <CardContent>
-              <Typography variant={'h5'}>
+              <Typography style={{fontSize: '1.2vw'}}>
                 {game.blackCard.text}
               </Typography>
             </CardContent>
