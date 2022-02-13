@@ -17,8 +17,8 @@ const CARD_STYLE = {
 
 const CARD_STYLE_MOBILE = {
   ...CARD_STYLE,
-  minHeight: '250px',
-  maxHeight: '250px',
+  minHeight: '240px',
+  maxHeight: '240px',
   marginRight: '2%',
   marginLeft: '2%',
   minWidth: '200px',
