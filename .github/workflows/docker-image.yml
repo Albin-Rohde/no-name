@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Build Docker Images
+    - name: Build Frontend Docker image
       run: |
-        make prod-build
+        docker build ./frontend/Dockerfile.prod -t no-name/frontend:latest
+    - name: Build Server Docker image
+      run: |
+        docker build ./server/Dockerfile.prod -t no-name/frontend:latest
