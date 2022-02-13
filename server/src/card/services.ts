@@ -43,8 +43,7 @@ const createWhiteCardRef = async (input: CreateWhiteCardRefInput): Promise<White
   wcr.white_card = input.whiteCard
   wcr.state = input.state || CardState.HAND
   wcr.game_key = input.gameKey
-  await wcr.save()
-  return wcr
+  return await wcr.save()
 }
 
 /**
