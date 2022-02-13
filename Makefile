@@ -1,5 +1,4 @@
 compose-prod = @docker-compose -f docker-compose.yml -f docker-compose.prod.yml
-compose-live = @docker-compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.live.yml
 
 all:
 	@echo "not implemented"
@@ -42,14 +41,6 @@ prod-stop:
 prod-migrate:
 	${compose-prod} exec server sh -c "npm run migrate:latest"
 
-live-deploy:
-	${compose-live} pull frontend server
-	${compose-live} up -d frontend server
-
-live-migrate:
-	${compose-live} exec server sh -c "npm run migrate:latest"
-
 stop: prod-stop dev-stop
 prod: prod-build prod-up prod-migrate
-redeploy: live-deploy live-migrate
 

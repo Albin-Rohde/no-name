@@ -3,21 +3,12 @@ name: Docker Image CI
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Prepare env
-      run: |
-        cp ./config/.env.docker .env
-        set -o allexport; cat .env | grep "^REACT_APP_*" > .env.tmp; source .env.tmp; set +o allexport; rm -rf .env.tmp;
-    - name: Build Docker images
-      run: |
-        make prod-build
     - name: Login to Github Packages
       uses: docker/login-action@v1
       with:
@@ -26,7 +17,18 @@ jobs:
         password: ${{ secrets.CR_PAT }}
     - name: Build image and push to GitHub Container Registry
       run: |
-        docker tag no-name_frontend ghcr.io/albinr99salt/no-name_frontend:latest
-        docker tag no-name_server ghcr.io/albinr99salt/no-name_server:latest
-        docker push ghcr.io/albinr99salt/no-name_frontend
-        docker push ghcr.io/albinr99salt/no-name_frontend
+        docker pull ghcr.io/albinr99salt/no-name_frontend:latest
+        docker build -t ghcr.io/albinr99salt/no-name_frontend:${GITHUB_SHA::7} \
+        --build-arg REACT_APP_API_BASE_URL=https://fasoner.party/api \
+        --build-arg REACT_APP_SOCKET_BASE_URL=https://fasoner.party \
+        --build-arg REACT_APP_CLIENT_URL=https://fasoner.party \
+        -f ./frontend/Dockerfile.prod ./frontend
+        docker tag ghcr.io/albinr99salt/no-name_frontend:${GITHUB_SHA::7} ghcr.io/albinr99salt/no-name_frontend:latest
+        docker push ghcr.io/albinr99salt/no-name_frontend:${GITHUB_SHA::7}
+        docker push ghcr.io/albinr99salt/no-name_frontend:latest
+
+        docker pull ghcr.io/albinr99salt/no-name_server:latest
+        docker build -t ghcr.io/albinr99salt/no-name_server:${GITHUB_SHA::7} -f ./server/Dockerfile.prod ./server
+        docker tag ghcr.io/albinr99salt/no-name_server:${GITHUB_SHA::7} ghcr.io/albinr99salt/no-name_server:latest
+        docker push ghcr.io/albinr99salt/no-name_server:${GITHUB_SHA::7}
+        docker push ghcr.io/albinr99salt/no-name_server:latest
