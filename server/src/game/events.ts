@@ -1,7 +1,14 @@
 import { Server } from "socket.io";
 import { setTimeoutAsync } from "../util";
 import { SocketWithSession } from "../types";
-import { createNewGame, deleteGameFromUser, getGameFromUser, getGameRound, getGameWithRelations } from "./services";
+import {
+  createNewGame,
+  deleteGameFromUser,
+  endGame,
+  getGameFromUser,
+  getGameRound,
+  getGameWithRelations
+} from "./services";
 import { GameRuleError, GameStateError, NotFoundError } from "../error";
 import { getUserWithRelation } from "../user/services";
 import { normalizeGameResponse } from "../socketResponse";
@@ -133,8 +140,9 @@ export async function nextRoundEvent(io: Server, socket: SocketWithSession) {
   await setTimeoutAsync(6000)
   const game = await getGameFromUser(socket.request.session.user.id);
   if (game.turn_number === game.rounds * game.users.length) {
-    game.active = false
-    await emitUpdateEvent(io, game);
+    const finishedGame = await endGame(game);
+    await emitUpdateEvent(io, finishedGame)
+    return;
   }
   const updateCards = game.allPlayerCards
     .filter((card) => {
