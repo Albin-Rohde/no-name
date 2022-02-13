@@ -27,7 +27,7 @@ export async function emitRemovedEvent(io: Server, socket: SocketWithSession, ga
 /**
  * Error catcher for all errors thrown by socket eventHandlers
  */
-export async function emitErrorEvent(err: Error, socket: SocketWithSession): Promise<void> {
+export async function emitErrorEvent(socket: SocketWithSession, err: Error): Promise<void> {
   if (err instanceof GameRuleError) {
     logger.warn('Socket Error', err)
     socket.emit('rule_error', err.message)

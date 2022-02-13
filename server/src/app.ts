@@ -30,6 +30,7 @@ import redis from 'redis'
 import connectRedis from 'connect-redis'
 import {authSocketUser, loggerMiddleware, expressLoggingMiddleware} from "./middlewares";
 import {Socket} from "socket.io";
+import {emitErrorEvent} from "./socketEmitters";
 
 dotenv.config({path: '.env'})
 
@@ -146,6 +147,7 @@ async function startServer() {
         once: [addUserSessionToSocket],
         beforeAll: [authSocketUser],
         beforeEach: [loggerMiddleware],
+        onError: emitErrorEvent,
       }
     )
     appendListeners(io)
