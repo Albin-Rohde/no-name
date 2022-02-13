@@ -44,7 +44,7 @@ prod-migrate:
 	${compose-prod} exec server sh -c "npm run migrate:latest"
 
 live-deploy:
-	${compose-live} pull
+	${compose-live} pull frontend server
 	${compose-live} up -d frontend server
 
 live-migrate:
