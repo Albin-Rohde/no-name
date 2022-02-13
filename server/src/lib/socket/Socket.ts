@@ -6,7 +6,7 @@ interface Options {
   once?: OnceMiddleware[],
   beforeAll?: Middleware[],
   beforeEach?: Middleware[],
-  onError?: OnErrorHandler,
+  onError: OnErrorHandler,
 }
 
 export class SocketServer extends Server {
