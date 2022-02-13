@@ -152,3 +152,18 @@ export async function getGameRound(gameKey: string, roundNumber: number) {
     .andWhere('gr.turn_number = :roundNumber', {roundNumber})
     .getOne()
 }
+
+/**
+ * End the game, clean up game and other logic that should be handled when game is finished
+ */
+export async function endGame(game: Game): Promise<Game> {
+  const removeWhiteCards: Promise<WhiteCardRef>[] = game.users.map((user) => {
+    return user.cards.map((card): Promise<WhiteCardRef> => {
+      return card.remove();
+    })
+  }).flat()
+  await Promise.all(removeWhiteCards);
+  game.active = false;
+  game.blackCard = null;
+  return game;
+}
