@@ -73,6 +73,16 @@ const CardsList = (props: CardsListProps) => {
 
   const getFontSize = (card: CardResponse): string => {
     const textLength = getTotalTextLength(card);
+    if (isMobile) {
+      let fontSize = '1.6em';
+      if (textLength > 78) {
+        fontSize = '1.4em';
+      }
+      if (textLength > 85) {
+        fontSize = '1.3em';
+      }
+      return fontSize;
+    }
     let fontSize = '1.3vw';
     if (textLength > 78) {
       fontSize = '1.2vw';
@@ -85,7 +95,6 @@ const CardsList = (props: CardsListProps) => {
 
   const cards = props.cards.map((card) => {
     const cardStyle = isMobile ? CARD_STYLE_MOBILE : CARD_STYLE_DESKTOP;
-    const textLength = getTotalTextLength(card);
     return (
       <Card
         id={card.id.toString()}

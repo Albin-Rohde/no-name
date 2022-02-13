@@ -71,7 +71,7 @@ const Game = () => {
             }}
           >
             <CardContent>
-              <Typography style={{fontSize: '1.2vw'}}>
+              <Typography style={{fontSize: isMobile ? '1.5em' : '1.2vw'}}>
                 {game.blackCard.text}
               </Typography>
             </CardContent>
