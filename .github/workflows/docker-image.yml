@@ -26,5 +26,7 @@ jobs:
         password: ${{ secrets.CR_PAT }}
     - name: Build image and push to GitHub Container Registry
       run: |
-        docker push no-name_server:latest
-        docker push no-name_frontend:latest
+        docker tag no-name_frontend ghcr.io/albinr99salt/no-name_frontend:latest
+        docker tag no-name_server ghcr.io/albinr99salt/no-name_server:latest
+        docker push no-name_server
+        docker push no-name_frontend

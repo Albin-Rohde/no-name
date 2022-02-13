@@ -2,8 +2,5 @@
 
 ## Move to correct path (root of project)
 cd ..
-## Populate shell env with REACT_ env from .env file.
-set -o allexport; cat .env | grep "^REACT_APP_*" > .env.tmp; source .env.tmp; set +o allexport; rm -rf .env.tmp;
-
 ## Redeploy server and frontend
 make redeploy
