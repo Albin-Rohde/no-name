@@ -8,7 +8,7 @@ import {WhiteCardRef} from "../card/models/WhiteCardRef";
  * @param userId - User to fetch
  * @param relations - Relations to get for user, if empty gets a default set.
  */
-export const getUserWithRelation = async (userId: number, relations: Array<string> | undefined = undefined) => {
+export const getUserWithRelation = async (userId: number, relations: Array<string> | undefined = undefined): Promise<User> => {
   try {
     return User.findOneOrFail(userId, {
       relations: relations ? relations : [
@@ -34,7 +34,7 @@ interface CreateUserData {
  * Returns the newly created user on success
  * @param body
  */
-export async function createUser (body: CreateUserData) {
+export async function createUser (body: CreateUserData): Promise<User> {
   const existingUser = await User.createQueryBuilder('user')
     .where('LOWER(user.email) = :email', {email: body.email.toLowerCase()})
     .orWhere('LOWER(user.username) = :username', {username: body.username.toLowerCase()})
@@ -52,7 +52,7 @@ export async function createUser (body: CreateUserData) {
 
 type UpdateUserData = Partial<CreateUserData> & { id: number };
 
-export async function updateUser(input: UpdateUserData) {
+export async function updateUser(input: UpdateUserData): Promise<User> {
   const user = await User.findOneOrFail(input.id);
   if (input.email) {
     user.email = input.email.toLowerCase();
