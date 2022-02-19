@@ -1,10 +1,17 @@
-version: '3'
+version: '3.8'
 
 services:
   server:
     container_name: server
     restart: unless-stopped
     build: ./server
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      graylog:
+        condition: service_healthy
     networks:
       - local
     ports:
@@ -27,6 +34,11 @@ services:
       - '5432:5432'
     env_file:
       - '.env'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   frontend:
     container_name: frontend
@@ -56,6 +68,11 @@ services:
       - '6379:6379'
     environment:
       - REDIS_REPLICATION_MODE=master
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
 
   nginx:
     container_name: nginx
@@ -112,8 +129,10 @@ services:
     container_name: graylog
     image: "graylog/graylog:4.2"
     depends_on:
-      - elasticsearch
-      - mongodb
+      elasticsearch:
+        condition: "service_started"
+      mongodb:
+        condition: "service_started"
     entrypoint: "/usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh"
     environment:
       GRAYLOG_NODE_ID_FILE: "/usr/share/graylog/data/config/node-id"
