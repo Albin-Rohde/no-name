@@ -6,6 +6,7 @@ import { GameTurn } from "./models/GameTurn";
 import { WhiteCardRef } from "../card/models/WhiteCardRef";
 import { BlackCardRef } from "../card/models/BlackCardRef";
 import { CardDeck } from "../card/models/CardDeck";
+import ShortUniqueId from "short-unique-id";
 
 
 /**
@@ -82,9 +83,10 @@ export async function createNewGame (user: User, options: GameSettings): Promise
   if (!cardDeck) {
     throw new BadRequestError('Supplied card deck was not found')
   }
+  const uid = new ShortUniqueId({ length: 5 });
   const game = new Game()
   game.key = uuidv4()
-  game.joinKey = uuidv4().substr(0, 5)
+  game.joinKey = uid.randomUUID(5).toLocaleLowerCase()
   game.playCards = options.playCards
   game.playerLimit = options.playerLimit
   game.privateLobby = options.private
