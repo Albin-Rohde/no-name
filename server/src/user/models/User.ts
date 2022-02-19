@@ -19,6 +19,7 @@ import {NotFoundError} from "../../error";
 @Unique(["email"])
 @Unique(["username"])
 @Unique(['id', 'game_fk'])
+@Index('game_fk')
 
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -30,7 +31,6 @@ export class User extends BaseEntity {
   @Column()
   password: string
 
-  @Index('username_idx')
   @Column({name: "username", length: 20})
   username: string
 
