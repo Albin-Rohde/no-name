@@ -1,6 +1,7 @@
 import { User } from './models/User'
 import {CreateError} from "../error";
 import bcrypt from "bcrypt";
+import {WhiteCardRef} from "../card/models/WhiteCardRef";
 
 /**
  * Get a user with relevant relations
@@ -63,4 +64,12 @@ export async function updateUser(input: UpdateUserData) {
     user.password = await bcrypt.hash(input.password, 10)
   }
   await user.save();
+}
+
+export async function getUserUserWithWinningCard(gameKey: string): Promise<User> {
+  return User.createQueryBuilder('u')
+    .leftJoin(WhiteCardRef, 'wcr', 'wcr.game_key = u.game_fk and wcr.user_id_fk = u.id')
+    .where('wcr.game_key = :key', {key: gameKey})
+    .andWhere(`wcr.state = 'winner'`)
+    .getOne();
 }
