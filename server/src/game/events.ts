@@ -10,10 +10,10 @@ import {
   getGameWithRelations
 } from "./services";
 import { GameRuleError, GameStateError, NotFoundError } from "../error";
-import { getUserWithRelation } from "../user/services";
+import {getUserUserWithWinningCard, getUserWithRelation} from "../user/services";
 import { normalizeGameResponse } from "../socketResponse";
-import { CardState } from "../card/models/WhiteCardRef";
-import {emitRemovedEvent, emitUpdateEvent} from "../socketEmitters";
+import {CardState} from "../card/models/WhiteCardRef";
+import {emitNotificationsEvent, emitRemovedEvent, emitUpdateEvent} from "../socketEmitters";
 
 /**
  * Gets a game if any is attached to the
@@ -180,6 +180,13 @@ export async function notifyCardWizzEvent(io: Server, socket: SocketWithSession)
   if (game.active) {
     const cardWizz = game.currentTurn.cardWizz;
     const message = `${cardWizz.username} is card wizz this turn`
-    io.in(game.key).emit('notification', message);
+    await emitNotificationsEvent(io, socket, message)
   }
+}
+
+export async function notifyWinnerEvent(io: Server, socket: SocketWithSession) {
+  const gameKey = socket.request.session.user.game_fk
+  const user = await getUserUserWithWinningCard(gameKey)
+  const message = `${user.username} won this round`;
+  await emitNotificationsEvent(io, socket, message)
 }
