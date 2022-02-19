@@ -8,7 +8,8 @@
     "dev": "NODE_ENV=development TYPEORM_ENTITIES=src/**/models/*.ts nodemon",
     "build": "rimraf ./build && tsc",
     "typeorm": "node ./node_modules/typeorm/cli.js",
-    "migrate:latest": "npm run typeorm migration:run"
+    "migrate:latest": "npm run typeorm migration:run",
+    "seed-data": "TYPEORM_ENTITIES=src/**/models/*.ts ts-node ./src/scripts/fakeDatabase.ts"
   },
   "repository": {
     "type": "git",
@@ -60,6 +61,7 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@faker-js/faker": "^6.0.0-alpha.6",
     "@tsconfig/node14": "^1.0.0",
     "@types/bcrypt": "^3.0.0",
     "@types/cookie-parser": "^1.4.2",
