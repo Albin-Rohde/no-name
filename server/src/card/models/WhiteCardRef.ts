@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinColumn, ManyToOne, Unique, ManyToMany, OneToOne } from "typeorm"
+import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinColumn, ManyToOne, Index} from "typeorm"
 import { User } from "../../user/models/User"
 import { WhiteCard } from "./WhiteCard"
 
@@ -12,6 +12,9 @@ export enum CardState {
 }
 
 @Entity('white_card_ref')
+@Index(['user_id_fk', 'game_key'])
+@Index('game_key')
+@Index('white_card_id_fk')
 export class WhiteCardRef extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
