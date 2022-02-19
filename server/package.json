@@ -49,6 +49,7 @@
     "raven": "^2.6.4",
     "redis": "^3.1.2",
     "reflect-metadata": "^0.1.13",
+    "short-unique-id": "^4.4.4",
     "socket.io": "3.1.1",
     "typeorm": "^0.2.36",
     "typeorm-store": "^1.2.0",
