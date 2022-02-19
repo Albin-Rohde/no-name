@@ -32,17 +32,22 @@ Easiest way to start in production mode is with the make command `make prod`.
 - Backend will start on localhost/api
 - graylog will start on logs.localhost
 - grafana will start on grafana.localhost
+if db is not up to date, one can run migrations with `make prod-migrate`.
 
 ## Migration
-### running migrations
+### Running migrations
 Whenever there are changes to the database schema/tables one will need to run the migrations.
 Easiest way to run the migrations are yet again through make command. `make migrate`.
+`make migrate` will use `.ts` migrations from `./server/src/migrations`.
 
 ### Creating new migration
-To create new migration, first make the changes to the model(s). When you are happy with the alterations run 
-`make migration name=<name of migration>`. This will create a migration in `server/src/migrations`. 
-Check that it looks and acts correct before committing/pushing the new migration. 
-A new created migration will not be applied until the actuall migration is ran. to run the migration `make migrate`.
+To create new migration, first make the changes to the model(s). When you are happy with the alterations 
+go to server root (`./server`) and run `npm run migration:generate`. This will create a migration in `server/src/migrations`. 
+Check that it looks correct and make changes if needed. When happy apply the migrations by running either `make migrate` or
+`npm run migration:run`.
+
+### Reverting migration
+To revert a migration run `npm run migration:revert` from server root (`./server`).
 
 ## Running app outside docker
 It is possible to run the app outside of docker, however the database is easiest ran through docker.
@@ -50,13 +55,21 @@ To start the server on host go to server root (`./server`) and run `npm run dev`
 To start the frontend on host go to frontend root (`./frontend`) and run `npm run dev`
 
 
-## Make commands summary
-| Command           | Description                                        |
-|-------------------|----------------------------------------------------|
-| `make init`         | Set ups the project                                |
-| `make dev`          | Starts the app in development mode                 |
-| `make dev-stop`     | Stops the app from dev mode (compose stop)         |
-| `make prod-build`   | Build the production images                        |
-| `make prod-up`      | Starts the app in production mode                  |
-| `make prod-migrate` | Migrates from within production container          |
-| `make prod`         | prod-build + prod-up + prod-migrate, in that order |
+## Commands cheat sheet
+| Make command                | Description                                        |
+|-----------------------------|----------------------------------------------------|
+| `make init`                 | Set ups the project                                |
+| `make dev`                  | Starts the app in development mode                 |
+| `make dev-stop`             | Stops the app from dev mode (compose stop)         |
+| `make migrate`              | Runs migration from ts source                      |
+| `make prod-build`           | Build the production images                        |
+| `make prod-up`              | Starts the app in production mode                  |
+| `make prod-migrate`         | Migrates from within production container          |
+| `make prod`                 | prod-build + prod-up + prod-migrate, in that order |
+
+| Server commans              | Description                         |
+|---|-------------------------------------|
+| `npm run migration:run`     | Runs migration from ts source       |
+| `npm run migration:revert`  | Revert last migration               |
+| `npm run migration:generate` | Creates a new migration             |
+| `npm run migration-prod:run` | Runs migration from build js source |

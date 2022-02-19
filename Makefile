@@ -16,15 +16,11 @@ init:
 	@echo "pulling docker images for prod"
 	${compose-prod} pull
 
-
-migrate:
-	@cd ./server && npm run build && npm run migrate:latest && cd ../
-
-migration:
-	@cd ./server && npm run build && npm run typeorm migration:generate -- -n $(name)
-
 dev:
 	@docker-compose up -d
+
+migrate:
+    cd ./server && npm run migration:run
 
 dev-stop:
 	@docker-compose stop
@@ -39,7 +35,7 @@ prod-stop:
 	${compose-prod} stop
 
 prod-migrate:
-	${compose-prod} exec server sh -c "npm run migrate:latest"
+	${compose-prod} exec server sh -c "npm run migration-prod:run"
 
 stop: prod-stop dev-stop
 prod: prod-build prod-up prod-migrate

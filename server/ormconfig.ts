@@ -8,15 +8,15 @@ module.exports = {
   "synchronize": false,
   "logging": false,
   "entities": [
-    process.env.TYPEORM_ENTITIES
+    process.env.TYPEORM_ENTITIES,
   ],
   "migrations": [
-    "build/src/migrations/*.js"
+    process.env.TYPEORM_MIGRATIONS,
   ],
   "subscribers": [
     "build/src/subscriber/**/*.js"
   ],
   "cli": {
-    "migrationsDir": "src/migrations"
+    "migrationsDir": process.env.TYPEORM_MIGRATIONS_OUT,
   }
 }
