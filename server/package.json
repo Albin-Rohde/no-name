@@ -11,7 +11,7 @@
     "migration:run": "npm run typeorm migration:run",
     "migration:revert": "npm run typeorm migration:revert",
     "migration:generate": "npm run typeorm migration:generate",
-    "migration-prod:run": "node ./node_modules/typeorm/cli.js",
+    "migration-prod:run": "node ./node_modules/typeorm/cli.js migration:run",
     "seed-data": "TYPEORM_ENTITIES=src/**/models/*.ts ts-node ./src/scripts/fakeDatabase.ts"
   },
   "repository": {

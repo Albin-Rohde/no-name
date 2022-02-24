@@ -27,7 +27,8 @@ After starting the app for the first time you will want to run the migrations
 Production mode spins up everything behind nginx, this is the exact same setup as the live server.
 Spinning up in production mode is a great way to test that everything works as expected locally before merge to master.
 
-Easiest way to start in production mode is with the make command `make prod`.
+Easiest way to start in production mode is with make commands. First run `make prod-build` to build production 
+docker images, followed by `make prod` to start everything.
 - Frontend will start on localhost
 - Backend will start on localhost/api
 - graylog will start on logs.localhost
@@ -56,20 +57,27 @@ To start the frontend on host go to frontend root (`./frontend`) and run `npm ru
 
 
 ## Commands cheat sheet
-| Make command                | Description                                        |
-|-----------------------------|----------------------------------------------------|
-| `make init`                 | Set ups the project                                |
-| `make dev`                  | Starts the app in development mode                 |
-| `make dev-stop`             | Stops the app from dev mode (compose stop)         |
-| `make migrate`              | Runs migration from ts source                      |
-| `make prod-build`           | Build the production images                        |
-| `make prod-up`              | Starts the app in production mode                  |
-| `make prod-migrate`         | Migrates from within production container          |
-| `make prod`                 | prod-build + prod-up + prod-migrate, in that order |
+| Make command        | Description                                           |
+|---------------------|-------------------------------------------------------|
+| `make init`         | Set ups the project                                   |
+| `make dev`          | Starts the app in development mode                    |
+| `make stop`         | Stops the app from dev mode (compose stop)            |
+| `make migrate`      | Runs migration in dev container (dev must be running) |
+| `make prod-build`   | Build the production images                           |
+| `make prod`         | Starts the app in production mode                     |
+| `make prod-migrate` | Migrates from within production container             |
 
-| Server commans              | Description                         |
-|---|-------------------------------------|
-| `npm run migration:run`     | Runs migration from ts source       |
-| `npm run migration:revert`  | Revert last migration               |
-| `npm run migration:generate` | Creates a new migration             |
-| `npm run migration-prod:run` | Runs migration from build js source |
+| Server commans               | Description                   |
+|------------------------------|-------------------------------|
+| `npm run dev`                | Run server in dev mode        |
+| `npm run prod`               | Run server in prod mode       |
+| `npm run migration:run`      | Runs migration from ts source |
+| `npm run migration:revert`   | Revert last migration         |
+| `npm run migration:generate` | Creates a new migration       |
+| `npm run migration-prod:run` | Runs migration from build js  |
+
+| Frontend commans | Description                                 |
+|------------------|---------------------------------------------|
+| `npm run dev`    | Run frontend in dev mode                    |
+| `npm run build`  | Builds a build bundle to serve in prod mdoe |
+| `npm run prod`   | Run frontend in prod mode                   |

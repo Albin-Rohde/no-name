@@ -3,21 +3,50 @@ version: '3'
 services:
   server:
     container_name: server
-    build:
-      context: ./server
-      dockerfile: Dockerfile.prod
+    image: ghcr.io/albinr99salt/no-name_server:latest
     depends_on:
       - graylog
+      - db
+    env_file:
+      - '.env'
+    networks:
+      - local
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5000/health" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  db:
+    container_name: pg_db
+    image: postgres
+    restart: unless-stopped
+    networks:
+      - local
+    ports:
+      - 5432:5432
+    env_file:
+      - '.env'
+
+  redis:
+    container_name: redis
+    image: "redis:alpine"
+    command: redis-server
+    networks:
+      - local
+    environment:
+      - REDIS_REPLICATION_MODE=master
 
   frontend:
     container_name: frontend
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.prod
-      args:
-        - REACT_APP_API_BASE_URL
-        - REACT_APP_SOCKET_BASE_URL
-        - REACT_APP_CLIENT_URL
+    image: ghcr.io/albinr99salt/no-name_frontend:latest
+    networks:
+      - local
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   nginx:
     container_name: nginx
@@ -29,6 +58,7 @@ services:
       - grafana
       - graylog
     networks:
+      - local
       - public
     ports:
       - 80:80

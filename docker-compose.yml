@@ -5,6 +5,10 @@ services:
     container_name: server
     restart: unless-stopped
     build: ./server
+    volumes:
+      - './server:/usr/src/server'
+    ports:
+      - '5000:5000'
     depends_on:
       - db
       - redis
@@ -12,7 +16,7 @@ services:
       - local
       - public
     env_file:
-      - '.env'
+      - 'config/.env.dev'
 
   db:
     container_name: pg_db
@@ -23,18 +27,21 @@ services:
     ports:
       - 5432:5432
     env_file:
-      - '.env'
+      - 'config/.env.dev'
 
   frontend:
     container_name: frontend
     restart: unless-stopped
-    build:
-      context: ./frontend
+    build: ./frontend
+    volumes:
+      - './frontend:/usr/src/frontend'
+    ports:
+      - '3000:3000'
     networks:
       - local
       - public
     env_file:
-      - '.env'
+      - 'config/.env.dev'
 
   redis:
     container_name: redis
