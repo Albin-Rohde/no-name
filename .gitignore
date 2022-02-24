@@ -5,6 +5,9 @@
 # Postgres data
 *postgres-data/
 
+# Prometheus data
+prometheus/prometheus_data/*
+
 # npm
 *node_modules/
 

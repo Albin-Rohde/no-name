@@ -63,7 +63,7 @@ export async function updateUser(input: UpdateUserData): Promise<User> {
   if (input.password) {
     user.password = await bcrypt.hash(input.password, 10)
   }
-  await user.save();
+  return user.save();
 }
 
 export async function getUserUserWithWinningCard(gameKey: string): Promise<User> {
