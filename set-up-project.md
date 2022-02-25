@@ -67,14 +67,14 @@ To start the frontend on host go to frontend root (`./frontend`) and run `npm ru
 | `make prod`         | Starts the app in production mode                     |
 | `make prod-migrate` | Migrates from within production container             |
 
-| Server commans               | Description                   |
-|------------------------------|-------------------------------|
-| `npm run dev`                | Run server in dev mode        |
-| `npm run prod`               | Run server in prod mode       |
-| `npm run migration:run`      | Runs migration from ts source |
-| `npm run migration:revert`   | Revert last migration         |
-| `npm run migration:generate` | Creates a new migration       |
-| `npm run migration-prod:run` | Runs migration from build js  |
+| Server commans                                    | Description                   |
+|---------------------------------------------------|-------------------------------|
+| `npm run dev`                                     | Run server in dev mode        |
+| `npm run prod`                                    | Run server in prod mode       |
+| `npm run migration:run`                           | Runs migration from ts source |
+| `npm run migration:revert`                        | Revert last migration         |
+| `npm run migration-prod:run`                      | Runs migration from build js  |
+| `npm run typeorm migration:generate -- -n <name>` | Creates a new migration       |
 
 | Frontend commans | Description                                 |
 |------------------|---------------------------------------------|

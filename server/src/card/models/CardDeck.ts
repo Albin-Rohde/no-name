@@ -9,7 +9,6 @@ export class CardDeck extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Index()
   @Column()
   name: string
 

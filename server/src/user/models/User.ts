@@ -19,7 +19,7 @@ import {NotFoundError} from "../../error";
 @Unique(["email"])
 @Unique(["username"])
 @Unique(['id', 'game_fk'])
-@Index('game_fk')
+@Index(['game_fk'])
 
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()

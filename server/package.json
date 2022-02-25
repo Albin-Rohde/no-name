@@ -7,10 +7,9 @@
     "prod": "NODE_ENV=production node ./build/src/app.js",
     "dev": "NODE_ENV=development TYPEORM_ENTITIES=src/**/models/*.ts nodemon",
     "build": "rimraf ./build && tsc",
-    "typeorm": "ts-node ./node_modules/typeorm/cli.js",
+    "typeorm": "POSTGRES_HOST=localhost ts-node ./node_modules/typeorm/cli.js",
     "migration:run": "npm run typeorm migration:run",
     "migration:revert": "npm run typeorm migration:revert",
-    "migration:generate": "npm run typeorm migration:generate",
     "migration-prod:run": "node ./node_modules/typeorm/cli.js migration:run",
     "seed-data": "TYPEORM_ENTITIES=src/**/models/*.ts ts-node ./src/scripts/fakeDatabase.ts"
   },

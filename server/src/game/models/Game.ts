@@ -17,15 +17,14 @@ import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {CardDeck} from "../../card/models/CardDeck";
 import {BlackCardRef, BlackCardState} from "../../card/models/BlackCardRef";
 
+@Index(['joinKey'])
 @Entity()
-
 export class Game extends BaseEntity {
   public nextGameKey: string | null
 
   @PrimaryGeneratedColumn('uuid')
   key: string
 
-  @Index()
   @Column({unique: true, nullable: false, name: 'join_key', length: 5})
   joinKey: string
 

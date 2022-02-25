@@ -13,8 +13,8 @@ export enum CardState {
 
 @Entity('white_card_ref')
 @Index(['user_id_fk', 'game_key'])
-@Index('game_key')
-@Index('white_card_id_fk')
+@Index(['game_key'])
+@Index(['white_card_id_fk'])
 export class WhiteCardRef extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
