@@ -13,6 +13,7 @@ export interface GameResponse {
 export interface CardDeckResponse {
   id: number,
   name: string,
+  cardsCount: number,
   description: string,
 }
 
