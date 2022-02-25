@@ -1,5 +1,10 @@
 compose-prod = @docker-compose -f docker-compose.prod.yml
 host=http://localhost
+PURPLE=\033[;35m
+GREEN=\033[;32m
+RED=\033[;31m
+BLUE=\033[0;34m
+NC=\033[0m
 
 all:
 	@echo "not implemented"
