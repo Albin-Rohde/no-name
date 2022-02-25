@@ -13,7 +13,7 @@ interface SelectInputFieldProps {
 export default function SelectInputField(props: SelectInputFieldProps) {
   const handleDeckChange = (e: any) => {
     e.preventDefault();
-    props.setValue(e.target.value);
+    props.setValue(Number(e.target.value));
   }
   return (
     <Box sx={{ width: 250, marginTop: '2vh' }}>

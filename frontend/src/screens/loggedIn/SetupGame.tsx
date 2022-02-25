@@ -1,6 +1,6 @@
-import React, {useState, useContext, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 
-import {Box, Button, Divider, Grid, Paper, Typography} from "@mui/material";
+import {Box, Button, Grid, Paper, Tooltip, Typography} from "@mui/material";
 import SliderInput from "../../components/SliderInput";
 import {CardDeckResponse, GameResponse} from "../../clients/ResponseTypes";
 import RestClient from "../../clients/RestClient";
@@ -14,11 +14,12 @@ interface SetupGameProps {
   setScreen: (screen: 'home' | 'create-game') => void;
 }
 const SetupGame = (props: SetupGameProps) => {
-  const [decks, setDecks] = useState(null);
-  const [deck, setDeck] = useState('0');
-  const [playerLimit, setPlayerLimit] = useState(3);
-  const [rounds, setRounds] = useState(5);
-  const [cardLimit, setCardLimit] = useState(6);
+  const [decks, setDecks] = useState<CardDeckResponse[]>([]);
+  const [deck, _setDeck] = useState<number>(0);
+  const [playerLimit, _setPlayerLimit] = useState(3);
+  const [rounds, _setRounds] = useState(5);
+  const [cardLimit, _setCardLimit] = useState(6);
+  const [tooManyCards, setTooManyCards] = useState<boolean>(false);
   const user = useSelector<ReduxState, User | undefined>((state) => state.user);
   const rest = new RestClient();
 
@@ -52,10 +53,48 @@ const SetupGame = (props: SetupGameProps) => {
       const decks = await rest.makeRequest<CardDeckResponse[]>({method: 'get', route: 'card', action: 'decks'});
       setDecks(decks);
       if (decks[0]) {
-        setDeck(decks[0].id.toString())
+        setDeck(decks[0].id)
       }
     } catch (err) {
       dispatch(setError(err.message));
+    }
+  }
+
+  const cardsRequired = (): number => {
+    const handOut = playerLimit * cardLimit;
+    const perRound = (playerLimit - 1) * cardLimit;
+    return handOut + (perRound * rounds);
+  }
+
+  const setPlayerLimit = (val: number): void => {
+    _setPlayerLimit(val);
+    const selectedDeck = decks.find((d) => d.id == deck)
+    if (selectedDeck) {
+      setTooManyCards(cardsRequired() > selectedDeck.cardsCount)
+    }
+  }
+
+  const setRounds = (val: number): void => {
+    _setRounds(val);
+    const selectedDeck = decks.find((d) => d.id == deck)
+    if (selectedDeck) {
+      setTooManyCards(cardsRequired() > selectedDeck.cardsCount)
+    }
+  }
+
+  const setCardLimit = (val: number): void => {
+    _setCardLimit(val);
+    const selectedDeck = decks.find((d) => d.id == deck)
+    if (selectedDeck) {
+      setTooManyCards(cardsRequired() > selectedDeck.cardsCount)
+    }
+  }
+
+  const setDeck = (id: number): void => {
+    _setDeck(id);
+    const selectedDeck = decks.find((d) => d.id == id)
+    if (selectedDeck) {
+      setTooManyCards(cardsRequired() > selectedDeck.cardsCount)
     }
   }
 
@@ -97,7 +136,15 @@ const SetupGame = (props: SetupGameProps) => {
             />
             <SelectInputField decks={decks} value={deck} setValue={setDeck}/>
             <Box width={250} sx={{marginTop: '3vh'}}>
-              <Button color='success' variant={'outlined'} sx={{width: '100%'}} onClick={createGame}>Create Game</Button>
+              <Tooltip
+                title={tooManyCards ?
+                  'too many players, cards or rounds for selected deck, please decrease one of them' :
+                  ''}
+              >
+                <span>
+                  <Button disabled={tooManyCards} color='success' variant={'outlined'} sx={{width: '100%'}} onClick={createGame}>Create Game</Button>
+                </span>
+              </Tooltip>
             </Box>
             <Box width={250} sx={{marginTop: '1vh'}}>
               <Button color='error' variant={'outlined'} sx={{width: '100%'}} onClick={() => props.setScreen('home')}>Cancel</Button>
