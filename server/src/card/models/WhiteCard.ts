@@ -1,4 +1,14 @@
-import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinColumn, ManyToOne, Unique, OneToMany} from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  BaseEntity,
+  JoinColumn,
+  ManyToOne,
+  Unique,
+  OneToMany,
+  Index
+} from "typeorm"
 import { WhiteCardRef } from "./WhiteCardRef"
 import {CardDeck} from "./CardDeck";
 
@@ -11,6 +21,7 @@ export enum WhiteCardType {
 
 @Entity('white_card')
 @Unique(['deck', 'text'])
+@Index(['deck_fk'])
 
 export class WhiteCard extends BaseEntity {
   @PrimaryGeneratedColumn()
