@@ -3,7 +3,11 @@
 ## Move to correct path (root of project)
 cd ..
 ## pull latest frontend and server
+echo pulling latest images
 docker pull ghcr.io/albinr99salt/no-name_server:$(git rev-parse --short HEAD)
 docker pull ghcr.io/albinr99salt/no-name_frontend:$(git rev-parse --short HEAD)
+echo tag latest images as :latest
+docker tag ghcr.io/albinr99salt/no-name_frontend:$(git rev-parse --short HEAD) ghcr.io/albinr99salt/no-name_frontend:latest
+docker tag ghcr.io/albinr99salt/no-name_server:$(git rev-parse --short HEAD) ghcr.io/albinr99salt/no-name_server:latest
 docker-compose -f docker-compose.prod.yml up -d frontend server
-docker exec server sh -c "npm run migrate:latest"
+docker exec server sh -c "npm run migration-prod:run"
