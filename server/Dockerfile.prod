@@ -10,6 +10,5 @@ RUN npm install
 ## build app when image is created.
 RUN npm run build
 
-EXPOSE 5000
 ## run the node process
 CMD ["npm", "run", "prod"]

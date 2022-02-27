@@ -1,4 +1,4 @@
-version: '3'
+version: '3.4'
 
 services:
   server:
@@ -13,8 +13,8 @@ services:
       - local
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:5000/health" ]
-      interval: 5s
-      timeout: 3s
+      interval: 10s
+      timeout: 5s
       retries: 10
 
   db:
@@ -27,6 +27,11 @@ services:
       - 5432:5432
     env_file:
       - '.env'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     container_name: redis
@@ -36,6 +41,11 @@ services:
       - local
     environment:
       - REDIS_REPLICATION_MODE=master
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 3s
+      retries: 10
 
   frontend:
     container_name: frontend
@@ -66,6 +76,11 @@ services:
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
       - ./${NGINX_CONF_FILE}:/etc/nginx/nginx.conf
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   #### GRAYLOG SERVICES ####
   mongodb:
@@ -76,6 +91,12 @@ services:
     restart: "unless-stopped"
     networks:
       - local
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
 
   elasticsearch:
     container_name: graylog_elastic
@@ -95,6 +116,12 @@ services:
     restart: "unless-stopped"
     networks:
       - local
+    healthcheck:
+      test: curl -s http://localhost:9200 >/dev/null || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
   graylog:
     container_name: graylog
@@ -113,13 +140,15 @@ services:
       GRAYLOG_MONGODB_URI: "mongodb://mongodb:27017/graylog"
     networks:
       - local
-      - public
     volumes:
       - graylog_data:/usr/share/graylog/data/data
       - graylog_journal:/usr/share/graylog/data/journal
     restart: "unless-stopped"
     healthcheck:
       test: "curl localhost:9000"
+      interval: 30s
+      timeout: 10s
+      retries: 10
 
   ### PROMETHEUS AND GRAFANA SERVICES ###
   node-exporter:
@@ -137,6 +166,11 @@ services:
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     networks:
       - local
+    healthcheck:
+      test: "wget -q -Y off -O /dev/null http://localhost:9100 > /dev/null 2>&1"
+      interval: 10s
+      timeout: 4s
+      retries: 5
 
   postgres-exporter:
     container_name: postgres-exporter
@@ -145,13 +179,16 @@ services:
       - DATA_SOURCE_URI=${POSTGRES_HOST}/${POSTGRES_DB}?sslmode=disable
       - DATA_SOURCE_USER=${POSTGRES_USER}
       - DATA_SOURCE_PASS=${POSTGRES_PASSWORD}
-
     networks:
       - local
     depends_on:
       - db
     restart: unless-stopped
-
+    healthcheck:
+      test: "wget -q -Y off -O /dev/null http://localhost:9187 > /dev/null 2>&1"
+      interval: 10s
+      timeout: 4s
+      retries: 5
 
   prometheus:
     container_name: prometheus
@@ -172,6 +209,11 @@ services:
       - '--web.enable-lifecycle'
     networks:
       - local
+    healthcheck:
+      test: "wget -q -Y off -O /dev/null http://localhost:9090 > /dev/null 2>&1"
+      interval: 15s
+      timeout: 7s
+      retries: 3
 
   grafana:
     container_name: grafana
@@ -185,8 +227,12 @@ services:
       - .env
     networks:
       - local
-      - public
     restart: unless-stopped
+    healthcheck:
+      test: "wget -q -Y off -O /dev/null http://localhost:3000/login > /dev/null 2>&1"
+      interval: 15s
+      timeout: 7s
+      retries: 3
 
 ### GRAYLOG AND PROM/GRAFANA VOLUMES ###
 volumes:
@@ -200,5 +246,6 @@ volumes:
 networks:
   local:
     driver: bridge
+    external: false
   public:
     driver: bridge
