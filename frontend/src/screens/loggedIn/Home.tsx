@@ -5,7 +5,7 @@ import {useDispatch} from "react-redux";
 import {setError} from "../../redux/redux";
 
 interface HomeProps {
-  setScreen: (screen: 'home' | 'create-game') => void;
+  setScreen: (screen: 'home' | 'create-game' | 'decks') => void;
 }
 const Home = (props: HomeProps) => {
   const [joinKey, setJoinKey] = useState('');
@@ -54,6 +54,15 @@ const Home = (props: HomeProps) => {
             sx={{width: '100%'}}
             onClick={() => props.setScreen('create-game')}
           >Create Game</Button>
+        </Grid>
+      </Box>
+      <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '3vh'}}>
+        <Grid item xs={8} sm={3} md={2}>
+          <Button
+            variant={'outlined'}
+            sx={{width: '100%'}}
+            onClick={() => props.setScreen('decks')}
+          >Manage Card decks</Button>
         </Grid>
       </Box>
     </React.Fragment>
