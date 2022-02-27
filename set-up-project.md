@@ -27,6 +27,9 @@ After starting the app for the first time you will want to run the migrations
 Production mode spins up everything behind nginx, this is the exact same setup as the live server.
 Spinning up in production mode is a great way to test that everything works as expected locally before merge to master.
 
+In order for grafana to be able to persist data on host first run:
+`sudo chown -R $USER ./grafana && chmod -R 777 ./grafana`. Then continue with the steps bellow.
+
 Easiest way to start in production mode is with make commands. First run `make prod-build` to build production 
 docker images, followed by `make prod` to start everything.
 - Frontend will start on localhost

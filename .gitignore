@@ -8,6 +8,10 @@
 # Prometheus data
 prometheus/prometheus_data/*
 
+#Grafana data
+grafana/dashboards/*
+!grafana/dashboards/info.txt
+
 # npm
 *node_modules/
 

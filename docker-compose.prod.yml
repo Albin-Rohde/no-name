@@ -223,6 +223,7 @@ services:
       - prometheus
     volumes:
       - grafana_data:/etc/grafana/provisioning/
+      - ./grafana/dashboards:/var/lib/grafana
     env_file:
       - .env
     networks:
