@@ -115,6 +115,10 @@ export const loggerMiddleware = (socket: SocketWithSession, meta: MiddlewareMeta
 
 export const expressLoggingMiddleware = (req: Request, _res: Response, next: NextFunction) => {
   let body = undefined
+  if (req.path.startsWith('/health')) {
+    next();
+    return;
+  }
   if (!(req.path.startsWith('/user') && req.method == "POST")) {
     body = req.body
   }

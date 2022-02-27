@@ -15,10 +15,10 @@ const graylogFormat = winston.format.combine(
 )
 
 function getTransports(name: string): (winston.transport | WinstonGraylog2)[] {
-  const console = new winston.transports.Console({ format: winstonConsoleFormat, level: 'silly' })
+  const console = new winston.transports.Console({ format: winstonConsoleFormat, level: 'info' })
   const transports: (winston.transport | WinstonGraylog2)[] = [console];
   const graylog = new WinstonGraylog2({
-    level: 'silly',
+    level: 'debug',
     name,
     format: graylogFormat,
     graylog: {
