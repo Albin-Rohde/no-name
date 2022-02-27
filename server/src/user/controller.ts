@@ -8,7 +8,7 @@ import bcrypt from "bcrypt";
 import { v4 as uuid } from 'uuid';
 import sgMail from '@sendgrid/mail';
 import passwordReset from "../email-templates/password-reset";
-import {CreateInput, createSchema, LoginInput, loginSchema, emailSchema, updateSchema} from "./schema";
+import {CreateInput, createSchema, LoginInput, loginSchema, emailSchema, updateSchema, searchSchema} from "./schema";
 import {Redis} from "../redis";
 import {logger} from "../logger/logger";
 
@@ -27,6 +27,42 @@ userRouter.get('/get', loginRequired, (req: Request, res: Response): Response =>
     data: req.session.user
   }
   return res.json(response)
+});
+
+userRouter.get('/all', loginRequired, async (req: Request, res: Response) => {
+  try {
+    const allUsers = await User.find();
+    const response: RestResponse<User[]> = {
+      ok: true,
+      err: null,
+      data: allUsers,
+    }
+    return res.json(response);
+  } catch (err) {
+    handleRestError(req, res, err);
+  }
+});
+
+userRouter.get('/search', loginRequired, async (req: Request, res: Response) => {
+  try{
+    const { username } = searchSchema.validateSync(req.query);
+
+    const response: RestResponse<User[]> = {
+      ok: true,
+      err: null,
+      data: []
+    };
+    if (username.length < 2) {
+      return res.json(response);
+    }
+    response.data = await User.createQueryBuilder('u')
+      .where('u.username LIKE :username', {username: `${username}%`})
+      .limit(10)
+      .getMany();
+    return res.json(response);
+  } catch (err) {
+    handleRestError(req, res, err);
+  }
 })
 
 /**

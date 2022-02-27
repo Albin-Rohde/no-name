@@ -29,3 +29,9 @@ export const updateSchema = yup.object({
   (obj) => [obj.email, obj.username, obj.password].some(v => !!v)
 )
 export interface UpdateInput extends yup.Asserts<typeof updateSchema> {}
+
+export const searchSchema = yup.object({
+  username: yup.string().required(),
+})
+
+export interface SearchInput extends yup.Asserts<typeof searchSchema> {}
