@@ -11,6 +11,7 @@ import {
 import {BlackCard} from "../../card/models/BlackCard";
 import {WhiteCard} from "../../card/models/WhiteCard";
 import {User} from "../../user/models/User";
+import {CardDeckUserRef} from "./CardDeckUserRef";
 
 @Entity('card_deck')
 @Unique(['name'])
@@ -42,4 +43,8 @@ export class CardDeck extends BaseEntity {
   @ManyToOne(type => User, user => user.myDecks)
   @JoinColumn({name: 'owner_user_fk', referencedColumnName: 'id'})
   owner: User
+
+  @OneToMany(type => CardDeckUserRef, deckRef => deckRef.deck)
+  @JoinColumn()
+  userRef: CardDeckUserRef[]
 }
