@@ -14,6 +14,7 @@ import {
 import {WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {Game} from '../../game/models/Game'
 import {NotFoundError} from "../../error";
+import {CardDeck} from "../../card/models/CardDeck";
 
 @Entity({name: "player"})
 @Unique(["email"])
@@ -42,6 +43,10 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true, type: 'uuid'})
   game_fk: string | null
+
+  @OneToMany(type => CardDeck, deck => deck.owner, { onDelete: 'CASCADE' })
+  @JoinColumn({name: 'myDecks'})
+  myDecks: CardDeck[]
 
   @OneToMany(type => WhiteCardRef, card => card.user)
   @JoinColumn({name: 'user_game_session_key'})

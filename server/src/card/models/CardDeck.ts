@@ -1,6 +1,16 @@
-import {BaseEntity, Column, Entity, Index, JoinColumn, OneToMany, PrimaryGeneratedColumn, Unique} from "typeorm";
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Unique
+} from "typeorm";
 import {BlackCard} from "./BlackCard";
 import {WhiteCard} from "./WhiteCard";
+import {User} from "../../user/models/User";
 
 @Entity('card_deck')
 @Unique(['name'])
@@ -22,4 +32,14 @@ export class CardDeck extends BaseEntity {
   @OneToMany(type => WhiteCard, whiteCard => whiteCard.deck)
   @JoinColumn()
   whiteCards: WhiteCard[]
+
+  @Column({name: 'public', nullable: false, default: true})
+  public: boolean
+
+  @Column({name: 'owner_user_fk', nullable: false})
+  _owner_user_fk: number
+
+  @ManyToOne(type => User, user => user.myDecks)
+  @JoinColumn({name: 'owner_user_fk', referencedColumnName: 'id'})
+  owner: User
 }
