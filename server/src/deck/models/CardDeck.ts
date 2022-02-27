@@ -8,8 +8,8 @@ import {
   PrimaryGeneratedColumn,
   Unique
 } from "typeorm";
-import {BlackCard} from "./BlackCard";
-import {WhiteCard} from "./WhiteCard";
+import {BlackCard} from "../../card/models/BlackCard";
+import {WhiteCard} from "../../card/models/WhiteCard";
 import {User} from "../../user/models/User";
 
 @Entity('card_deck')

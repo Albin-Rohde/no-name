@@ -11,7 +11,7 @@ import session from "express-session";
 import {User} from "./user/models/User";
 import userRoute from "./user/controller";
 import gameRouter from "./game/controller";
-import cardRouter from "./card/controller";
+import deckRouter from "./deck/controller";
 import { flipCardEvent, playCardEvent, voteCardEvent } from "./card/events";
 import {
   deleteGameEvent,
@@ -170,8 +170,7 @@ function registerRoutes(app: Application) {
   })
   app.use('/user', userRoute)
   app.use('/game', gameRouter)
-  // TODO: rename this route to card-deck or something
-  app.use('/card', cardRouter)
+  app.use('/deck', deckRouter)
 }
 
 export enum Events {

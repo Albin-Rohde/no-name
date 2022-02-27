@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { GameTurn } from "./models/GameTurn";
 import { WhiteCardRef } from "../card/models/WhiteCardRef";
 import { BlackCardRef } from "../card/models/BlackCardRef";
-import { CardDeck } from "../card/models/CardDeck";
+import { CardDeck } from "../deck/models/CardDeck";
 import ShortUniqueId from "short-unique-id";
 
 

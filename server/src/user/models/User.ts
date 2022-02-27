@@ -14,7 +14,8 @@ import {
 import {WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {Game} from '../../game/models/Game'
 import {NotFoundError} from "../../error";
-import {CardDeck} from "../../card/models/CardDeck";
+import {CardDeck} from "../../deck/models/CardDeck";
+import {CardDeckAccess} from "../../deck/models/CardDeckAccess";
 
 @Entity({name: "player"})
 @Unique(["email"])

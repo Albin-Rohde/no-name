@@ -3,7 +3,7 @@ import faker from "@faker-js/faker";
 import {User} from "../user/models/User";
 import {Game} from "../game/models/Game";
 import {v4 as uuidv4} from "uuid";
-import {CardDeck} from "../card/models/CardDeck";
+import {CardDeck} from "../deck/models/CardDeck";
 import dotenv from "dotenv";
 import ShortUniqueId from "short-unique-id";
 import {getGameWithRelations} from "../game/services";

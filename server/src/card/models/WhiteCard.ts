@@ -10,7 +10,7 @@ import {
   Index
 } from "typeorm"
 import { WhiteCardRef } from "./WhiteCardRef"
-import {CardDeck} from "./CardDeck";
+import {CardDeck} from "../../deck/models/CardDeck";
 
 export enum WhiteCardType {
   NOUN='noun',

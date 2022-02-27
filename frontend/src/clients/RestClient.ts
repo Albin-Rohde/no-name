@@ -5,7 +5,7 @@ import type { RestResponse } from "./ResponseTypes";
 import {config} from "dotenv";
 config()
 
-type Routes = 'game' | 'user' | 'card'
+type Routes = 'game' | 'user' | 'deck'
 type HttpMethods = 'put' | 'get' | 'post' | 'delete'
 
 interface RestRequestOptions {
