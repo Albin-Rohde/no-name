@@ -5,7 +5,6 @@ import {Game} from "../game/models/Game";
 import {User} from "../user/models/User";
 import {DbError} from "../error";
 import {BlackCardRef, BlackCardState} from "./models/BlackCardRef";
-import {CardDeck} from "./models/CardDeck";
 
 /**
  * Get a set of random WhiteCards that is not yet
@@ -78,11 +77,4 @@ const createBlackCardRef = async (input: CreateBlackCardRefInput): Promise<Black
   return blackCardRef
 }
 
-const countCardsInDeck = async (deck: CardDeck): Promise<number> => {
-  return WhiteCard.createQueryBuilder('wc')
-    .leftJoin(CardDeck, 'cd', 'wc.deck_fk = cd.id')
-    .where('cd.id = :id', {id: deck.id})
-    .getCount();
-}
-
-export { getUnusedWhiteCards, getUnusedBlackCard, createWhiteCardRef, createBlackCardRef, countCardsInDeck }
+export { getUnusedWhiteCards, getUnusedBlackCard, createWhiteCardRef, createBlackCardRef }
