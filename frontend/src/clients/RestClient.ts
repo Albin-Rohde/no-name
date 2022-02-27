@@ -9,20 +9,22 @@ type Routes = 'game' | 'user' | 'deck'
 type HttpMethods = 'put' | 'get' | 'post' | 'delete'
 
 interface RestRequestOptions {
-  method: HttpMethods
-  route: Routes
-  data?: Record<any, any>
-  action?: string
+  method: HttpMethods;
+  route: Routes;
+  data?: Record<any, any>;
+  action?: string;
+  query?: Record<string, string>;
 }
 
 export default class RestClient {
   private readonly baseUrl = process.env.REACT_APP_API_BASE_URL;
   public async makeRequest<T>(option: RestRequestOptions): Promise<T> {
     try {
-      option.action = option.action ? `/${option.action}` : ''
+      option.action = option.action ? `/${option.action}` : '';
+      const queryString = option.query ? '?' + new URLSearchParams(option.query).toString() : ''
       const res: RestResponse<T> = await axios({
         withCredentials: true,
-        url: `${this.baseUrl}/${option.route}${option.action}`,
+        url: `${this.baseUrl}/${option.route}${option.action}${queryString}`,
         method: option.method,
         headers: {
           "Content-Type": "application/json",
