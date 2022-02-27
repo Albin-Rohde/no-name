@@ -17,9 +17,10 @@ import SetupGame from "./SetupGame";
 import InGame from "./inGame/InGame";
 import JoinGame from "./inGame/JoinGame";
 import {Route} from "react-router-dom";
+import {ManageDecks} from "./ManageDecks";
 
 const LoggedIn = () => {
-  const [screen, setScreen] = useState<'home' | 'create-game'>('home');
+  const [screen, setScreen] = useState<'home' | 'create-game' | 'decks'>('home');
   const [loading, setLoading] = useState(true);
   const [hasGame, setHasGame] = useState(false);
   const user = useSelector<ReduxState, User | null>((state) => state.user);
@@ -79,6 +80,8 @@ const LoggedIn = () => {
         return <Home setScreen={setScreen}/>
       case 'create-game':
         return <SetupGame setScreen={setScreen}/>
+      case 'decks':
+        return <ManageDecks user={user} setScreen={setScreen}/>
     }
   }
 
