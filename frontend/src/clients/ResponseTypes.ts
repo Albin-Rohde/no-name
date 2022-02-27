@@ -14,7 +14,16 @@ export interface CardDeckResponse {
   id: number,
   name: string,
   cardsCount: number,
+  public: boolean,
+  owner: number,
   description: string,
+}
+
+export interface CardDeckUsersResponse extends CardDeckResponse{
+  users: {
+    added: UserData[],
+    invited: UserData[],
+  }
 }
 
 export interface GameSocketResponse {
