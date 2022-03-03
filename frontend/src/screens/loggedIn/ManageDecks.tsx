@@ -8,28 +8,26 @@ import React, {useEffect, useState} from "react";
 import {
   AddCircleOutline,
   DeleteForever,
-  EditOutlined,
   InfoOutlined
 } from "@mui/icons-material";
 import RestClient from "../../clients/RestClient";
-import {CardDeckResponse, UserData} from "../../clients/ResponseTypes";
+import {CardDeckResponse, CardDeckUsersResponse, UserData} from "../../clients/ResponseTypes";
 import Divider from "@mui/material/Divider";
 import {AddDeckModal} from "../../components/modals/AddDeckModal";
-import {EditDeckModal} from "../../components/modals/EdiDeckModal";
 import {useDispatch} from "react-redux";
 import {setError} from "../../redux/redux";
+import {DeckCard} from "../../components/DeckCard";
 
 interface Props {
   setScreen: (screen: 'home' | 'create-game' | 'decks') => void,
   user: UserData,
 }
 export const ManageDecks = (props: Props) => {
-  const [myDecks, setMyDecks] = useState<CardDeckResponse[]>([]);
+  const [myDecks, setMyDecks] = useState<CardDeckUsersResponse[]>([]);
   const [libraryDecks, setLibraryDecks] = useState<CardDeckResponse[]>([]);
   const [publicDecks, setPublicDecks] = useState<CardDeckResponse[]>([]);
   const [invites, setInvites] = useState<CardDeckResponse[]>([]);
   const [addModalOpen, setAddModalOpen] = useState<boolean>(false);
-  const [editDeck, setEditDeck] = useState<CardDeckResponse>(null);
   const dispatch = useDispatch();
 
   const rest = new RestClient();
@@ -52,10 +50,6 @@ export const ManageDecks = (props: Props) => {
     }
   }
 
-  const onEditDeck = (deck: CardDeckResponse) => {
-    setEditDeck(deck);
-  }
-
   const deleteDeckFromLibrary = async (deckId: number) => {
     try {
       const deletedDeck = await rest.makeRequest<CardDeckResponse>({
@@ -75,7 +69,7 @@ export const ManageDecks = (props: Props) => {
   }
 
   const fetchMyDecks = async () => {
-    const data = await rest.makeRequest<CardDeckResponse[]>({
+    const data = await rest.makeRequest<CardDeckUsersResponse[]>({
       method: 'get',
       route: 'deck',
       action: 'created',
@@ -112,24 +106,22 @@ export const ManageDecks = (props: Props) => {
 
   const renderMyDecks = () => {
     return myDecks.map((deck) => {
-      return (
-        <Chip
-        onDelete={() => onEditDeck(deck)}
-        color={deck.public ? 'success' : 'primary'}
-        label={deck.name}
-        variant={'outlined'}
-        sx={{marginLeft: '1vh'}}
-        deleteIcon={<Tooltip title={'edit'}><EditOutlined/></Tooltip>}
-        size={'medium'}
-        style={{height: '4vh'}}
-        />
-      )
+      return <DeckCard
+        id={deck.id}
+        title={deck.name}
+        description={deck.description}
+        public={deck.public}
+        addedUsers={deck.users.added}
+        invitedUsers={deck.users.invited}
+        currentUser={props.user}
+      />
     })
   }
 
   const renderLibraryDecks = () => {
-    return libraryDecks.map((deck) => {
-      if (deck.owner == props.user.id) {
+    return libraryDecks
+      .filter((deck) => deck.owner !== props.user.id)
+      .map((deck) => {
         return (
           <Chip
             color={'primary'}
@@ -137,22 +129,11 @@ export const ManageDecks = (props: Props) => {
             variant={'outlined'}
             sx={{marginLeft: '1vh'}}
             size={'medium'}
+            onDelete={() => deleteDeckFromLibrary(deck.id)}
+            deleteIcon={<DeleteForever/>}
             style={{height: '4vh'}}
           />
         )
-      }
-      return (
-        <Chip
-          color={'primary'}
-          label={deck.name}
-          variant={'outlined'}
-          sx={{marginLeft: '1vh'}}
-          size={'medium'}
-          onDelete={() => deleteDeckFromLibrary(deck.id)}
-          deleteIcon={<DeleteForever/>}
-          style={{height: '4vh'}}
-        />
-      )
     })
   }
   const reFetch = async (): Promise<void> => {
@@ -183,28 +164,14 @@ export const ManageDecks = (props: Props) => {
         invites={invites}
         addDeckToLibrary={addDeckToLibrary}
       />
-      <EditDeckModal
-        open={!!editDeck}
-        setOpen={setEditDeck}
-        deck={editDeck}
-        user={props.user}
-        reFetch={reFetch}
-      />
       <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '4vh'}}>
         <Typography color={'#8795ab'} variant={'h4'}>
           Your Decks <Tooltip title={yourDecksToolTip}><Icon><InfoOutlined/></Icon></Tooltip>
         </Typography>
       </Box>
       <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '2vh'}}>
-        <Box sx={{width: '30vw'}}>
+        <Box sx={{width: '60vw', display: 'flex', justifyContent: 'center'}}>
           {renderMyDecks()}
-          <Button
-            disabled
-            variant="outlined"
-            sx={{minHeight: '4vh', marginLeft: '1vh', borderRadius: '15px'}}
-          >
-            <AddCircleOutline/>
-          </Button>
         </Box>
       </Box>
       <Box sx={{display: 'flex', justifyContent: 'center'}}>
