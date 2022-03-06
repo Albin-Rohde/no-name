@@ -1,5 +1,7 @@
 compose-prod = @docker-compose -f docker-compose.prod.yml
 host=http://localhost
+server_ip=46.59.37.131
+
 PURPLE=\033[;35m
 GREEN=\033[;32m
 RED=\033[;31m
@@ -22,6 +24,8 @@ init:
 	@echo -e "$(PURPLE)==== Installing dependencies locally ====$(NC)"
 	@cd ./frontend && npm i && cd ../server && npm i && cd ../
 	@npm i -g ts-node typeorm
+	@echo -e "$(PURPLE)==== setting up grafana permissions ====$(NC)"
+	@sudo chown -R $USER ./grafana && chmod -R 777 ./grafana
 	@echo -e "$(GREEN)====== Done with setup ======$(NC)"
 
 migrate:
@@ -52,3 +56,5 @@ prod:
 prod-stop:
 	${compose-prod} stop
 
+deploy:
+	ssh ubuntu@${server_ip} "cd app/no-name && git pull && cd ./hooks && ./post-receive"
