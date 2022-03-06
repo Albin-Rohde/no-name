@@ -18,7 +18,9 @@
   certbot certonly \
     --dns-cloudflare \
     --dns-cloudflare-credentials .env \
-    -d yobotics.club \
-    -d www.yobotics.club \
-    -d app.yobotics.club
+    -d fasoner.party \
+    -d www.fasoner.party \
+    -d app.fasoner.party \
+    -d logs.fasoner.party \
+    -d grafana.fasoner.party
   ```
