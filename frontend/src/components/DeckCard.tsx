@@ -1,4 +1,4 @@
-import {Box, Button, Card, Chip, Icon, Switch, Tooltip, Typography} from "@mui/material";
+import {Box, Button, Card, Chip, Icon, Switch, TextField, Tooltip, Typography} from "@mui/material";
 import {CardDeckResponse, UserData} from "../clients/ResponseTypes";
 import {AddCircleOutline, Clear, EditOutlined} from "@mui/icons-material";
 import Divider from "@mui/material/Divider";
@@ -25,11 +25,28 @@ const CARD_STYLE_MOBILE = {
 const CARD_STYLE_DESKTOP = {
   ...CARD_STYLE,
   minHeight: '300px',
-  maxHeight: '13.8vw',
   marginRight: '14px',
   marginLeft: '14px',
   width: '375px',
   borderRadius: '0.3vw',
+}
+
+const WHITE_CARD_ICON = {
+  width: '10px',
+  height: '16px',
+  backgroundColor: '#d7d7d7',
+  borderRadius: '1px',
+  color: 'black',
+  marginRight: '1%',
+}
+
+const BLACK_CARD_ICON = {
+  width: '10px',
+  height: '16px',
+  backgroundColor: '#232323',
+  borderRadius: '1px',
+  color: 'white',
+  marginRight: '1%',
 }
 
 interface EditProps {
@@ -43,11 +60,20 @@ const EditIcon = (props: EditProps) => {
   )
 }
 
+interface UpdateDeckData {
+  id: number
+  description?: string,
+  public?: boolean,
+  name?: string,
+}
+
 interface Props {
   id: number;
   title: string;
   description: string;
   public: boolean;
+  cardsCount: number;
+  blackCount: number;
   invitedUsers: UserData[];
   addedUsers: UserData[];
   currentUser: UserData;
@@ -57,6 +83,11 @@ export const DeckCard = (props: Props) => {
   const [invitedUser, setInvitedUsers] = useState<UserData[]>(props.invitedUsers);
   const [users, setUsers] = useState<UserData[]>(props.addedUsers);
   const [isPublic, setIsPublic] = useState<boolean>(props.public);
+  const [title, setTitle] = useState<string>(props.title);
+  const [description, setDescription] = useState<string>(props.description);
+  const [editTitle, setEditTitle] = useState<boolean>(false);
+  const [editDescription, setEditDescription] = useState<boolean>(false);
+
   const dispatch = useDispatch();
   const rest = new RestClient();
 
@@ -66,6 +97,8 @@ export const DeckCard = (props: Props) => {
 
   const removeUser = async (cardDeckId, userId) => {
     try {
+      setUsers(users.filter((u) => u.id !== userId));
+      setInvitedUsers(invitedUser.filter((u) => u.id !== userId));
       await rest.makeRequest<void>({
         method: 'post',
         route: 'deck',
@@ -82,14 +115,40 @@ export const DeckCard = (props: Props) => {
     }
   }
 
+  const updateDeck = async (data: UpdateDeckData): Promise<void> => {
+    try {
+      await rest.makeRequest<CardDeckResponse>({
+          method: 'post',
+          route: 'deck',
+          action: `update/${data.id}`,
+          data: data,
+        });
+    } catch (err) {
+      if (err.message) {
+        dispatch(setError(err.message))
+      }
+    }
+  }
+
   const togglePublic = async (_e, val: boolean): Promise<void> => {
     setIsPublic(val);
-    await rest.makeRequest<CardDeckResponse>({
-      method: 'post',
-      route: 'deck',
-      action: `update/${props.id}`,
-      data: {public: val}
-    });
+    await updateDeck({id: props.id, public: val})
+  }
+
+  const handleUpdateTitle = async (): Promise<void> => {
+    setEditTitle(false);
+    if (title === props.title) {
+      return;
+    }
+    await updateDeck({id: props.id, name: title});
+  }
+
+  const handleUpdateDesc = async (): Promise<void> => {
+    setEditDescription(false);
+    if (description === props.description) {
+      return;
+    }
+    await updateDeck({id: props.id, description});
   }
 
   const renderUsersChip = () => {
@@ -136,15 +195,44 @@ export const DeckCard = (props: Props) => {
         setOpen={setAddPlayerModalOpen}
         addUser={addUser}
         deckId={props.id}
+        invited={[...users, ...invitedUser]}
       />
       <Card sx={CARD_STYLE_DESKTOP}>
-        <Typography variant={'h5'} sx={{marginTop: '5%', textAlign: 'center'}}>
-          {props.title} <EditIcon/>
-        </Typography>
-        <Box sx={{display: 'flex', justifyContent: 'center'}}>
-          <Typography fontSize={'0.9em'} variant={'body1'} sx={{textAlign: 'center', marginTop: '1%', maxWidth: '80%'}}>
-            {props.description} <EditIcon/>
+        {editTitle && (
+          <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '5%'}}>
+            <TextField
+              variant={'standard'}
+              autoFocus
+              onBlur={handleUpdateTitle}
+              onKeyDown={(e) => e.key === 'Enter' && handleUpdateTitle()}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              sx={{width: '50%'}}
+            />
+          </Box>
+        )}
+        {!editTitle && (
+          <Typography onClick={() => setEditTitle(true)} variant={'h5'} sx={{marginTop: '5%', textAlign: 'center'}}>
+            {title} <EditIcon/>
           </Typography>
+        )}
+        <Box sx={{display: 'flex', justifyContent: 'center'}}>
+          {editDescription && (
+            <TextField
+              variant={'standard'}
+              autoFocus
+              onBlur={handleUpdateDesc}
+              onKeyDown={(e) => e.key === 'Enter' && handleUpdateDesc()}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              sx={{width: '90%', marginTop: '1%', fontSize: '0.9em'}}
+            />
+          )}
+          {!editDescription && (
+            <Typography onClick={() => setEditDescription(true)} fontSize={'0.9em'} variant={'body1'} sx={{textAlign: 'center', marginTop: '1%', maxWidth: '80%'}}>
+              {props.description} <EditIcon/>
+            </Typography>
+          )}
         </Box>
         <Box sx={{display: 'flex', justifyContent: 'center', flexDirection: 'row', marginTop: '5%', marginBottom: '3%'}}>
           <Divider style={{width: '92%'}}/>
@@ -172,6 +260,12 @@ export const DeckCard = (props: Props) => {
         </Box>
         <Box sx={{width: '92%', marginLeft: '4%'}}>
           Public <Switch checked={isPublic} onChange={togglePublic}/>
+        </Box>
+        <Box sx={{width: '92%', marginLeft: '4%', paddingBottom: '0.4%',display: 'flex', flexDirection: 'row'}}>
+          <Box sx={WHITE_CARD_ICON}/><Typography fontSize={'0.8em'}>{props.cardsCount}</Typography>
+        </Box>
+        <Box sx={{width: '92%', marginLeft: '4%', paddingBottom: '5%',display: 'flex', flexDirection: 'row'}}>
+          <Box sx={BLACK_CARD_ICON}/><Typography fontSize={'0.8em'}>{props.blackCount}</Typography>
         </Box>
       </Card>
     </React.Fragment>

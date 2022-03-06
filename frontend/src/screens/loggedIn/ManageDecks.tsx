@@ -111,6 +111,8 @@ export const ManageDecks = (props: Props) => {
         title={deck.name}
         description={deck.description}
         public={deck.public}
+        cardsCount={deck.cardsCount}
+        blackCount={deck.blackCount}
         addedUsers={deck.users.added}
         invitedUsers={deck.users.invited}
         currentUser={props.user}

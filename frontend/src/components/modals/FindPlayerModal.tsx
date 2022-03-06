@@ -44,6 +44,7 @@ interface Props {
   deckId: number;
   setOpen: (open: boolean) => void;
   addUser: (user: UserData) => void;
+  invited: UserData[];
 }
 
 export const FindPlayerModal = (props: Props) =>  {
@@ -58,12 +59,13 @@ export const FindPlayerModal = (props: Props) =>  {
         setUsers([]);
         return;
       }
-      const players = await rest.makeRequest<UserData[]>({
+      const res = await rest.makeRequest<UserData[]>({
         method: 'get',
         route: 'user',
         action: '/search',
         query: {username: e.target.value},
       });
+      const players = res.filter((p) => !props.invited.some((i) => i.id === p.id))
       setUsers(players);
     } catch (err) {
       if (err.message) {
@@ -142,6 +144,7 @@ export const FindPlayerModal = (props: Props) =>  {
           </Box>
           <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '2%'}}>
             <TextField
+              autoFocus={true}
               InputLabelProps={{
                 style: { color: '#8795ab', borderRadius: '5px' },
               }}
