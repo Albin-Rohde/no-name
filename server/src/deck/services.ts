@@ -3,10 +3,18 @@ import {WhiteCard} from "../card/models/WhiteCard";
 import {CardDeckUserRef} from "./models/CardDeckUserRef";
 import {User} from "../user/models/User";
 import {ExpectedError} from "../error";
+import {BlackCard} from "../card/models/BlackCard";
 
 const countCardsInDeck = async (deck: CardDeck): Promise<number> => {
   return WhiteCard.createQueryBuilder('wc')
     .leftJoin(CardDeck, 'cd', 'wc.deck_fk = cd.id')
+    .where('cd.id = :id', {id: deck.id})
+    .getCount();
+}
+
+const countBlackCardsInDeck = async (deck: CardDeck): Promise<number> => {
+  return BlackCard.createQueryBuilder('bc')
+    .leftJoin(CardDeck, 'cd', 'cd.id = bc.deck_fk')
     .where('cd.id = :id', {id: deck.id})
     .getCount();
 }
@@ -18,6 +26,7 @@ export interface CardDeckData {
   owner: number
   description: string,
   cardsCount: number,
+  blackCount: number,
 }
 
 export const normalizeDeckData = async (decks: CardDeck[]): Promise<CardDeckData[]> => {
@@ -29,6 +38,7 @@ export const normalizeDeckData = async (decks: CardDeck[]): Promise<CardDeckData
       owner: deck._owner_user_fk,
       description: deck.description,
       cardsCount: await countCardsInDeck(deck),
+      blackCount: await countBlackCardsInDeck(deck),
     }
   })
   return await Promise.all(deckData)
@@ -56,6 +66,7 @@ export const normalizeDeckWithUser = async (decks: CardDeck[]): Promise<DeckWith
       owner: deck._owner_user_fk,
       description: deck.description,
       cardsCount: await countCardsInDeck(deck),
+      blackCount: await countBlackCardsInDeck(deck),
       users: {
         added,
         invited,

@@ -14,6 +14,7 @@ export interface CardDeckResponse {
   id: number,
   name: string,
   cardsCount: number,
+  blackCount: number,
   public: boolean,
   owner: number,
   description: string,
