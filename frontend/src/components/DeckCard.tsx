@@ -15,11 +15,10 @@ const CARD_STYLE = {
 const CARD_STYLE_MOBILE = {
   ...CARD_STYLE,
   minHeight: '240px',
-  maxHeight: '240px',
-  marginRight: '2%',
-  marginLeft: '2%',
-  minWidth: '200px',
-  maxWidth: '200px',
+  marginRight: '5%',
+  marginLeft: '5%',
+  minWidth: '60vw',
+  scrollSnapAlign: 'center',
 }
 
 const CARD_STYLE_DESKTOP = {
@@ -88,6 +87,7 @@ export const DeckCard = (props: Props) => {
   const [editTitle, setEditTitle] = useState<boolean>(false);
   const [editDescription, setEditDescription] = useState<boolean>(false);
 
+  const isMobile = window.screen.width < 800;
   const dispatch = useDispatch();
   const rest = new RestClient();
 
@@ -197,7 +197,7 @@ export const DeckCard = (props: Props) => {
         deckId={props.id}
         invited={[...users, ...invitedUser]}
       />
-      <Card sx={CARD_STYLE_DESKTOP}>
+      <Card sx={isMobile ? CARD_STYLE_MOBILE : CARD_STYLE_DESKTOP}>
         {editTitle && (
           <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '5%'}}>
             <TextField
