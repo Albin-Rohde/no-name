@@ -2,6 +2,7 @@ import { User } from './models/User'
 import {CreateError} from "../error";
 import bcrypt from "bcrypt";
 import {WhiteCardRef} from "../card/models/WhiteCardRef";
+import {CardDeckUserRef} from "../deck/models/CardDeckUserRef";
 
 /**
  * Get a user with relevant relations
@@ -46,6 +47,10 @@ export async function createUser (body: CreateUserData): Promise<User> {
   user.password = await bcrypt.hash(body.password, 10)
   user.email = body.email.toLowerCase()
   user.username = body.username
+  const deckRef = new CardDeckUserRef();
+  deckRef.user = user;
+  deckRef.card_deck_fk = 3;
+  user.deckRef = [await deckRef.save()]
   await user.save()
   return user
 }

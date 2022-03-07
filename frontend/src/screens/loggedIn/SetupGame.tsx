@@ -50,7 +50,7 @@ const SetupGame = (props: SetupGameProps) => {
   }
   const fetchDecks = async () => {
     try {
-      const decks = await rest.makeRequest<CardDeckResponse[]>({method: 'get', route: 'deck'});
+      const decks = await rest.makeRequest<CardDeckResponse[]>({method: 'get', route: 'deck', action: 'library'});
       setDecks(decks);
       if (decks[0]) {
         setDeck(decks[0].id)
