@@ -1,8 +1,10 @@
 import {
-  Box, Button,
-  Chip, Icon,
+  Box,
+  Button,
+  Chip,
+  Icon,
   Tooltip,
-  Typography
+  Typography,
 } from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {
@@ -31,6 +33,8 @@ export const ManageDecks = (props: Props) => {
   const dispatch = useDispatch();
 
   const rest = new RestClient();
+
+  const isMobile = window.screen.width < 800;
 
   const addDeckToLibrary = async (deckId: number) => {
     try {
@@ -157,6 +161,12 @@ export const ManageDecks = (props: Props) => {
 
   const yourDecksToolTip: string = 'There are the decks that you have created, you may edit these.'
   const libraryToolTip: string = 'These are the decks you have added to your library.'
+  const myDecksStyle = {
+    width: isMobile ? '100vw' : '60vw',
+    display: 'flex',
+    justifyContent: isMobile ? 'left' : 'center',
+    overflow: isMobile ? 'scroll' : 'none',
+  }
   return (
     <React.Fragment>
       <AddDeckModal
@@ -172,7 +182,7 @@ export const ManageDecks = (props: Props) => {
         </Typography>
       </Box>
       <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '2vh'}}>
-        <Box sx={{width: '60vw', display: 'flex', justifyContent: 'center'}}>
+        <Box sx={myDecksStyle}>
           {renderMyDecks()}
         </Box>
       </Box>
@@ -185,7 +195,7 @@ export const ManageDecks = (props: Props) => {
         </Typography>
       </Box>
       <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '2vh'}}>
-        <Box sx={{width: '30vw'}}>
+        <Box sx={{maxWidth: isMobile ? '80vw' : '30vw'}}>
           {renderLibraryDecks()}
           <Button
             onClick={() => setAddModalOpen(true)}
@@ -195,6 +205,9 @@ export const ManageDecks = (props: Props) => {
             <AddCircleOutline/>
           </Button>
         </Box>
+      </Box>
+      <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '15vh'}}>
+        <Button color='error' variant={'outlined'} onClick={() => props.setScreen('home')}>Back</Button>
       </Box>
     </React.Fragment>
   )
