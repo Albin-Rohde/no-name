@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {
-  AddCircleOutline,
+  AddCircleOutline, Clear,
   DeleteForever,
   InfoOutlined
 } from "@mui/icons-material";
@@ -136,7 +136,7 @@ export const ManageDecks = (props: Props) => {
             sx={{marginLeft: '1vh'}}
             size={'medium'}
             onDelete={() => deleteDeckFromLibrary(deck.id)}
-            deleteIcon={<DeleteForever/>}
+            deleteIcon={<Clear/>}
             style={{height: '4vh'}}
           />
         )
