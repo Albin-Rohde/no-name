@@ -39,19 +39,19 @@ export async function createUser (body: CreateUserData): Promise<User> {
   const existingUser = await User.createQueryBuilder('user')
     .where('LOWER(user.email) = :email', {email: body.email.toLowerCase()})
     .orWhere('LOWER(user.username) = :username', {username: body.username.toLowerCase()})
-    .getOne()
+    .getOne();
   if (existingUser) {
     throw new CreateError('A user with same Email or Username already exist')
   }
-  const user = new User()
-  user.password = await bcrypt.hash(body.password, 10)
-  user.email = body.email.toLowerCase()
-  user.username = body.username
+  const user = new User();
+  user.password = await bcrypt.hash(body.password, 10);
+  user.email = body.email.toLowerCase();
+  user.username = body.username;
+  await user.save();
   const deckRef = new CardDeckUserRef();
   deckRef.user = user;
   deckRef.card_deck_fk = 3;
-  user.deckRef = [await deckRef.save()]
-  await user.save()
+  await deckRef.save();
   return user
 }
 
