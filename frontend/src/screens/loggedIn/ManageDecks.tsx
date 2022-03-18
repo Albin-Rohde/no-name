@@ -2,7 +2,7 @@ import {
   Box,
   Button,
   Chip,
-  Icon,
+  Icon, Skeleton,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -19,6 +19,7 @@ import {AddDeckModal} from "../../components/modals/AddDeckModal";
 import {useDispatch} from "react-redux";
 import {setError} from "../../redux/redux";
 import {DeckCard} from "../../components/DeckCard";
+import Spinner from "../../components/Spinner";
 
 interface Props {
   setScreen: (screen: 'home' | 'create-game' | 'decks') => void,
@@ -26,6 +27,7 @@ interface Props {
 }
 export const ManageDecks = (props: Props) => {
   const [myDecks, setMyDecks] = useState<CardDeckUsersResponse[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [libraryDecks, setLibraryDecks] = useState<CardDeckResponse[]>([]);
   const [publicDecks, setPublicDecks] = useState<CardDeckResponse[]>([]);
   const [invites, setInvites] = useState<CardDeckResponse[]>([]);
@@ -109,6 +111,21 @@ export const ManageDecks = (props: Props) => {
   }
 
   const renderMyDecks = () => {
+    const width = isMobile ? '60vw' : '340px';
+    const height = isMobile ? '300px' : '320px';
+    const style = {
+      marginLeft: isMobile ? '5%' : '14px',
+      marginRight: isMobile ? '5%' : '14px',
+      borderRadius: isMobile? '0.3vw' : '0.3vw'
+    }
+    if (loading) {
+      return (
+        <Skeleton variant="rectangular" sx={style} width={width} height={height} />
+      )
+    }
+    if (myDecks.length === 0) {
+      return <Box sx={{height: '300px'}}/>
+    }
     return myDecks.map((deck) => {
       return <DeckCard
         id={deck.id}
@@ -137,7 +154,7 @@ export const ManageDecks = (props: Props) => {
             size={'medium'}
             onDelete={() => deleteDeckFromLibrary(deck.id)}
             deleteIcon={<Clear/>}
-            style={{height: '4vh'}}
+            style={{height: isMobile ? '5vh' : '2.7vh'}}
           />
         )
     })
@@ -148,6 +165,9 @@ export const ManageDecks = (props: Props) => {
       await fetchLibraryDecks();
       await fetchPublicDecks();
       await fetchInvites();
+      if (loading) {
+        setLoading(false);
+      }
     } catch (err) {
       if (err.message) {
         dispatch(setError(err.message))
@@ -200,7 +220,7 @@ export const ManageDecks = (props: Props) => {
           <Button
             onClick={() => setAddModalOpen(true)}
             variant="outlined"
-            sx={{minHeight: '4vh', marginLeft: '1vh', borderRadius: '15px'}}
+            sx={{minHeight: '2vh', marginLeft: '1vh', borderRadius: '15px'}}
           >
             <AddCircleOutline/>
           </Button>

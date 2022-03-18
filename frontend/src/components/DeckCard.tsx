@@ -14,7 +14,7 @@ const CARD_STYLE = {
 
 const CARD_STYLE_MOBILE = {
   ...CARD_STYLE,
-  minHeight: '240px',
+  minHeight: '300px',
   marginRight: '5%',
   marginLeft: '5%',
   minWidth: '60vw',
@@ -160,25 +160,23 @@ export const DeckCard = (props: Props) => {
               color={'primary'}
               label={user.username}
               variant={'outlined'}
-              sx={{marginLeft: '1vh'}}
+              sx={{marginLeft: '1vh', height: isMobile ? '4.6vh' : '3vh'}}
               size={'medium'}
               onDelete={() => removeUser(props.id, user.id)}
               deleteIcon={<Clear/>}
-              style={{height: '3vh'}}
             />
           </Tooltip>
         )
       })
     const invitedUserChips = invitedUser.map((user) => {
       return (
-        <Tooltip title={'Invite is pending accept'}>
+        <Tooltip title={'Invite is pending accept'} sx={{minHeight: '3vh'}}>
           <Chip
             color={'warning'}
             label={user.username}
             variant={'outlined'}
-            sx={{marginLeft: '1vh'}}
+            sx={{marginLeft: '1vh', height: '3vh'}}
             size={'medium'}
-            style={{height: '3vh'}}
             onDelete={() => removeUser(props.id, user.id)}
             deleteIcon={<Clear/>}
           />
