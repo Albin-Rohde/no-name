@@ -11,7 +11,7 @@ Along with this project is a Makefile. The most common commands are located in t
 getting started.
 When requirements are met run `make init` from root.
 This will prepare everything that's needed in order to run the project.
-`make init` will copy all .env files to correct directories and pull/build all docker images.
+`make init` will copy all .env files to correct directories and pull/build all docker images for the dev environment.
 
 ## Starting in development mode
 Development mode will spin up backend(server) and frontend with autoreload to make development as easy as possible.

@@ -25,14 +25,14 @@ init:
 	@cd ./frontend && npm i && cd ../server && npm i && cd ../
 	@npm i -g ts-node typeorm
 	@echo -e "$(PURPLE)==== setting up grafana permissions ====$(NC)"
-	@sudo chown -R $USER ./grafana && chmod -R 777 ./grafana
+	@sudo chown -R $(USER) ./grafana && chmod -R 777 ./grafana
 	@echo -e "$(GREEN)====== Done with setup ======$(NC)"
 
 migrate:
-	@docker-compose exec server sh -c "npm run migration:run"
+	cd ./server && npm run migration:run && cd ..
 
 dev:
-	@docker-compose up -d
+	@docker-compose up -d db server frontend redis && make migrate
 
 stop:
 	@docker-compose stop
