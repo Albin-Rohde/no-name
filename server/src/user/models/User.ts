@@ -38,6 +38,7 @@ export class User extends BaseEntity {
 
   @ManyToOne(type => Game, game => game._users, {
     cascade: true,
+    onDelete: 'CASCADE'
   })
   @JoinColumn({name: 'game_fk'})
   game: Game
@@ -49,11 +50,11 @@ export class User extends BaseEntity {
   @JoinColumn({name: 'myDecks'})
   myDecks: CardDeck[]
 
-  @OneToMany(type => CardDeckUserRef, cardRef => cardRef.user)
+  @OneToMany(type => CardDeckUserRef, cardRef => cardRef.user, {onDelete: 'CASCADE'})
   @JoinColumn()
   deckRef: CardDeckUserRef[]
 
-  @OneToMany(type => WhiteCardRef, card => card.user)
+  @OneToMany(type => WhiteCardRef, card => card.user, {onDelete: 'CASCADE'})
   @JoinColumn({name: 'user_game_session_key'})
   _cards: WhiteCardRef[]
 
