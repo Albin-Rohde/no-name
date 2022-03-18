@@ -1,6 +1,6 @@
 compose-prod = @docker-compose -f docker-compose.prod.yml
 host=http://localhost
-server_ip=46.59.37.131
+server_ip=81.170.195.205
 
 PURPLE=\033[;35m
 GREEN=\033[;32m
