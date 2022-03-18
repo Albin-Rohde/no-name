@@ -20,8 +20,8 @@ Clone this repo and follow the steps in [set-up-project](./set-up-project.md) to
 ### Tech stack
 This project consists of two parts; A Frontend and a Backend. These are called [`frontend`](./frontend/README.md) and [`server`](./server/README.md) in the repo.
 
-The frontend is a react typescript project using material ui for most of the components. 
-Along with a redux store for state management. Read more about the frontend [here](./frontend/README.md)
+The frontend is a react typescript project with material ui for most of the components. 
+It uses redux as store for state management. Read more about the frontend [here](./frontend/README.md)
 
 The backend is developed in typescript using `express` and `socket-io` as rest and socket frameworks/lib.
 Read more about the server [here](./server/README.md).
@@ -43,6 +43,3 @@ When the card wizz has read all cards, he/she should decide on the funniest comb
 
 The winner is awarded 1 point and the gamw will continue to the next round, a new card wizz will be assigned for the
 new round.
-
-## Report Issues
-Issues should be created on the github page for this repo https://github.com/albinr99salt/no-name/issues. Issues can also be reported to albin.rohde@notifyme.se
