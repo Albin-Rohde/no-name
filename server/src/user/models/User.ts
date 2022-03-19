@@ -30,7 +30,7 @@ export class User extends BaseEntity {
   @Column({name: "email"})
   email: string
 
-  @Column()
+  @Column({name: 'password', select: false})
   password: string
 
   @Column({name: "username", length: 20})
