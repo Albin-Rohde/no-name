@@ -71,6 +71,7 @@ export interface CardResponse {
 export interface BlackCardResponse {
   id: number
   text: string
+  blanks: number
 }
 
 export interface UserData {
