@@ -29,20 +29,6 @@ userRouter.get('/get', loginRequired, (req: Request, res: Response): Response =>
   return res.json(response)
 });
 
-userRouter.get('/all', loginRequired, async (req: Request, res: Response) => {
-  try {
-    const allUsers = await User.find();
-    const response: RestResponse<User[]> = {
-      ok: true,
-      err: null,
-      data: allUsers,
-    }
-    return res.json(response);
-  } catch (err) {
-    handleRestError(req, res, err);
-  }
-});
-
 userRouter.get('/search', loginRequired, async (req: Request, res: Response) => {
   try{
     const { username } = searchSchema.validateSync(req.query);
