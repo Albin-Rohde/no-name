@@ -80,6 +80,7 @@ userRouter.post('/login', async (req: Request, res: Response) => {
     if (!passwordOk) {
       throw new AuthenticationError('Incorrect email or password')
     }
+    user.password = undefined;
     req.session.user = user
     req.session.save(() => null)
     const response: RestResponse<User> = {
