@@ -20,12 +20,11 @@ const authUser = async (sessionUser: User) => {
   if(!sessionUser) {
     throw new AuthenticationError('You are not logged in.')
   }
-  const user = await User.findOne(sessionUser.id, {relations: ['game', 'game._users']})
+  const user = await User.findOne(sessionUser.id, {
+    relations: ['game', 'game._users'],
+  });
   if(!user) {
     throw new NotFoundError(`Could not find <User> with id ${sessionUser.id}`)
-  }
-  if(user.email !== sessionUser.email || user.password !== sessionUser.password) {
-    throw new AuthenticationError('AUTH_FAILED')
   }
   return user
 }

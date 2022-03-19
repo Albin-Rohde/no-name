@@ -84,8 +84,9 @@ userRouter.post('/login', async (req: Request, res: Response) => {
   try {
     const input: LoginInput = loginSchema.validateSync(req.body)
     const user = await User.createQueryBuilder('user')
+      .addSelect('user.password')
       .where('LOWER(user.email) = :email', { email: input.email.toLowerCase() })
-      .getOne()
+      .getOne();
     if(!user) {
       throw new AuthenticationError(`Incorrect email or password`)
     }
