@@ -39,8 +39,9 @@ interface CardResponse {
 }
 
 interface BlackCardResponse {
-  id: number,
-  text: string,
+  id: number;
+  text: string;
+  blanks: number;
 }
 
 const normalizeUserResponse = (user: User, currentRound: GameTurn | undefined): UserResponse => ({
@@ -65,7 +66,8 @@ const normalizeBlackCardResponse = (card: BlackCardRef): BlackCardResponse | und
   if (card) {
     return {
       id: card.id,
-      text: card.blackCard.text
+      text: card.blackCard.text,
+      blanks: card.blackCard.blanks,
     }
   }
   return undefined
