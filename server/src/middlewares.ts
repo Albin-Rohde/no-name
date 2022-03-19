@@ -6,7 +6,8 @@ import {
   GameRequiredError,
   NotFoundError,
   GameRuleError,
-  WrappedValidationError, WrappedError
+  WrappedValidationError,
+  WrappedError
 } from "./error";
 import { RestResponse } from "./types";
 import {expressLogger, logger, socketLogger} from "./logger/logger";
@@ -32,6 +33,9 @@ const authUser = async (sessionUser: User) => {
   });
   if(!user) {
     throw new NotFoundError(`Could not find <User> with id ${sessionUser.id}`)
+  }
+  if(user.email !== sessionUser.email || user.password !== sessionUser.password) {
+    throw new AuthenticationError('AUTH_FAILED')
   }
   return user
 }
@@ -65,11 +69,15 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
     ok: false,
     err: {
       message: err.message,
-      name: err.name
+      name: err.name,
     },
     data: null
   }
-  const extraErrorMeta = {userId: req.session?.user?.id, tracingId: req.tracingId};
+  const extraErrorMeta = {
+    userId: req.session?.user?.id,
+    tracingId: req.tracingId,
+    endpoint: req.originalUrl,
+  };
   if (err instanceof GameRuleError) {
     err.extra = extraErrorMeta
     logger.warn(err);
@@ -157,7 +165,7 @@ export const expressLoggingMiddleware = (req: Request, _res: Response, next: Nex
   }
   expressLogger.debug(message, {
     body,
-    url: req.url,
+    url: req.originalUrl,
     method: req.method,
     query: req.query,
     userId: req.session?.user?.id,
