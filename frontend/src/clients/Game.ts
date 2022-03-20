@@ -1,6 +1,12 @@
 import autoBind from "auto-bind";
-import type { BlackCardResponse, CardResponse, GameOptionsResponse, GameSocketResponse, UserResponse } from './ResponseTypes';
-import { CardState } from "./ResponseTypes";
+import type {
+  BlackCardResponse,
+  CardResponse,
+  GameOptionsResponse,
+  GameSocketResponse,
+  UserResponse
+} from './ResponseTypes';
+import {CardState} from "./ResponseTypes";
 
 export enum GameState {
   PLAYING = 'playing',
@@ -66,7 +72,9 @@ export default class Game {
   public get playedCards(): CardResponse[] {
     let allPlayedCards: CardResponse[] = []
     for (const player of this.players) {
-      allPlayedCards = [...allPlayedCards, ...player.cards.filter(card => card.state !== CardState.HAND)]
+      allPlayedCards = [...allPlayedCards, ...player.cards.filter((card) => {
+        return card.state !== CardState.HAND && card.order === 0; // Ignore cards with order > 0
+      })]
     }
     return allPlayedCards.sort((a, b) => a.id - b.id)
   }
@@ -96,7 +104,7 @@ export default class Game {
     if(!allHasPlayed) {
       return GameState.PLAYING
     }
-    let playedCards = this.playedCards.filter((card) => card.order === 0)
+    let playedCards = this.playedCards
     if(playedCards.some(card => card.state === CardState.PLAYED_HIDDEN)) {
       return GameState.FLIPPING
     }
@@ -106,5 +114,25 @@ export default class Game {
     if(playedCards.some(card => card.state === CardState.WINNER)) {
       return GameState.DISPLAY_WINNER
     }
+  }
+
+  public getCombinedCard = (card: CardResponse): CardResponse => {
+    if (card.order !== 0) {
+      throw new Error('Card to get combined sibling should have an order of 0');
+    }
+    let allPlayedCards: CardResponse[] = []
+    for (const player of this.players) {
+      allPlayedCards = [...allPlayedCards, ...player.cards.filter((card) => {
+        return card.state !== CardState.HAND || card.state !== CardState.HAND
+      })]
+    }
+    // Find card played by the same player, with an order of 1. This is the second card that the player played.
+    const combinedCard = allPlayedCards.find((c) => {
+      return c.order === 1 && c.playedBy === card.playedBy;
+    })
+    if (!combinedCard) {
+      throw new Error(`No combinedCard found for card ${card.id}`);
+    }
+    return combinedCard;
   }
 }

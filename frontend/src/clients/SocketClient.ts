@@ -137,9 +137,7 @@ export class SocketClient {
     if(!this.game.players.every(user => user.hasPlayed)) {
       throw new Error('All user must play before voting')
     }
-    const allCards = this.game.players.flatMap(user => user.cards)
-      .filter((card) => card.order === 0);
-    if(allCards.some(card => card.state === CardState.PLAYED_HIDDEN)) {
+    if(this.game.playedCards.some(card => card.state === CardState.PLAYED_HIDDEN)) {
       throw new Error('All cards must be flipped before vote')
     }
     this.socket.emit(Events.VOTE_CARD, card.id)
