@@ -113,8 +113,7 @@ export class SocketClient {
   public playCard(cards: CardResponse[]) {
     if(!this.socket) throw new Error('InGameClient not connected to socket.')
     if(!this.game.currentUser.hasPlayed) {
-      // backend only supports playing 1 card
-      this.socket.emit(Events.PLAY_CARD, cards[0].id)
+      this.socket.emit(Events.PLAY_CARD, cards.map((c) => c.id))
     }
   }
 
