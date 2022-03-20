@@ -11,6 +11,9 @@ import {getGameFromUser} from "../game/services";
  */
 export async function playCardEvent(io: Server, socket: Socket, cardIds: [number]) {
   const game = await getGameFromUser(socket.request.session.user.id);
+  if (cardIds.length < 1) {
+    throw new Error('Received empty list of cardIds');
+  }
   if (!game.active) {
     throw new GameStateError('Can not play card in inactive game')
   }
@@ -20,8 +23,8 @@ export async function playCardEvent(io: Server, socket: Socket, cardIds: [number
   if (game.isFinished) {
     throw new GameStateError('Can not play card in finished game')
   }
-  if (cardIds.length > game.blackCard.blackCard.blanks) {
-    throw new NotAllowedError('You can not play that many white cards in this turn.');
+  if (cardIds.length !== game.blackCard.blackCard.blanks) {
+    throw new NotAllowedError('Invalid number of white cards played.');
   }
   const cards = cardIds.map((cardId) => game.currentUser.findCard(cardId));
   await Promise.all(cards.map((wcr, order) => wcr.play(order)));
