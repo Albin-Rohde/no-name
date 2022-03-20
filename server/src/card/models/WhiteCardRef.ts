@@ -50,6 +50,9 @@ export class WhiteCardRef extends BaseEntity {
   @Column({name: 'user_id_fk', nullable: false})
   user_id_fk: number
 
+  @Column({name: 'order', nullable: false, default: 0})
+  order: number;
+
   /**
    * Set self to state PLAYED_HIDDEN
    */

@@ -36,6 +36,8 @@ interface CardResponse {
   id: number
   text: string
   state: CardState
+  order: number
+  playedBy: number
 }
 
 interface BlackCardResponse {
@@ -49,17 +51,19 @@ const normalizeUserResponse = (user: User, currentRound: GameTurn | undefined): 
   username: user.username,
   cards: user.cards
     .filter((card) => card.state !== CardState.USED)
-    .map((card) => normalizeCardResponse(card)),
+    .map((card) => normalizeCardResponse(card, user)),
   cardWizz: currentRound?.card_wizz_user_id_fk === user.id,
   hasPlayed: user.hasPlayed,
   isHost: user.isHost,
   score: user.score,
 })
 
-const normalizeCardResponse = (card: WhiteCardRef): CardResponse => ({
+const normalizeCardResponse = (card: WhiteCardRef, user: User): CardResponse => ({
   id: card.id,
   text: card.white_card.text,
   state: card.state,
+  order: card.order,
+  playedBy: user.id,
 })
 
 const normalizeBlackCardResponse = (card: BlackCardRef): BlackCardResponse | undefined => {
