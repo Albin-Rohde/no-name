@@ -58,7 +58,7 @@ const CardsList = (props: CardsListProps) => {
       if (props.blackCard.blanks === 1) {
         return (<React.Fragment>{blackTextParts[0]}<b>{card.text}</b> {blackTextParts[1]}</React.Fragment>);
       }
-      const secondWhiteCard = game.getCombinedCard(card);
+      const secondWhiteCard = game.getSecondPlayedCard(card);
       if (blackTextParts.length < 3) {
         throw new Error('blackCardTextParts where to short to render 2 white cards.')
       }

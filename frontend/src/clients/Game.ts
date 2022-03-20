@@ -73,7 +73,7 @@ export default class Game {
     let allPlayedCards: CardResponse[] = []
     for (const player of this.players) {
       allPlayedCards = [...allPlayedCards, ...player.cards.filter((card) => {
-        return card.state !== CardState.HAND && card.order === 0; // Ignore cards with order > 0
+        return card.state !== CardState.HAND && card.order === 0;
       })]
     }
     return allPlayedCards.sort((a, b) => a.id - b.id)
@@ -116,7 +116,7 @@ export default class Game {
     }
   }
 
-  public getCombinedCard = (card: CardResponse): CardResponse => {
+  public getSecondPlayedCard = (card: CardResponse): CardResponse => {
     if (card.order !== 0) {
       throw new Error('Card to get combined sibling should have an order of 0');
     }
