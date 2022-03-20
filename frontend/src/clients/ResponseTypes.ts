@@ -66,6 +66,8 @@ export interface CardResponse {
   id: number
   text: string
   state: CardState
+  order: number
+  playedBy: number
 }
 
 export interface BlackCardResponse {
