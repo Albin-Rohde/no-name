@@ -1,9 +1,10 @@
 import {Card, CardContent, Typography} from "@mui/material";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {BlackCardResponse, CardResponse, CardState} from '../../../../clients/ResponseTypes';
 
 interface CardsListProps {
   cards: CardResponse[];
+  selectedCards: CardResponse[];
   blackCard: BlackCardResponse;
   cardClickCb: (card: CardResponse) => any;
   lastFlipped: CardResponse;
@@ -95,10 +96,11 @@ const CardsList = (props: CardsListProps) => {
 
   const cards = props.cards.map((card) => {
     const cardStyle = isMobile ? CARD_STYLE_MOBILE : CARD_STYLE_DESKTOP;
+    const selected = props.selectedCards.includes(card);
     return (
       <Card
         id={card.id.toString()}
-        sx={cardStyle}
+        sx={{...cardStyle, border: selected ? '2px solid #b0b0b0' : '0px'}}
         className='noSelect playedCards' // prevent some default behaviour regarding clickables.
         onClick={() => props.cardClickCb(card)}
       >

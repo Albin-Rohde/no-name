@@ -8,6 +8,7 @@ type CardClickCallback = (card: CardResponse) => void;
 
 interface RenderCardsProps {
   game: Game;
+  selectedCards: CardResponse[],
   handleCardClick: CardClickCallback,
   handleFlipClick: CardClickCallback,
   handleVoteClick: CardClickCallback,
@@ -96,7 +97,7 @@ const RenderCards = (props: RenderCardsProps) => {
           marginTop: '2vh',
           scrollSnapType: 'x mandatory',
         }}>
-          <CardsList cards={state.cards} lastFlipped={props.game.lastFlipped} blackCard={state.blackCard} cardClickCb={state.cardClickCb}/>
+          <CardsList selectedCards={props.selectedCards} cards={state.cards} lastFlipped={props.game.lastFlipped} blackCard={state.blackCard} cardClickCb={state.cardClickCb}/>
         </Box>
       </Box>
     )
@@ -107,7 +108,7 @@ const RenderCards = (props: RenderCardsProps) => {
           {state.helpText}
         </Typography>
         <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '2vh'}}>
-          <CardsList cards={state.cards} lastFlipped={props.game.lastFlipped} blackCard={state.blackCard} cardClickCb={state.cardClickCb}/>
+          <CardsList selectedCards={props.selectedCards} cards={state.cards} lastFlipped={props.game.lastFlipped} blackCard={state.blackCard} cardClickCb={state.cardClickCb}/>
         </Box>
       </Box>
     )

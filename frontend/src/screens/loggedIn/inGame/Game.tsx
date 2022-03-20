@@ -13,13 +13,25 @@ import RenderCards from "./components/RenderCards";
 
 const Game = () => {
   const [confirmPlayOpen, setConfirmPlayOpen] = useState(false);
-  const [openCard, setOpenCard] = useState<CardResponse>(null);
+  const [openCards, setOpenCards] = useState<CardResponse[]>([]);
   const game = useSelector<ReduxState, GameClient.default>((state) => state.game);
   const socket = useSelector<ReduxState, SocketClient>((state) => state.socket);
 
   const handleCardClick = (card: CardResponse) => {
-    if (!game.currentUser.hasPlayed) {
-      setOpenCard(card);
+    if (game.currentUser.hasPlayed) {
+      return
+    }
+    if (openCards.includes(card)) {
+      setOpenCards(openCards.filter(c => c.id !== card.id))
+      return;
+    }
+    if (game.blackCard.blanks < 2) {
+      setOpenCards([card]);
+      setConfirmPlayOpen(true);
+      return;
+    }
+    setOpenCards([...openCards, card]);
+    if (game.blackCard.blanks === openCards.length + 1) {
       setConfirmPlayOpen(true);
     }
   }
@@ -30,13 +42,13 @@ const Game = () => {
     socket.voteCard(card);
   }
   const handlePlayCard = () => {
-    socket.playCard(openCard);
-    setOpenCard(null);
+    socket.playCard(openCards);
+    setOpenCards([]);
     setConfirmPlayOpen(false);
   }
   const closeModal = () => {
     setConfirmPlayOpen(false);
-    setOpenCard(null);
+    setOpenCards([]);
   }
   const isMobile = window.screen.width < 800;
 
@@ -87,17 +99,18 @@ const Game = () => {
         <RenderCards
           {...{
             game,
+            selectedCards: openCards,
             handleCardClick,
             handleFlipClick,
             handleVoteClick,
-            handlePlayCard
+            handlePlayCard,
           }}
         />
       </Box>
       <Grid item sm={3} md={4}/>
       <ConfirmPlayModal
         open={confirmPlayOpen}
-        card={openCard}
+        cards={openCards}
         close={closeModal}
         playCard={handlePlayCard}
       />
