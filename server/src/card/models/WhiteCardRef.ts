@@ -56,8 +56,9 @@ export class WhiteCardRef extends BaseEntity {
   /**
    * Set self to state PLAYED_HIDDEN
    */
-  public play = async () => {
+  public play = async (order?: number) => {
     this.state = CardState.PLAYED_HIDDEN
+    this.order = order || 0;
     await this.save()
   }
 

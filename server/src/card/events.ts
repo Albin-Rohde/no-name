@@ -9,7 +9,7 @@ import {getGameFromUser} from "../game/services";
  * Will play the card on the game that the user
  * is attached to. If allowed by game rules.
  */
-export async function playCardEvent(io: Server, socket: Socket, cardId: number) {
+export async function playCardEvent(io: Server, socket: Socket, cardIds: [number]) {
   const game = await getGameFromUser(socket.request.session.user.id);
   if (!game.active) {
     throw new GameStateError('Can not play card in inactive game')
@@ -20,10 +20,13 @@ export async function playCardEvent(io: Server, socket: Socket, cardId: number) 
   if (game.isFinished) {
     throw new GameStateError('Can not play card in finished game')
   }
-  const card = game.currentUser.findCard(cardId)
-  await card.play()
-  game.currentUser.hasPlayed = true
-  await emitUpdateEvent(io, socket, game)
+  if (cardIds.length > game.blackCard.blackCard.blanks) {
+    throw new NotAllowedError('You can not play that many white cards in this turn.');
+  }
+  const cards = cardIds.map((cardId) => game.currentUser.findCard(cardId));
+  await Promise.all(cards.map((wcr, order) => wcr.play(order)));
+  game.currentUser.hasPlayed = true;
+  await emitUpdateEvent(io, socket, game);
 }
 
 /**
@@ -69,7 +72,7 @@ export async function voteCardEvent(io: Server, socket: Socket, cardId: number) 
   if (!game.allPlayers.every(user => user.hasPlayed)) {
     throw new NotAllowedError('ALl user must play before voting')
   }
-  if(game.allPlayerCards.some(card => card.state === CardState.PLAYED_HIDDEN)) {
+  if (game.allPlayerCards.some(card => card.state === CardState.PLAYED_HIDDEN && card.order === 0)) {
     throw new NotAllowedError('All cards must be flipped before voting')
   }
   const card = game.findCard(cardId)
