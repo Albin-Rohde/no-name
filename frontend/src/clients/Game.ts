@@ -96,7 +96,7 @@ export default class Game {
     if(!allHasPlayed) {
       return GameState.PLAYING
     }
-    let playedCards = this.playedCards
+    let playedCards = this.playedCards.filter((card) => card.order === 0)
     if(playedCards.some(card => card.state === CardState.PLAYED_HIDDEN)) {
       return GameState.FLIPPING
     }

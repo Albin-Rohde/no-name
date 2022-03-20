@@ -146,8 +146,8 @@ export async function nextRoundEvent(io: Server, socket: Socket) {
   const updateCards = game.allPlayerCards
     .filter((card) => {
       return (
-        card.state === CardState.PLAYED_SHOW ||
-        card.state === CardState.WINNER
+        card.state !== CardState.USED &&
+        card.state !== CardState.HAND
       )
     })
     .map(async (card) => {
