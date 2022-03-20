@@ -1,6 +1,9 @@
 import {Card, CardContent, Typography} from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {BlackCardResponse, CardResponse, CardState} from '../../../../clients/ResponseTypes';
+import {useSelector} from "react-redux";
+import {ReduxState} from "../../../../redux/redux";
+import * as GameClient from "../../../../clients/Game";
 
 interface CardsListProps {
   cards: CardResponse[];
@@ -37,6 +40,7 @@ const CARD_STYLE_DESKTOP = {
 }
 
 const CardsList = (props: CardsListProps) => {
+  const game = useSelector<ReduxState, GameClient.default>((state) => state.game);
   const isMobile = window.screen.width < 800;
 
   useEffect(() => {
@@ -46,10 +50,23 @@ const CardsList = (props: CardsListProps) => {
     const cardRef = document.getElementById(props.lastFlipped.id.toString());
     cardRef.scrollIntoView({behavior: 'smooth', block: 'center'});
   }, [props.lastFlipped])
+
   const getCardText = (card: CardResponse) => {
     const mergedCardText = () => {
       const blackTextParts = props.blackCard.text.split('_');
-      return (<React.Fragment>{blackTextParts[0]}<b>{card.text}</b> {blackTextParts[1]}</React.Fragment>);
+      if (props.blackCard.blanks < 2) {
+        return (<React.Fragment>{blackTextParts[0]}<b>{card.text}</b> {blackTextParts[1]}</React.Fragment>);
+      }
+      const secondWhiteCard = game.playedCards.find((c) => {
+        return c.order === 1 && c.playedBy === card.playedBy;
+      });
+      if (!secondWhiteCard) {
+        return null;
+      }
+      if (blackTextParts.length < 3) {
+        throw new Error('blackCardTextParts where to short to render 2 white cards.')
+      }
+      return (<React.Fragment>{blackTextParts[0]}<b>{card.text}</b> {blackTextParts[1]} <b>{secondWhiteCard.text}</b> {blackTextParts[2]}</React.Fragment>);
     }
     switch (card.state) {
       case CardState.HAND:
@@ -62,6 +79,7 @@ const CardsList = (props: CardsListProps) => {
         return '';
     }
   }
+
   const getTotalTextLength = (card: CardResponse) => {
     if (card.state === CardState.HAND) {
       return card.text.length
@@ -94,7 +112,7 @@ const CardsList = (props: CardsListProps) => {
     return fontSize;
   }
 
-  const cards = props.cards.map((card) => {
+  const cards = props.cards.filter((c) => c.order === 0).map((card) => {
     const cardStyle = isMobile ? CARD_STYLE_MOBILE : CARD_STYLE_DESKTOP;
     const selected = props.selectedCards.includes(card);
     return (
@@ -112,6 +130,7 @@ const CardsList = (props: CardsListProps) => {
       </Card>
     )
   })
+
   return (
     <React.Fragment>
       {cards}
