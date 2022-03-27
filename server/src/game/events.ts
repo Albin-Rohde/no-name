@@ -1,6 +1,5 @@
-import { Server } from "socket.io";
+import {Server, Socket} from "socket.io";
 import { setTimeoutAsync } from "../util";
-import { SocketWithSession } from "../types";
 import {
   createNewGame,
   deleteGameFromUser,
@@ -19,7 +18,7 @@ import {emitNotificationsEvent, emitRemovedEvent, emitUpdateEvent} from "../sock
  * Gets a game if any is attached to the
  * user making the request.
  */
-export async function getGameEvent(io: Server, socket: SocketWithSession): Promise<void> {
+export async function getGameEvent(io: Server, socket: Socket): Promise<void> {
   try {
     const game = await getGameFromUser(socket.request.session.user.id)
     if(!socket.rooms.has(game.key)) {
@@ -37,7 +36,7 @@ export async function getGameEvent(io: Server, socket: SocketWithSession): Promi
 /**
  * Joins a game by gameKey
  */
-export async function joinGameEvent(io: Server, socket: SocketWithSession, key: string): Promise<void> {
+export async function joinGameEvent(io: Server, socket: Socket, key: string): Promise<void> {
   const game = await getGameWithRelations(key)
   const user = await getUserWithRelation(socket.request.session.user.id)
   if (game.active) {
@@ -57,7 +56,7 @@ export async function joinGameEvent(io: Server, socket: SocketWithSession, key: 
  * Start game
  * Only the gameHost can do this action.
  */
-export async function startGameEvent(io: Server, socket: SocketWithSession): Promise<void> {
+export async function startGameEvent(io: Server, socket: Socket): Promise<void> {
   const game = await getGameFromUser(socket.request.session.user.id);
   if (game.active) {
     throw new GameStateError('Game already active')
@@ -82,7 +81,7 @@ export async function startGameEvent(io: Server, socket: SocketWithSession): Pro
  * players in the current game. This make it possible for them to use
  * that key to join the new game.
  */
-export async function playAgainEvent(io: Server, socket: SocketWithSession): Promise<void> {
+export async function playAgainEvent(io: Server, socket: Socket): Promise<void> {
   const game = await getGameFromUser(socket.request.session.user.id);
   if (game.active) {
     throw new GameStateError('Can not restart ongoing game')
@@ -109,7 +108,7 @@ export async function playAgainEvent(io: Server, socket: SocketWithSession): Pro
  * Leaves the game that the requesting user
  * is attached to.
  */
-export async function leaveGameEvent(io: Server, socket: SocketWithSession) {
+export async function leaveGameEvent(io: Server, socket: Socket) {
   const game = await getGameFromUser(socket.request.session.user.id);
   await game.removePlayer(game.currentUser)
   await emitUpdateEvent(io, game)
@@ -122,7 +121,7 @@ export async function leaveGameEvent(io: Server, socket: SocketWithSession) {
  * Additionally sends a removed event to remaining
  * players. Disconnecting them from the game.
  */
-export async function deleteGameEvent(io: Server, socket: SocketWithSession) {
+export async function deleteGameEvent(io: Server, socket: Socket) {
   const game = await getGameFromUser(socket.request.session.user.id);
   await deleteGameFromUser(game.currentUser)
   await emitRemovedEvent(io, socket, game);
@@ -136,7 +135,7 @@ export async function deleteGameEvent(io: Server, socket: SocketWithSession) {
  * - Next round with new card wizz
  * - Discards played cards as used
  */
-export async function nextRoundEvent(io: Server, socket: SocketWithSession) {
+export async function nextRoundEvent(io: Server, socket: Socket) {
   await setTimeoutAsync(6000)
   const game = await getGameFromUser(socket.request.session.user.id);
   if (game.turn_number === game.rounds * game.users.length) {
@@ -175,7 +174,7 @@ export async function nextRoundEvent(io: Server, socket: SocketWithSession) {
   await emitUpdateEvent(io, game);
 }
 
-export async function notifyCardWizzEvent(io: Server, socket: SocketWithSession) {
+export async function notifyCardWizzEvent(io: Server, socket: Socket) {
   const game = await getGameFromUser(socket.request.session.user.id);
   if (game.active) {
     const cardWizz = game.currentTurn.cardWizz;
@@ -184,7 +183,7 @@ export async function notifyCardWizzEvent(io: Server, socket: SocketWithSession)
   }
 }
 
-export async function notifyWinnerEvent(io: Server, socket: SocketWithSession) {
+export async function notifyWinnerEvent(io: Server, socket: Socket) {
   const gameKey = socket.request.session.user.game_fk
   const user = await getUserUserWithWinningCard(gameKey)
   const message = `${user.username} won this round`;

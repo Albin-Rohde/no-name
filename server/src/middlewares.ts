@@ -9,7 +9,7 @@ import {
   NotFoundError,
   GameRuleError
 } from "./error";
-import { RestResponse, SocketWithSession } from "./types";
+import { RestResponse } from "./types";
 import {expressLogger, logger, socketLogger} from "./logger/logger";
 import { getUserWithRelation } from "./user/services";
 import {ValidationError} from "yup";
@@ -101,7 +101,7 @@ interface SocketEventInfo {
   userId: number
   gameId?: string
 }
-export const loggerMiddleware = (socket: SocketWithSession, meta: MiddlewareMetaData): void => {
+export const loggerMiddleware = (socket: Socket, meta: MiddlewareMetaData): void => {
   const info: SocketEventInfo = {
     arguments: meta.args,
     eventMethod: meta.handler,
