@@ -1,139 +1,55 @@
 import * as http from "http";
 import "reflect-metadata";
-import dotenv from 'dotenv'
-import { createConnection } from "typeorm";
-import { logger } from "./logger/logger";
-import express, {Application} from "express";
+import express, {Application, RequestHandler} from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import session from "express-session";
-import {User} from "./user/models/User";
-import userRoute from "./user/controller";
-import gameRouter from "./game/controller";
-import deckRouter from "./deck/controller";
-import { flipCardEvent, playCardEvent, voteCardEvent } from "./card/events";
-import {
-  deleteGameEvent,
-  getGameEvent,
-  joinGameEvent,
-  leaveGameEvent,
-  nextRoundEvent,
-  notifyCardWizzEvent,
-  notifyWinnerEvent,
-  playAgainEvent,
-  startGameEvent
-} from "./game/events";
 import {SocketServer} from "./lib/socket/Socket";
-import * as Sentry from "@sentry/node";
 import Raven from 'raven'
-import redis from 'redis'
-import connectRedis from 'connect-redis'
 import {authSocketUser, loggerMiddleware, expressLoggingMiddleware} from "./middlewares";
-import {Socket} from "socket.io";
 import {emitErrorEvent} from "./socketEmitters";
-
-dotenv.config({path: '.env'})
-
-/** Sentry config **/
-// This allows TypeScript to detect our global value
-declare global {
-  namespace NodeJS {
-    interface Global {
-      __rootdir__: string;
-    }
-  }
-}
-global.__rootdir__ = __dirname || process.cwd();
-
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  tracesSampleRate: 1.0,
-});
-Raven.config(process.env.SENTRY_DSN).install();
+import {RedisStore} from "connect-redis";
+import {logger} from "./logger/logger";
+import {Socket} from "socket.io";
+import {appendListeners, registerRoutes} from "./routing";
 
 export interface ServerOptions {
   port: number
   clientUrl: string
 }
-const RedisStore = connectRedis(session)
-const redisClient = redis.createClient({
-  host: process.env.REDIS_HOST,
-  port: 6379
-})
-redisClient.on('error', function (err) {
-  logger.error('Could not establish a connection with redis.', err);
-});
-redisClient.on('connect', function (_err) {
-  logger.info('Connected to redis successfully');
-});
 
-export const userSession = session({
-  store: new RedisStore({ client: redisClient }),
-  name: 'sid',
-  secret: process.env.COOKIE_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: false,
-    maxAge: 1000 * 60 * 60 * 24, // (24 hours)
-    httpOnly: false,
-    sameSite: false,
-  }
-})
-
-declare module 'express-session' {
-  export interface SessionData {
-    user: User
-    destroy: () => void
-    save: () => void
-  }
-}
-
-declare module 'http' {
-  export interface IncomingMessage {
-    session: {
-      user: User
-      save: (...args: any[]) => void
-      destroy: (...args: any[]) => void
-    }
-  }
-}
-
-
-/**
- * Start the web server
- * Will start one express rest server
- * Will start one socket.io websocket server
- */
-async function startServer() {
-  const options: ServerOptions = {
-    port: Number(process.env.PORT),
-    clientUrl: process.env.CLIENT_URL!,
-  }
-  try {
-    await createConnection()
-    logger.info('Connected to db')
-    const app: Application = express()
-    app.use(bodyParser.urlencoded({extended: false}))
-    app.use(bodyParser.json())
-    app.use(cookieParser())
-    app.set('trust proxy', true)
-    app.use(cors({origin: options.clientUrl, credentials: true}))
-    app.use((_req, res, next) => {
-      res.header({'Access-Control-Allow-Headers': options.clientUrl})
-      next()
-    })
-    app.use(Raven.requestHandler())
-    app.use(userSession)
-    app.use(expressLoggingMiddleware)
-    registerRoutes(app)
+function getExpressApp(options: ServerOptions, session: RequestHandler): Application {
+  const app: Application = express();
+  /** Generic middlewares **/
+  app.use(bodyParser.urlencoded({extended: false}))
+  app.use(bodyParser.json())
+  app.use(cookieParser())
+  app.set('trust proxy', true)
+  app.use(cors({origin: options.clientUrl, credentials: true}));
+  app.use((_req, res, next) => {
+    res.header({'Access-Control-Allow-Headers': options.clientUrl});
+    next();
+  });
+  /** Sentry middleware **/
+  if (process.env.NODE_ENV === 'Production') {
+    app.use(Raven.requestHandler());
     app.use(Raven.errorHandler());
-    const httpServer = http.createServer(app)
+  }
+  /** logger middleware **/
+  app.use(expressLoggingMiddleware);
+  /** user session **/
+  app.use(session)
+  return app;
+}
 
-    const addUserSessionToSocket = (socket: any, next: any) => userSession(socket.request, {} as any, next)
-    const io = new SocketServer(
-      httpServer,
+function getSocketServer(server: http.Server, options: ServerOptions, session: RequestHandler): SocketServer {
+  /** Make express session available to socket **/
+  const mapSession = (socket: any, next: any) => {
+    session(socket.request, {} as any, next);
+  }
+  return new SocketServer(
+      server,
       {
         cors: {
           origin: options.clientUrl,
@@ -145,56 +61,44 @@ async function startServer() {
         transports: ['websocket']
       },
       {
-        once: [addUserSessionToSocket],
+        once: [mapSession],
         beforeAll: [authSocketUser],
         beforeEach: [loggerMiddleware],
         onError: emitErrorEvent,
       }
-    )
-    appendListeners(io)
-    io.on('connection', (socket: Socket) => {
-      io.subscribeListeners(socket)
-      io.emit('connected')
-    })
-    httpServer.listen(options.port, () => {
-      logger.info(`server started on port ${options.port}`)
-    })
-  } catch (err) {
-    logger.error("Error", err)
+    );
+}
+
+function initApp(redisStore: RedisStore) {
+  const userSession = session({
+    store: redisStore,
+    name: 'sid',
+    secret: process.env.COOKIE_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+      maxAge: 1000 * 60 * 60 * 24, // 24 hours
+      httpOnly: false,
+      sameSite: false,
+    }
+  });
+  const options: ServerOptions = {
+    port: Number(process.env.PORT),
+    clientUrl: process.env.CLIENT_URL!,
   }
-}
-
-function registerRoutes(app: Application) {
-  app.get('/health', (_req, res) => {
-    res.status(200).send("OK");
+  const app = getExpressApp(options, userSession);
+  registerRoutes(app);
+  const server = http.createServer(app);
+  const socketServer = getSocketServer(http.createServer(app), options, userSession);
+  appendListeners(socketServer);
+  socketServer.on('connection', (socket: Socket) => {
+    socketServer.subscribeListeners(socket);
+    socket.emit('connected');
   })
-  app.use('/user', userRoute)
-  app.use('/game', gameRouter)
-  app.use('/deck', deckRouter)
+  server.listen(options.port, () => {
+    logger.info(`server started on port ${options.port}`)
+  });
 }
 
-export enum Events {
-  GET_GAME = 'get-game',
-  JOIN_GAME = 'join-game',
-  START_GAME = 'start-game',
-  LEAVE_GAME = 'leave-game',
-  DELETE_GAME = 'delete-game',
-  PLAY_AGAIN = 'play-again',
-  PLAY_CARD = 'play-card',
-  FLIP_CARD = 'flip-card',
-  VOTE_CARD = 'vote-card',
-}
-
-export const appendListeners = (io: SocketServer) => {
-  io.addEventHandler(Events.JOIN_GAME, joinGameEvent)
-  io.addEventHandler(Events.GET_GAME, getGameEvent)
-  io.addEventHandler(Events.PLAY_AGAIN, playAgainEvent)
-  io.addEventHandler(Events.START_GAME, startGameEvent)
-  io.addEventHandler(Events.LEAVE_GAME, leaveGameEvent)
-  io.addEventHandler(Events.DELETE_GAME, deleteGameEvent)
-  io.addEventHandler(Events.PLAY_CARD, playCardEvent)
-  io.addEventHandler(Events.FLIP_CARD, flipCardEvent)
-  io.addEventHandler(Events.VOTE_CARD, voteCardEvent, notifyWinnerEvent, nextRoundEvent, notifyCardWizzEvent)
-}
-
-startServer()
+export {initApp};
