@@ -1,7 +1,6 @@
 import {GameStateError, NotAllowedError} from "../error";
 import {CardState} from "./models/WhiteCardRef";
-import {SocketWithSession} from "../types";
-import {Server} from "socket.io";
+import {Server, Socket} from "socket.io";
 import {emitUpdateEvent} from "../socketEmitters";
 import {getGameFromUser} from "../game/services";
 
@@ -10,7 +9,7 @@ import {getGameFromUser} from "../game/services";
  * Will play the card on the game that the user
  * is attached to. If allowed by game rules.
  */
-export async function playCardEvent(io: Server, socket: SocketWithSession, cardId: number) {
+export async function playCardEvent(io: Server, socket: Socket, cardId: number) {
   const game = await getGameFromUser(socket.request.session.user.id);
   if (!game.active) {
     throw new GameStateError('Can not play card in inactive game')
@@ -32,7 +31,7 @@ export async function playCardEvent(io: Server, socket: SocketWithSession, cardI
  * Will flip the card on the game that the user
  * is attached to. If allowed by game rules.
  */
-export async function flipCardEvent(io: Server, socket: SocketWithSession, cardId: number) {
+export async function flipCardEvent(io: Server, socket: Socket, cardId: number) {
   const game = await getGameFromUser(socket.request.session.user.id);
   if (!game.active) {
     throw new GameStateError('Can not flip card in inactive game')
@@ -56,7 +55,7 @@ export async function flipCardEvent(io: Server, socket: SocketWithSession, cardI
  * Will vote for a card in the game that the user it attached to
  * if allowed by game rules.
  */
-export async function voteCardEvent(io: Server, socket: SocketWithSession, cardId: number) {
+export async function voteCardEvent(io: Server, socket: Socket, cardId: number) {
   const game = await getGameFromUser(socket.request.session.user.id);
   if (!game.active) {
     throw new GameStateError('Game is not active')
