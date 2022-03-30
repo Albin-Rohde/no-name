@@ -54,7 +54,14 @@ Check that it looks correct and make changes if needed. When happy apply the mig
 To revert a migration run `npm run migration:revert` from server root (`./server`).
 
 ## Running app outside docker
-It is possible to run the app outside of docker, however the database is easiest ran through docker.
+It is possible to run the app outside of docker, however the database and redis is easier to run through docker.
+First you need to alter the db and redis host in the `.env` file in the server root (`./server`).
+Replace `redis` and `db` with `localhost` respectively.
+```
+POSTGRES_HOST=localhost
+REDIS_HOST=localhost
+```
+
 To start the server on host go to server root (`./server`) and run `npm run dev`.
 To start the frontend on host go to frontend root (`./frontend`) and run `npm run dev`
 
