@@ -12,19 +12,24 @@ export class WrappedValidationError extends ValidationError {
 
 export class ExpectedError extends Error {
   public message
-  constructor(message: string) {
+  public extra
+
+  constructor(message: string, extra?: Record<string, string | number | undefined | null>) {
     super(message);
     this.name = this.constructor.name
+    this.extra = extra
   }
 }
 
 export class BadRequestError extends ExpectedError {
   public message
   public name
+  public extra
 
-  constructor(message: string) {
-    super(message)
+  constructor(message: string, extra: Record<string, string | number | undefined | null> = {}) {
+    super(message, extra)
     this.name = this.constructor.name
+    this.extra = extra
     this.message = message
   }
 }
@@ -32,10 +37,12 @@ export class BadRequestError extends ExpectedError {
 export class AuthenticationError extends ExpectedError {
   public message
   public name
+  public extra
 
-  constructor(message: string) {
-    super(message)
+  constructor(message: string, extra: Record<string, string | number | undefined | null> = {}) {
+    super(message, extra)
     this.name = this.constructor.name
+    this.extra = extra
     this.message = message
   }
 }
@@ -43,10 +50,12 @@ export class AuthenticationError extends ExpectedError {
 export class GameRequiredError extends ExpectedError {
   public message
   public name
+  public extra
 
-  constructor(message: string) {
-    super(message)
+  constructor(message: string, extra: Record<string, string | number | undefined | null> = {}) {
+    super(message, extra)
     this.name = this.constructor.name
+    this.extra = extra
     this.message = message
   }
 }
@@ -54,45 +63,58 @@ export class GameRequiredError extends ExpectedError {
 export class CreateError extends ExpectedError {
   public message
   public name
+  public extra
 
-  constructor(message: string) {
-    super(message)
+  constructor(message: string, extra: Record<string, string | number | undefined | null> = {}) {
+    super(message, extra)
     this.name = this.constructor.name
+    this.extra = extra
     this.message = message
   }
 }
 
 export class DbError extends Error {
-  constructor(message: string) {
+  public extra
+
+  constructor(message: string, extra: Record<string, string | number | undefined | null> = {}) {
     super(message)
     this.name = this.constructor.name
+    this.extra = extra
   }
 }
 
 export class NotFoundError extends DbError{
-  constructor(message: string) {
-    super(message);
+  public extra
+
+  constructor(message: string, extra: Record<string, string | number | undefined | null> = {}) {
+    super(message, extra);
     this.name = this.constructor.name
+    this.extra = extra
   }
 }
 
 export class GameRuleError extends ExpectedError {
-  constructor(message: string) {
+  public extra
+
+  constructor(message: string, extra: Record<string, string | number | undefined | null> = {}) {
     super(message)
     this.name = this.constructor.name
+    this.extra = extra
   }
 }
 
 export class NotAllowedError extends GameRuleError {
-  constructor(message: string) {
-    super(message)
+  constructor(message: string, extra: Record<string, string | number | undefined | null> = {}) {
+    super(message, extra)
     this.name = this.constructor.name
+    this.extra = extra
   }
 }
 
 export class GameStateError extends GameRuleError {
-  constructor(message: string) {
-    super(message)
+  constructor(message: string, extra: Record<string, string | number | undefined | null> = {}) {
+    super(message, extra)
     this.name = this.constructor.name
+    this.extra = extra
   }
 }
