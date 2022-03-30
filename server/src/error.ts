@@ -1,3 +1,15 @@
+import {ValidationError} from "yup";
+
+export class WrappedValidationError extends ValidationError {
+  public extra
+
+  constructor(err: ValidationError, extra?: Record<string, string | number | undefined | null>) {
+    super(err);
+    this.name = this.constructor.name
+    this.extra = extra
+  }
+}
+
 export class ExpectedError extends Error {
   public message
   constructor(message: string) {
