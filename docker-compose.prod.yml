@@ -7,6 +7,7 @@ services:
     depends_on:
       - graylog
       - db
+      - redis
     env_file:
       - '.env'
     networks:
@@ -45,7 +46,7 @@ services:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 3s
-      retries: 10
+      retries: 20
 
   frontend:
     container_name: frontend
@@ -146,9 +147,9 @@ services:
     restart: "unless-stopped"
     healthcheck:
       test: "curl localhost:9000"
-      interval: 30s
-      timeout: 10s
-      retries: 10
+      interval: 10s
+      timeout: 5s
+      retries: 15
 
   ### PROMETHEUS AND GRAFANA SERVICES ###
   node-exporter:

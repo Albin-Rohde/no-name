@@ -40,15 +40,23 @@ function getExpressApp(options: ServerOptions, session: RequestHandler): Applica
   app.use(expressLoggingMiddleware);
   /** user session **/
   app.use(session)
+  /** register routes **/
+  registerRoutes(app);
   return app;
 }
 
-function getSocketServer(server: http.Server, options: ServerOptions, session: RequestHandler): SocketServer {
+function getHttpServer(app: Application, options: ServerOptions, session: RequestHandler): http.Server {
+  const httpServer = http.createServer(app);
+  addSocketServer(httpServer, options, session);
+  return httpServer;
+}
+
+function addSocketServer(server: http.Server, options: ServerOptions, session: RequestHandler): void {
   /** Make express session available to socket **/
   const mapSession = (socket: any, next: any) => {
     session(socket.request, {} as any, next);
   }
-  return new SocketServer(
+  const socketServer = new SocketServer(
       server,
       {
         cors: {
@@ -67,6 +75,13 @@ function getSocketServer(server: http.Server, options: ServerOptions, session: R
         onError: emitErrorEvent,
       }
     );
+  /** add event listeners **/
+  appendListeners(socketServer);
+  /** handle initial connection **/
+  socketServer.on('connection', (socket: Socket) => {
+    socketServer.subscribeListeners(socket);
+    socket.emit('connected');
+  });
 }
 
 function initApp(redisStore: RedisStore) {
@@ -88,14 +103,7 @@ function initApp(redisStore: RedisStore) {
     clientUrl: process.env.CLIENT_URL!,
   }
   const app = getExpressApp(options, userSession);
-  registerRoutes(app);
-  const server = http.createServer(app);
-  const socketServer = getSocketServer(http.createServer(app), options, userSession);
-  appendListeners(socketServer);
-  socketServer.on('connection', (socket: Socket) => {
-    socketServer.subscribeListeners(socket);
-    socket.emit('connected');
-  })
+  const server = getHttpServer(app, options, userSession);
   server.listen(options.port, () => {
     logger.info(`server started on port ${options.port}`)
   });

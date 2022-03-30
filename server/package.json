@@ -4,7 +4,7 @@
   "description": "",
   "main": "innit.js",
   "scripts": {
-    "prod": "NODE_ENV=production node ./build/src/app.js",
+    "prod": "NODE_ENV=production node ./build/src/index.js",
     "dev": "NODE_ENV=development TYPEORM_ENTITIES=src/**/models/*.ts nodemon",
     "build": "rimraf ./build && tsc",
     "typeorm": "POSTGRES_HOST=localhost ts-node ./node_modules/typeorm/cli.js",
