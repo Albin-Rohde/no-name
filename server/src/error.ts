@@ -10,11 +10,23 @@ export class WrappedValidationError extends ValidationError {
   }
 }
 
+export class WrappedError extends Error {
+  public extra
+
+  constructor(err: Error, extra: Record<string, string | number | undefined | null> = {}) {
+    super(err.message);
+    this.name = err.name;
+    this.message = err.message;
+    this.stack = err.stack;
+    this.extra = extra
+  }
+}
+
 export class ExpectedError extends Error {
   public message
   public extra
 
-  constructor(message: string, extra?: Record<string, string | number | undefined | null>) {
+  constructor(message: string, extra: Record<string, string | number | undefined | null> = {}) {
     super(message);
     this.name = this.constructor.name
     this.extra = extra

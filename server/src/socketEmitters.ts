@@ -1,7 +1,7 @@
 import {Server, Socket} from "socket.io";
 import { normalizeGameResponse } from "./socketResponse";
 import { Game } from "./game/models/Game";
-import { GameRuleError } from "./error";
+import {GameRuleError, WrappedError} from "./error";
 import { logger } from "./logger/logger";
 
 enum EventType {
@@ -41,9 +41,11 @@ export async function emitNotificationsEvent(io: Server, socket: Socket, message
  */
 export async function emitErrorEvent(socket: Socket, err: Error): Promise<void> {
   if (err instanceof GameRuleError) {
+    err.extra = {userId: socket.request?.session?.user?.id}
     logger.warn('Socket Error', err)
     socket.emit(EventType.RULE_ERROR, err.message)
   } else {
+    err = new WrappedError(err, {userId: socket.request?.session?.user?.id});
     logger.error('Socket Error', err)
     socket.emit(EventType.SERVER_ERROR, 'Internal Server Error')
   }

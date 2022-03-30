@@ -1,13 +1,12 @@
-// fix user import
 import { User } from "./user/models/User";
-
 import { NextFunction, Request, Response } from "express";
 import {
   AuthenticationError,
   ExpectedError,
   GameRequiredError,
   NotFoundError,
-  GameRuleError
+  GameRuleError,
+  WrappedValidationError
 } from "./error";
 import { RestResponse } from "./types";
 import {expressLogger, logger, socketLogger} from "./logger/logger";
@@ -63,14 +62,27 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
     data: null
   }
   if (err instanceof GameRuleError) {
+    err.extra = {userId: req.session.user.id}
     logger.warn(err);
     return res.status(200).json(response);
   }
   if (err instanceof ExpectedError) {
+    err.extra = {userId: req.session.user.id}
     logger.warn(err);
     return res.status(200).json(response);
   }
   if (err instanceof ValidationError) {
+    if (err.value) {
+      // remove password field from error message
+      let value = {}
+      for (const [k, v] of Object.entries(value)) {
+        if (k !== 'password') {
+          value[k] = v;
+        }
+      }
+      err.value = value;
+      err = new WrappedValidationError(err, {userId: req.session?.user?.id})
+    }
     logger.warn(err);
     return res.status(200).json(response)
   }
@@ -89,7 +101,7 @@ export const authSocketUser = async (socket: Socket): Promise<void> => {
     socket.request.session.user = user
     socket.request.session.save()
   } else {
-    throw new AuthenticationError('Authentication for user failed.')
+    throw new AuthenticationError('Authentication for user failed.', {userId: socket.request?.session?.user?.id})
   }
 }
 
