@@ -1,0 +1,19 @@
+<h1>{{model}}</h1>
+<table>
+    <tr>
+        {{#each columns}}
+            <th>{{this}}</th>
+        {{/each}}
+    </tr>
+    {{#each rows}}
+        <tr>
+            {{#each this}}
+                {{#if this.link}}
+                    <td><a href="{{this.link}}">{{this.value}}</a></td>
+                {{else}}
+                    <td>{{this.value}}</td>
+                {{/if}}
+            {{/each}}
+        </tr>
+    {{/each}}
+</table>

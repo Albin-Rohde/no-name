@@ -21,6 +21,8 @@ import {Socket} from "socket.io";
 import {appendListeners, registerRoutes} from "./routing";
 import redis from "redis";
 import {createConnection} from "typeorm";
+import {engine} from "express-handlebars";
+import path from "path";
 
 export interface ServerOptions {
   port: number
@@ -29,6 +31,10 @@ export interface ServerOptions {
 
 function getExpressApp(options: ServerOptions, session: RequestHandler): Application {
   const app: Application = express();
+  /** Handlebars engine **/
+  app.set('views', path.join(__dirname, './admin', 'views'))
+  app.engine('.hbs', engine({extname: '.hbs', defaultLayout: 'main.hbs'}));
+  app.set('view engine', 'hbs');
   /** Generic middlewares **/
   app.use(bodyParser.urlencoded({extended: false}))
   app.use(bodyParser.json())

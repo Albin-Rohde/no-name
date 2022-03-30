@@ -1,0 +1,18 @@
+<h1>Details for <a href="/admin/{{model}}">{{model}}</a> {{id}}</h1>
+
+<table>
+    <tr>
+        <th>Column</th>
+        <th>Value</th>
+    </tr>
+    {{#each row}}
+        <tr>
+            <td>{{this.name}}</td>
+            {{#if this.link}}
+                <td><a href="{{this.link}}">{{this.value}}</a></td>
+            {{else}}
+                <td>{{this.value}}</td>
+            {{/if}}
+        </tr>
+    {{/each}}
+</table>
