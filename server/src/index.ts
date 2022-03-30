@@ -1,12 +1,7 @@
 import dotenv from "dotenv";
 import * as Sentry from "@sentry/node";
 import Raven from "raven";
-import connectRedis, {RedisStore} from "connect-redis";
-import session from "express-session";
-import redis from "redis";
-import {logger} from "./logger/logger";
 import {initApp} from "./app";
-import {createConnection} from "typeorm";
 import {User} from "./user/models/User";
 
 dotenv.config({path: '.env'});
@@ -48,25 +43,4 @@ declare module 'http' {
   }
 }
 
-function getRedisSessionStore(): RedisStore {
-  const redisClient = redis.createClient({
-    host: process.env.REDIS_HOST,
-    port: Number.parseInt(process.env.REDIS_PORT) || 6379
-  });
-  redisClient.on('error', (err) => {
-    logger.error('Could not establish a connection with redis.', err);
-  });
-  redisClient.on('connect', (_err) => {
-    logger.info('Connected to redis successfully');
-  });
-  const connectedRedis = connectRedis(session);
-  return new connectedRedis({client: redisClient});
-}
-
-async function init() {
-  const redisStore = getRedisSessionStore();
-  await createConnection();
-  initApp(redisStore);
-}
-
-init();
+initApp();

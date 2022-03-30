@@ -9,10 +9,12 @@ import {SocketServer} from "./lib/socket/Socket";
 import Raven from 'raven'
 import {authSocketUser, loggerMiddleware, expressLoggingMiddleware} from "./middlewares";
 import {emitErrorEvent} from "./socketEmitters";
-import {RedisStore} from "connect-redis";
+import connectRedis, {RedisStore} from "connect-redis";
 import {logger} from "./logger/logger";
 import {Socket} from "socket.io";
 import {appendListeners, registerRoutes} from "./routing";
+import redis from "redis";
+import {createConnection} from "typeorm";
 
 export interface ServerOptions {
   port: number
@@ -84,9 +86,26 @@ function addSocketServer(server: http.Server, options: ServerOptions, session: R
   });
 }
 
-function initApp(redisStore: RedisStore) {
+function getRedisSessionStore(): RedisStore {
+  const redisClient = redis.createClient({
+    host: process.env.REDIS_HOST,
+    port: Number.parseInt(process.env.REDIS_PORT) || 6379
+  });
+  redisClient.on('error', (err) => {
+    logger.error('Could not establish a connection with redis.', err);
+  });
+  redisClient.on('connect', (_err) => {
+    logger.info('Connected to redis successfully');
+  });
+  const connectedRedis = connectRedis(session);
+  return new connectedRedis({client: redisClient});
+}
+
+async function initApp() {
+  await createConnection();
+  const store = getRedisSessionStore();
   const userSession = session({
-    store: redisStore,
+    store,
     name: 'sid',
     secret: process.env.COOKIE_SECRET,
     resave: false,
