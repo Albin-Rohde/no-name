@@ -12,6 +12,7 @@ import {
   startGameEvent
 } from "./game/events";
 import {flipCardEvent, playCardEvent, voteCardEvent} from "./card/events";
+import {adminRouter} from "./admin/controller";
 
 enum Events {
   GET_GAME = 'get-game',
@@ -43,6 +44,10 @@ function registerRoutes(app: Application): void {
   app.use('/user', userRoute);
   app.use('/game', gameRouter);
   app.use('/deck', deckRouter);
+  app.use('/admin', adminRouter);
+  app.get('/hbs', (req, res) => {
+    res.render('index')
+  });
 }
 
 export {appendListeners, registerRoutes}
