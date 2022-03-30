@@ -29,6 +29,17 @@ services:
     env_file:
       - 'config/.env.dev'
 
+  redis:
+    container_name: redis
+    image: "redis:alpine"
+    command: redis-server
+    networks:
+      - local
+    ports:
+      - 6379:6379
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
   frontend:
     container_name: frontend
     restart: unless-stopped
@@ -42,15 +53,6 @@ services:
       - public
     env_file:
       - 'config/.env.dev'
-
-  redis:
-    container_name: redis
-    image: "redis:alpine"
-    command: redis-server
-    networks:
-      - local
-    environment:
-      - REDIS_REPLICATION_MODE=master
 
 networks:
   local:

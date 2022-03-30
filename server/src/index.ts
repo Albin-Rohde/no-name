@@ -63,13 +63,9 @@ function getRedisSessionStore(): RedisStore {
   return new connectedRedis({client: redisClient});
 }
 
-async function connectPostgres(): Promise<void> {
-  await createConnection();
-}
-
 async function init() {
   const redisStore = getRedisSessionStore();
-  await connectPostgres()
+  await createConnection();
   initApp(redisStore);
 }
 
