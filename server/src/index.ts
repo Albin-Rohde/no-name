@@ -32,6 +32,14 @@ declare module 'express-session' {
   }
 }
 
+/** custom attributes on express.Request object **/
+declare module 'express' {
+  export interface Request {
+    /** uuid for tracking logs */
+    tracingId: string
+  }
+}
+
 /** Setup session for websockets **/
 declare module 'http' {
   export interface IncomingMessage {
@@ -40,6 +48,8 @@ declare module 'http' {
       save: (...args: any[]) => void
       destroy: (...args: any[]) => void
     }
+    /** uuid for tracking logs */
+    tracingId: string
   }
 }
 
