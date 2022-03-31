@@ -6,7 +6,7 @@ import {
   GameRequiredError,
   NotFoundError,
   GameRuleError,
-  WrappedValidationError
+  WrappedValidationError, WrappedError
 } from "./error";
 import { RestResponse } from "./types";
 import {expressLogger, logger, socketLogger} from "./logger/logger";
@@ -14,6 +14,14 @@ import { getUserWithRelation } from "./user/services";
 import {ValidationError} from "yup";
 import {Socket} from "socket.io";
 import {MiddlewareMetaData} from "./lib/socket/types";
+import {v4 as uuid} from 'uuid';
+
+export const initTracingId = (req: Request, res: Response, next: NextFunction) => {
+  if(!req.tracingId) {
+    req.tracingId = uuid();
+  }
+  next();
+}
 
 const authUser = async (sessionUser: User) => {
   if(!sessionUser) {
@@ -61,13 +69,14 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
     },
     data: null
   }
+  const extraErrorMeta = {userId: req.session?.user?.id, tracingId: req.tracingId};
   if (err instanceof GameRuleError) {
-    err.extra = {userId: req.session.user.id}
+    err.extra = extraErrorMeta
     logger.warn(err);
     return res.status(200).json(response);
   }
   if (err instanceof ExpectedError) {
-    err.extra = {userId: req.session.user.id}
+    err.extra = extraErrorMeta
     logger.warn(err);
     return res.status(200).json(response);
   }
@@ -81,12 +90,13 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
         }
       }
       err.value = value;
-      err = new WrappedValidationError(err, {userId: req.session?.user?.id})
+      err = new WrappedValidationError(err, extraErrorMeta)
     }
     logger.warn(err);
     return res.status(200).json(response)
   }
   // makes sure any unexpected error is not sent to client.
+  err = new WrappedError(err, extraErrorMeta)
   logger.error("Rest Error", err)
   response.err = {name: 'INTERNAL_ERROR', message: 'UNKNOWN_INTERNAL_ERROR'}
   return res.status(500).json(response)
@@ -105,12 +115,19 @@ export const authSocketUser = async (socket: Socket): Promise<void> => {
   }
 }
 
+export const initTracingIdSocket = async (socket: Socket): Promise<void> => {
+  if (!socket.request.tracingId) {
+    socket.request.tracingId = uuid();
+  }
+}
+
 
 interface SocketEventInfo {
   eventName: string
   eventMethod: string
   arguments: any[]
   userId: number
+  tracingId: string
   gameId?: string
 }
 export const loggerMiddleware = (socket: Socket, meta: MiddlewareMetaData): void => {
@@ -120,6 +137,7 @@ export const loggerMiddleware = (socket: Socket, meta: MiddlewareMetaData): void
     eventName: meta.event,
     gameId: socket.request.session.user.game_fk,
     userId: socket.request.session.user.id,
+    tracingId: socket.request.tracingId,
   }
   socketLogger.info(`WS ${info.eventName} user: ${info.userId}`, info)
 }
@@ -147,6 +165,7 @@ export const expressLoggingMiddleware = (req: Request, _res: Response, next: Nex
     params: req.params,
     path: req.path,
     headers: req.headers,
-  })
+    tracingId: req.tracingId,
+  });
   next();
 }

@@ -54,7 +54,7 @@ export const socketLogger = winston.createLogger({
 })
 
 /**
- * All purpose logger, user for logging errors and other info's
+ * All-purpose logger, used for logging errors and other info
  */
 export const logger = winston.createLogger({
   defaultMeta: {service: 'Server'},

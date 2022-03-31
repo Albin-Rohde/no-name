@@ -7,7 +7,13 @@ import cors from "cors";
 import session from "express-session";
 import {SocketServer} from "./lib/socket/Socket";
 import Raven from 'raven'
-import {authSocketUser, loggerMiddleware, expressLoggingMiddleware} from "./middlewares";
+import {
+  authSocketUser,
+  loggerMiddleware,
+  expressLoggingMiddleware,
+  initTracingId,
+  initTracingIdSocket
+} from "./middlewares";
 import {emitErrorEvent} from "./socketEmitters";
 import connectRedis, {RedisStore} from "connect-redis";
 import {logger} from "./logger/logger";
@@ -39,6 +45,7 @@ function getExpressApp(options: ServerOptions, session: RequestHandler): Applica
     app.use(Raven.errorHandler());
   }
   /** logger middleware **/
+  app.use(initTracingId);
   app.use(expressLoggingMiddleware);
   /** user session **/
   app.use(session)
@@ -72,7 +79,7 @@ function addSocketServer(server: http.Server, options: ServerOptions, session: R
       },
       {
         once: [mapSession],
-        beforeAll: [authSocketUser],
+        beforeAll: [authSocketUser, initTracingIdSocket],
         beforeEach: [loggerMiddleware],
         onError: emitErrorEvent,
       }
