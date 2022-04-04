@@ -15,14 +15,15 @@ const graylogFormat = winston.format.combine(
 )
 
 function getTransports(name: string): (winston.transport | WinstonGraylog2)[] {
-  const console = new winston.transports.Console({ format: winstonConsoleFormat, level: 'info' })
+  const consoleLevel = process.env.DEBUG ? 'debug' : 'info'
+  const console = new winston.transports.Console({ format: winstonConsoleFormat, level: consoleLevel })
   const transports: (winston.transport | WinstonGraylog2)[] = [console];
   const graylog = new WinstonGraylog2({
     level: 'debug',
     name,
     format: graylogFormat,
     graylog: {
-      servers: [{host: process.env.GRAYLOG_HOST, port: 12201}],
+      servers: [{host: process.env.GRAYLOG_HOST, port: Number.parseInt(process.env.GRAYLOG_PORT)}],
       facility: name
     }
   })
