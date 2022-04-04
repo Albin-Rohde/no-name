@@ -40,13 +40,17 @@ export async function emitNotificationsEvent(io: Server, socket: Socket, message
  * Error catcher for all errors thrown by socket eventHandlers
  */
 export async function emitErrorEvent(socket: Socket, err: Error): Promise<void> {
+  const extra = {
+    userId: socket.request?.session?.user?.id,
+    tracingId: socket.request.tracingId,
+  }
   if (err instanceof GameRuleError) {
-    err.extra = {userId: socket.request?.session?.user?.id}
-    logger.warn('Socket Error', err)
-    socket.emit(EventType.RULE_ERROR, err.message)
+    err.extra = extra;
+    logger.warn('Socket Error', err);
+    socket.emit(EventType.RULE_ERROR, err.message);
   } else {
-    err = new WrappedError(err, {userId: socket.request?.session?.user?.id});
-    logger.error('Socket Error', err)
-    socket.emit(EventType.SERVER_ERROR, 'Internal Server Error')
+    err = new WrappedError(err, extra);
+    logger.error('Socket Error', err);
+    socket.emit(EventType.SERVER_ERROR, 'Internal Server Error');
   }
 }
