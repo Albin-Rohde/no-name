@@ -2,7 +2,7 @@ import {Server, Socket} from "socket.io";
 import { normalizeGameResponse } from "./socketResponse";
 import { Game } from "./game/models/Game";
 import {GameRuleError, WrappedError} from "./error";
-import { logger } from "./logger/logger";
+import {logger, socketLogger} from "./logger/logger";
 
 enum EventType {
   UPDATE = 'update',
@@ -16,10 +16,18 @@ enum EventType {
  * Emits an update event with the game supplied
  * Saves the updated game to db before exit.
  */
-export async function emitUpdateEvent(io: Server, game: Game): Promise<void> {
+export async function emitUpdateEvent(io: Server, socket: Socket, game: Game): Promise<void> {
   await Promise.all(game.users.map(u => u.save()))
   await game.save()
-  io.in(game.key).emit(EventType.UPDATE, normalizeGameResponse(game))
+  const response = normalizeGameResponse(game);
+  socketLogger.debug(`WS finish user: ${game.currentUser.id}`, {
+    userId: game.currentUser.id,
+    tracingId: socket.request.tracingId,
+    gameId: game.key,
+    emitEvent: 'updateEvent',
+    data: response,
+  });
+  io.in(game.key).emit(EventType.UPDATE, response)
 }
 
 /**
@@ -27,12 +35,27 @@ export async function emitUpdateEvent(io: Server, game: Game): Promise<void> {
  * current socket will leave the socket room.
  */
 export async function emitRemovedEvent(io: Server, socket: Socket, game: Game): Promise<void> {
-  socket.leave(game.key)
+  socket.leave(game.key);
+  socketLogger.debug(`WS finish user: ${game.currentUser.id}`, {
+    userId: game.currentUser.id,
+    tracingId: socket.request.tracingId,
+    gameId: game.key,
+    emitEvent: 'removedEvent',
+    data: {},
+  });
   io.in(game.key).emit(EventType.REMOVED, game.key)
 }
 
 export async function emitNotificationsEvent(io: Server, socket: Socket, message: string) {
+  const user = socket.request.session.user;
   const gameKey = socket.request.session.user.game_fk;
+    socketLogger.debug(`WS finish user: ${user.id}`, {
+    userId: user.id,
+    tracingId: socket.request.tracingId,
+    gameId: gameKey,
+    emitEvent: 'notificationEvent',
+    data: {message: message},
+  });
   io.in(gameKey).emit(EventType.NOTIFICATION, message);
 }
 
