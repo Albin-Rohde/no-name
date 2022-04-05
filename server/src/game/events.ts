@@ -24,7 +24,7 @@ export async function getGameEvent(io: Server, socket: Socket): Promise<void> {
     if(!socket.rooms.has(game.key)) {
       socket.join(game.key)
     }
-    await emitUpdateEvent(io, game);
+    await emitUpdateEvent(io, socket, game);
   } catch (err) {
     if (err instanceof NotFoundError) {
       return;
@@ -49,7 +49,7 @@ export async function joinGameEvent(io: Server, socket: Socket, key: string): Pr
   user.hasPlayed = false
   game.addPlayer(user)
   socket.join(game.key)
-  await emitUpdateEvent(io, game)
+  await emitUpdateEvent(io, socket, game)
 }
 
 /**
@@ -73,7 +73,7 @@ export async function startGameEvent(io: Server, socket: Socket): Promise<void> 
     game.assingCardWizz(),
     game.newBlackCard(),
   ])
-  await emitUpdateEvent(io, game)
+  await emitUpdateEvent(io, socket, game)
 }
 
 /**
@@ -111,7 +111,7 @@ export async function playAgainEvent(io: Server, socket: Socket): Promise<void> 
 export async function leaveGameEvent(io: Server, socket: Socket) {
   const game = await getGameFromUser(socket.request.session.user.id);
   await game.removePlayer(game.currentUser)
-  await emitUpdateEvent(io, game)
+  await emitUpdateEvent(io, socket, game)
 }
 
 /**
@@ -140,7 +140,7 @@ export async function nextRoundEvent(io: Server, socket: Socket) {
   const game = await getGameFromUser(socket.request.session.user.id);
   if (game.turn_number === game.rounds * game.users.length) {
     const finishedGame = await endGame(game);
-    await emitUpdateEvent(io, finishedGame)
+    await emitUpdateEvent(io, socket, finishedGame)
     return;
   }
   const updateCards = game.allPlayerCards
@@ -171,7 +171,7 @@ export async function nextRoundEvent(io: Server, socket: Socket) {
     newPlayerCards,
   ])
   await nextTurn()
-  await emitUpdateEvent(io, game);
+  await emitUpdateEvent(io, socket, game);
 }
 
 export async function notifyCardWizzEvent(io: Server, socket: Socket) {

@@ -23,7 +23,7 @@ export async function playCardEvent(io: Server, socket: Socket, cardId: number) 
   const card = game.currentUser.findCard(cardId)
   await card.play()
   game.currentUser.hasPlayed = true
-  await emitUpdateEvent(io, game)
+  await emitUpdateEvent(io, socket, game)
 }
 
 /**
@@ -47,7 +47,7 @@ export async function flipCardEvent(io: Server, socket: Socket, cardId: number) 
   }
   const card = game.findCard(cardId)
   await card.flip()
-  await emitUpdateEvent(io, game)
+  await emitUpdateEvent(io, socket, game)
 }
 
 /**
@@ -79,5 +79,5 @@ export async function voteCardEvent(io: Server, socket: Socket, cardId: number) 
   const winningUser = game.findUser(card.user_id_fk)
   winningUser.score += 1
   await card.winner()
-  await emitUpdateEvent(io, game)
+  await emitUpdateEvent(io, socket, game)
 }
