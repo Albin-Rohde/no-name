@@ -45,9 +45,6 @@ function registerRoutes(app: Application): void {
   app.use('/game', gameRouter);
   app.use('/deck', deckRouter);
   app.use('/admin', adminRouter);
-  app.get('/hbs', (req, res) => {
-    res.render('index')
-  });
 }
 
 export {appendListeners, registerRoutes}

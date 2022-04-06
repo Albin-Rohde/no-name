@@ -35,7 +35,6 @@ interface CreateWhiteCardRefInput {
 
 const createWhiteCardRef = async (input: CreateWhiteCardRefInput): Promise<WhiteCardRef> => {
   if (!input.user.id) {
-    console.log(input.user)
     throw new DbError('Can not create wcr without user id')
   }
   const wcr = new WhiteCardRef()

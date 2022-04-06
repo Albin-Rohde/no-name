@@ -70,6 +70,9 @@ export class User extends BaseEntity {
   @DeleteDateColumn()
   deleted_at: string
 
+  @Column({name: 'admin', nullable: false, default: false})
+  admin: boolean
+
   public get cards(): WhiteCardRef[] {
     return this._cards.sort((a, b) => a.id - b.id)
   }
