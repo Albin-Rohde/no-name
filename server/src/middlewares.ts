@@ -47,6 +47,18 @@ export const loginRequired = async (req: Request, res: Response, next: NextFunct
   }
 }
 
+export const adminRequired = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await authUser(req.session.user)
+    if (!user.admin) {
+      return res.status(404);
+    }
+    next();
+  } catch (err) {
+    res.status(404);
+  }
+}
+
 export const gameRequired = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = await authUser(req.session.user)
