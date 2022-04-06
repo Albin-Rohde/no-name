@@ -4,7 +4,7 @@ import {createNewGame, deleteGameFromUser, getGameFromJoinKey} from './services'
 import {RestResponse} from "../types";
 import {Game} from "./models/Game";
 import {User} from "../user/models/User";
-import {ExpectedError, NotFoundError} from "../error";
+import {ExpectedError} from "../error";
 import {CreateInput, createSchema, joinSchema} from "./schema";
 import {EntityNotFoundError} from "typeorm";
 
@@ -12,16 +12,20 @@ const gameRouter = Router()
 
 gameRouter.use(loginRequired)
 
-gameRouter.get('/', gameRequired, async (req: Request, res: Response) => {
-  const response: RestResponse<Game> = {
-    ok: true,
-    err: null,
-    data: req.session.user.game
+gameRouter.get('/', gameRequired, async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const response: RestResponse<Game> = {
+      ok: true,
+      err: null,
+      data: req.session.user.game,
+    }
+    return res.json(response);
+  } catch (err) {
+    handleRestError(req, res, err);
   }
-  return res.json(response)
 })
 
-gameRouter.post('/', async (req: Request, res: Response) => {
+gameRouter.post('/', async (req: Request, res: Response): Promise<Response> => {
   try{
     const input: CreateInput = createSchema.validateSync(req.body);
     const game = await createNewGame(req.session.user, input)
@@ -30,34 +34,38 @@ gameRouter.post('/', async (req: Request, res: Response) => {
     const response: RestResponse<Game> = {
       ok: true,
       err: null,
-      data: game
+      data: game,
     }
-    return res.json(response)
+    return res.json(response);
   } catch(err) {
     handleRestError(req, res, err)
   }
 })
 
-gameRouter.delete('/', gameRequired, async (req: Request, res: Response) => {
+gameRouter.delete('/', gameRequired, async (req: Request, res: Response): Promise<Response> => {
   try {
     await deleteGameFromUser(req.session.user)
     req.session.save(() => null)
-    res.json({ok: true, err: null, data: null} as RestResponse<null>)
+    return res.json({ok: true, err: null, data: null} as RestResponse<null>)
   } catch(err) {
     handleRestError(req, res, err)
   }
 })
 
-gameRouter.get('/users', gameRequired, async (req: Request, res: Response) => {
-  const response: RestResponse<User[]> = {
-    ok: true,
-    err: null,
-    data: req.session.user.game.users
+gameRouter.get('/users', gameRequired, async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const response: RestResponse<User[]> = {
+      ok: true,
+      err: null,
+      data: req.session.user.game.users,
+    }
+    return res.json(response);
+  } catch (err) {
+    handleRestError(req, res, err);
   }
-  return res.json(response)
 })
 
-gameRouter.get('/join', async (req: Request, res: Response) => {
+gameRouter.get('/join', async (req: Request, res: Response): Promise<Response> => {
   try {
     const { key } = joinSchema.validateSync(req.query)
     const user = req.session.user
@@ -75,7 +83,7 @@ gameRouter.get('/join', async (req: Request, res: Response) => {
     }
     game.addPlayer(user)
     await game.save()
-    res.json(response);
+    return res.json(response);
   } catch (err) {
     if (err instanceof EntityNotFoundError) {
       err = new ExpectedError('Incorrect game key')
@@ -83,7 +91,5 @@ gameRouter.get('/join', async (req: Request, res: Response) => {
     handleRestError(req, res, err)
   }
 })
-
-
 
 export default gameRouter
