@@ -81,6 +81,7 @@ export interface UserData {
   email?: string
   password?: string
   username: string
+  admin: boolean
   cards?: CardResponse[]
 }
 

@@ -10,6 +10,7 @@ export default class User extends RestClient {
   public username: string
   public cards: CardResponse[] = []
   public isActive: boolean = false
+  public admin: boolean = false
 
   constructor(user: UserData | undefined = undefined) {
     super()
@@ -18,6 +19,7 @@ export default class User extends RestClient {
       this.username = user.username
       this.email = user.email
       this.cards = user.cards
+      this.admin = user.admin
       autoBind(this)
     }
   }
