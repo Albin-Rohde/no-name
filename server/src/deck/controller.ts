@@ -32,7 +32,7 @@ deckRouter.use(loginRequired);
 /**
  * All decks available for the player
  */
-deckRouter.get('/', async (req: Request, res: Response) => {
+deckRouter.get('/', async (req: Request, res: Response): Promise<Response> => {
   try {
     const decks = await getAvailableDecks(req.session.user);
     const deckData: CardDeckData[] = await normalizeDeckData(decks);
@@ -50,7 +50,7 @@ deckRouter.get('/', async (req: Request, res: Response) => {
 /**
  * All decks created and owned by the player
  */
-deckRouter.get('/created', async (req: Request, res: Response) => {
+deckRouter.get('/created', async (req: Request, res: Response): Promise<Response> => {
   try {
     const decks = await getMyDecksWithRelation(req.session.user);
     const deckData = await normalizeDeckWithUser(decks);
@@ -68,7 +68,7 @@ deckRouter.get('/created', async (req: Request, res: Response) => {
 /**
  * All public decks not added to library, and not owned by player
  */
-deckRouter.get('/public', async (req: Request, res: Response) => {
+deckRouter.get('/public', async (req: Request, res: Response): Promise<Response> => {
   try {
     const decks = await getPublicDecks(req.session.user);
     const deckData = await normalizeDeckData(decks);
@@ -83,7 +83,7 @@ deckRouter.get('/public', async (req: Request, res: Response) => {
   }
 })
 
-deckRouter.post('/update/:deckId', async (req: Request, res: Response) => {
+deckRouter.post('/update/:deckId', async (req: Request, res: Response): Promise<Response> => {
   try {
     const updateDeckInput = updateDeckSchema.validateSync(req.body);
     const deckId = Number(req.params.deckId)
@@ -103,7 +103,7 @@ deckRouter.post('/update/:deckId', async (req: Request, res: Response) => {
 /**
  * Decks in players library
  */
-deckRouter.get('/library', async (req: Request, res: Response) => {
+deckRouter.get('/library', async (req: Request, res: Response): Promise<Response> => {
   try {
     const decks = await getDecksInLibrary(req.session.user);
     const deckData = await normalizeDeckData(decks);
@@ -118,7 +118,7 @@ deckRouter.get('/library', async (req: Request, res: Response) => {
   }
 });
 
-deckRouter.post('/library/add', async (req: Request, res: Response) => {
+deckRouter.post('/library/add', async (req: Request, res: Response): Promise<Response> => {
   try {
     const { cardDeckId } = addToLibSchema.validateSync(req.body);
     const deck: CardDeck = await addDeckToLibrary(req.session.user, cardDeckId)
@@ -134,7 +134,7 @@ deckRouter.post('/library/add', async (req: Request, res: Response) => {
   }
 })
 
-deckRouter.post('/library/remove', async (req: Request, res: Response) => {
+deckRouter.post('/library/remove', async (req: Request, res: Response): Promise<Response> => {
   try {
     const {cardDeckId} = addToLibSchema.validateSync(req.body);
     const removedDeck = await removeDeckFromLibrary(req.session.user, cardDeckId);
@@ -153,7 +153,7 @@ deckRouter.post('/library/remove', async (req: Request, res: Response) => {
 /**
  * All decks the player has been invited to
  */
-deckRouter.get('/invite', async (req: Request, res: Response) => {
+deckRouter.get('/invite', async (req: Request, res: Response): Promise<Response> => {
   try {
     const decks = await getDecksInvitedTo(req.session.user);
     const deckData: CardDeckData[] = await normalizeDeckData(decks);
@@ -168,7 +168,7 @@ deckRouter.get('/invite', async (req: Request, res: Response) => {
   }
 })
 
-deckRouter.get('/invite/sent', async (req: Request, res: Response) => {
+deckRouter.get('/invite/sent', async (req: Request, res: Response): Promise<Response> => {
   try {
     const decks = await getSentInvites(req.session.user);
     const deckData = await normalizeDeckData(decks);
@@ -186,7 +186,7 @@ deckRouter.get('/invite/sent', async (req: Request, res: Response) => {
 /**
  * Invite player to deck owned by requesting user
  */
-deckRouter.post('/invite', async (req: Request, res: Response) => {
+deckRouter.post('/invite', async (req: Request, res: Response): Promise<Response> => {
   try {
     const {cardDeckId, userId} = inviteUserSchema.validateSync(req.body);
     if (userId === req.session.user.id) {
@@ -207,7 +207,7 @@ deckRouter.post('/invite', async (req: Request, res: Response) => {
 /**
  * Remove invite
  */
-deckRouter.post('/invite/remove', async (req: Request, res: Response) => {
+deckRouter.post('/invite/remove', async (req: Request, res: Response): Promise<Response> => {
   try {
     const {cardDeckId, userId} = inviteUserSchema.validateSync(req.body);
     await removeInviteToDeck(req.session.user, userId, cardDeckId)

@@ -21,18 +21,21 @@ const userRouter = Router()
  * if no user on session, returns null
  */
 userRouter.get('/get', loginRequired, (req: Request, res: Response): Response => {
-  const response: RestResponse<User> = {
-    ok: true,
-    err: null,
-    data: req.session.user
+  try {
+    const response: RestResponse<User> = {
+      ok: true,
+      err: null,
+      data: req.session.user,
+    }
+    return res.json(response);
+  } catch (err) {
+    handleRestError(req, res, err);
   }
-  return res.json(response)
 });
 
-userRouter.get('/search', loginRequired, async (req: Request, res: Response) => {
+userRouter.get('/search', loginRequired, async (req: Request, res: Response): Promise<Response> => {
   try{
     const { username } = searchSchema.validateSync(req.query);
-
     const response: RestResponse<User[]> = {
       ok: true,
       err: null,
@@ -59,15 +62,15 @@ userRouter.get('/search', loginRequired, async (req: Request, res: Response) => 
  * Returns the authenticated user on success
  * @param body
  */
-userRouter.post('/login', async (req: Request, res: Response) => {
-  if(req.session.user) {
-    return res.status(200).json({
-      ok: true,
-      err: null,
-      data: req.session.user
-    } as RestResponse<User>)
-  }
+userRouter.post('/login', async (req: Request, res: Response): Promise<Response> => {
   try {
+    if(req.session.user) {
+      return res.status(200).json({
+        ok: true,
+        err: null,
+        data: req.session.user
+      } as RestResponse<User>)
+    }
     const input: LoginInput = loginSchema.validateSync(req.body)
     const user = await User.createQueryBuilder('user')
       .addSelect('user.password')
@@ -98,7 +101,7 @@ userRouter.post('/login', async (req: Request, res: Response) => {
  * Logout user, destroys session for requester
  * Which will make then de-authenticated for subsequent calls
  */
-userRouter.post('/logout', loginRequired, async (req: Request, res: Response): Promise<void> => {
+userRouter.post('/logout', loginRequired, async (req: Request, res: Response): Promise<Response> => {
   try {
     req.session.destroy(() => res.json({ok: true, err: null, data: {}} as RestResponse<any>))
     return
@@ -112,7 +115,7 @@ userRouter.post('/logout', loginRequired, async (req: Request, res: Response): P
  * Creates a new user and sets the new user to the
  * requesters session, making them authenticated.
  */
-userRouter.post('/register', async (req: Request, res: Response) => {
+userRouter.post('/register', async (req: Request, res: Response): Promise<Response> => {
   try {
     const input: CreateInput = createSchema.validateSync(req.body)
     const user = await createUser(input)
@@ -123,13 +126,13 @@ userRouter.post('/register', async (req: Request, res: Response) => {
       err: null,
       data: user,
     }
-    res.json(response)
+    return res.json(response)
   } catch(err) {
     handleRestError(req, res, err)
   }
 })
 
-userRouter.post('/send-reset', async (req: Request, res: Response) => {
+userRouter.post('/send-reset', async (req: Request, res: Response): Promise<Response> => {
   try {
     const { email } = emailSchema.validateSync(req.body);
     const user = await User.createQueryBuilder('user')
@@ -146,7 +149,7 @@ userRouter.post('/send-reset', async (req: Request, res: Response) => {
       data: null,
     }
     // Do not send email when running locally.
-    if (process.env.CLIENT_URL.includes('localhost')) {
+    if (process.env.NODE_ENV !== 'Production') {
       logger.info(`${process.env.CLIENT_URL}/reset/${key}`);
       return res.json(response);
     }
@@ -163,7 +166,7 @@ userRouter.post('/send-reset', async (req: Request, res: Response) => {
   }
 });
 
-userRouter.get('/reset/:key', async (req: Request, res: Response) => {
+userRouter.get('/reset/:key', async (req: Request, res: Response): Promise<Response> => {
   try {
     const userId = await redis.get(req.params.key)
     if (!userId) {
@@ -180,13 +183,13 @@ userRouter.get('/reset/:key', async (req: Request, res: Response) => {
       err: null,
       data: userData,
     }
-    res.json(response);
+    return res.json(response);
   } catch (err) {
     handleRestError(req, res, err);
   }
 });
 
-userRouter.post('/reset/:key', async (req: Request, res: Response) => {
+userRouter.post('/reset/:key', async (req: Request, res: Response): Promise<Response> => {
   try {
     const userId = await redis.get(req.params.key);
     if (!userId) {
@@ -200,7 +203,7 @@ userRouter.post('/reset/:key', async (req: Request, res: Response) => {
       err: null,
       data: null,
     };
-    res.json(response);
+    return res.json(response);
   } catch (err) {
     handleRestError(req, res, err);
   }
