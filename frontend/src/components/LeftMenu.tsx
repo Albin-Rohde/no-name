@@ -6,7 +6,7 @@ import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import {Avatar} from "@mui/material";
+import {Avatar, Link} from "@mui/material";
 import {Logout} from "@mui/icons-material";
 import {UserData} from "../clients/ResponseTypes";
 import {useSelector} from "react-redux";
@@ -55,6 +55,13 @@ export default function LeftMenu(props: LeftMenuProps) {
             <ListItem button key='delete-game' onClick={props.deleteGame}>
               <ListItemText primary='Delete Game' />
             </ListItem>
+          )}
+          {props.user?.admin && (
+            <Link href={`${process.env.REACT_APP_API_BASE_URL}/admin`}>
+              <ListItem button key='go-to-admin'>
+                  <ListItemText primary='Admin' />
+              </ListItem>
+            </Link>
           )}
         </List>
       )}
