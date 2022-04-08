@@ -11,16 +11,29 @@ interface ModelRow {
   value: any;
   link?: string;
 }
+
+const getPasswordField = (coll: ColumnMetadata, id: any): ModelRow => {
+  return {
+    name: 'password',
+    value: 'change password',
+    link: `/admin/User/change-password/${id}`,
+  }
+}
+
 export const getModelRows = async (model: Repository<any>): Promise<ModelRow[][]> => {
   const rows: ModelRow[][] = []
   for (const row of await model.find()) {
     const columnData: ModelRow[] = [];
     for(const coll of model.metadata.columns) {
-      columnData.push({
-        name: coll.propertyName,
-        value: row[coll.propertyName],
-        link: getColumnLink(coll, row),
-      });
+      if (coll.propertyName === 'password') {
+        columnData.push(getPasswordField(coll, row.id));
+      } else {
+        columnData.push({
+          name: coll.propertyName,
+          value: row[coll.propertyName],
+          link: getColumnLink(coll, row),
+        });
+      }
     }
     rows.push(columnData);
   }
@@ -44,11 +57,15 @@ export const getSingleRow = async (model: Repository<any>, id: string): Promise<
   const row = await model.findOne(id);
   const columnData: ModelRow[] = [];
   for(const coll of model.metadata.columns) {
-    columnData.push({
-      name: coll.propertyName,
-      value: row[coll.propertyName],
-      link: getColumnLink(coll, row),
-    });
+    if (coll.propertyName === 'password') {
+      columnData.push(getPasswordField(coll, row.id))
+    } else {
+      columnData.push({
+        name: coll.propertyName,
+        value: row[coll.propertyName],
+        link: getColumnLink(coll, row),
+      });
+    }
   }
   return columnData;
 }
