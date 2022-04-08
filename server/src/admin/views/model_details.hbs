@@ -1,11 +1,11 @@
-<h1>Details for <a href="/admin/{{model}}">{{model}}</a> {{id}}</h1>
-
+<h1>Details for <a href="/admin/{{detailsTable.model}}">{{detailsTable.model}}</a> {{id}}</h1>
+<button class="delete">Delete {{detailsTable.model}}</button>
 <table>
     <tr>
         <th>Column</th>
         <th>Value</th>
     </tr>
-    {{#each row}}
+    {{#each detailsTable.row}}
         <tr>
             <td>{{this.name}}</td>
             {{#if this.link}}
@@ -16,3 +16,42 @@
         </tr>
     {{/each}}
 </table>
+{{#each tableData}}
+    <h1>{{this.description}}</h1>
+    <table>
+        <tr>
+            {{#each this.columns}}
+                <th>{{this}}</th>
+            {{/each}}
+        </tr>
+        {{#each this.rows}}
+            <tr>
+                {{#each this}}
+                    {{#if this.link}}
+                        <td><a href="{{this.link}}">{{this.value}}</a></td>
+                    {{else}}
+                        <td>{{this.value}}</td>
+                    {{/if}}
+                {{/each}}
+            </tr>
+        {{/each}}
+    </table>
+{{/each}}
+<script>
+    const button = document.querySelector('.delete')
+    button.addEventListener('click', () => {
+        const yes = confirm('are you sure you want to delete this {{detailsTable.model}}, this may delete its relations as well')
+        if (yes) {
+            window.fetch('/admin/{{detailsTable.model}}/{{detailsTable.id}}', {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+            }).then((res) => {
+                if (res.ok) {
+                    window.location.replace('/admin/{{detailsTable.model}}')
+                }
+            });
+        }
+    })
+</script>
