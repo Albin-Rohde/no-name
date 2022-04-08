@@ -1,8 +1,9 @@
 import { User } from './models/User'
-import {CreateError} from "../error";
+import {AuthenticationError, CreateError} from "../error";
 import bcrypt from "bcrypt";
 import {WhiteCardRef} from "../card/models/WhiteCardRef";
 import {CardDeckUserRef} from "../deck/models/CardDeckUserRef";
+import {LoginInput} from "./schema";
 
 /**
  * Get a user with relevant relations
@@ -26,6 +27,21 @@ interface CreateUserData {
   email: string
   password: string
   username: string
+}
+
+export const loginUser = async (input: LoginInput): Promise<User> => {
+  const user = await User.createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('LOWER(user.email) = :email', { email: input.email.toLowerCase() })
+      .getOne();
+  if(!user) {
+    throw new AuthenticationError(`Incorrect email or password`)
+  }
+  const passwordOk = await bcrypt.compare(input.password, user.password)
+  if (!passwordOk) {
+    throw new AuthenticationError('Incorrect email or password')
+  }
+  return user;
 }
 
 /**

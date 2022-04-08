@@ -1,10 +1,9 @@
 import { Router, Request, Response } from 'express'
 import {handleRestError, loginRequired} from '../middlewares'
-import {createUser, updateUser} from './services'
+import {createUser, loginUser, updateUser} from './services'
 import {RestResponse} from "../types";
 import {User} from "./models/User";
 import {AuthenticationError, ExpectedError} from "../error";
-import bcrypt from "bcrypt";
 import { v4 as uuid } from 'uuid';
 import sgMail from '@sendgrid/mail';
 import passwordReset from "../email-templates/password-reset";
@@ -72,17 +71,7 @@ userRouter.post('/login', async (req: Request, res: Response): Promise<Response>
       } as RestResponse<User>)
     }
     const input: LoginInput = loginSchema.validateSync(req.body)
-    const user = await User.createQueryBuilder('user')
-      .addSelect('user.password')
-      .where('LOWER(user.email) = :email', { email: input.email.toLowerCase() })
-      .getOne();
-    if(!user) {
-      throw new AuthenticationError(`Incorrect email or password`)
-    }
-    const passwordOk = await bcrypt.compare(input.password, user.password)
-    if (!passwordOk) {
-      throw new AuthenticationError('Incorrect email or password')
-    }
+    const user = await loginUser(input);
     user.password = undefined;
     req.session.user = user
     req.session.save(() => null)
@@ -150,7 +139,7 @@ userRouter.post('/send-reset', async (req: Request, res: Response): Promise<Resp
     }
     // Do not send email when running locally.
     if (process.env.NODE_ENV !== 'Production') {
-      logger.info(`${process.env.CLIENT_URL}/reset/${key}`);
+      logger.info(`sending reset key`, {resetLink: `${process.env.CLIENT_URL}/reset/${key}`});
       return res.json(response);
     }
     const msg = {

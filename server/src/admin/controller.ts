@@ -81,5 +81,38 @@ adminRouter.get('/:modelName/details/:id', async (req: Request, res: Response) =
   });
 });
 
+adminRouter.get('/User/change-password/:id', async (req: Request, res: Response) => {
+  try {
+    const user = await User.findOneOrFail(req.params.id);
+    return res.render('change-password', {...user, err: req.query.err})
+  } catch (err) {
+    handleAdminError(req, res, err);
+  }
+});
+
+adminRouter.post('/User/change-password/:id', async (req: Request, res: Response) => {
+  try {
+    const user = await User.findOneOrFail(req.params.id);
+    const {password1, password2} = req.body;
+    if (password1 !== password2) {
+      throw new ValidationError('password missmatch');
+    }
+    const input = updateSchema.validateSync({password: password1, id: user.id});
+    await updateUser(input);
+    return res.redirect(`/admin/User/details/${user.id}`);
+  } catch (err) {
+    handleAdminError(req, res, err);
+  }
+});
+
+
+function handleAdminError(req: Request, res: Response, err: Error) {
+  if (err instanceof ValidationError) {
+    logger.warn(err);
+    return res.redirect(`/admin/${req.path}?err=${err.message}`);
+  } else {
+    return res.redirect(req.path);
+  }
+}
 
 export {adminRouter}
