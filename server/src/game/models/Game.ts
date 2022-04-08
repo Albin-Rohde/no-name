@@ -66,6 +66,9 @@ export class Game extends BaseEntity {
   @JoinColumn({name: 'current_turn_fk'})
   currentTurn: GameTurn
 
+  @Column({name: 'current_turn_fk'})
+  current_turn_fk: string
+
   @ManyToOne(type => BlackCardRef)
   @JoinColumn({name: 'black_card_id_fk'})
   blackCard: BlackCardRef

@@ -82,14 +82,14 @@ export class User extends BaseEntity {
   }
 
   /**
-   * Hybrid property, boolean if the redux is host over a geme
+   * Hybrid property, boolean if the user is host over a geme
    */
   get isHost(): boolean {
     return this.id === this.game?.hostUserId
   }
 
   /**
-   * Hybrid property, boolean if the redux is cardWizz for the
+   * Hybrid property, boolean if the user is cardWizz for the
    * current currentTurn in a game.
    */
   get isCardWizz(): boolean {

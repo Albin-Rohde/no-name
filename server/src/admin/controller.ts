@@ -1,36 +1,21 @@
 import { Router, Request, Response} from 'express';
 import {User} from "../user/models/User";
-import {Game} from "../game/models/Game";
-import {CardDeck} from "../deck/models/CardDeck";
-import {CardDeckUserRef} from "../deck/models/CardDeckUserRef";
-import {BlackCard} from "../card/models/BlackCard";
-import {BlackCardRef} from "../card/models/BlackCardRef";
-import {GameTurn} from "../game/models/GameTurn";
-import {WhiteCardRef} from "../card/models/WhiteCardRef";
-import {WhiteCard} from "../card/models/WhiteCard";
-import {getColumnNames, getModelRows, getSingleRow} from "./services";
+import {
+  deleteModel,
+  getModelData,
+  getModelDetails,
+  MODELS,
+} from "./services";
 import {adminRequired} from "../middlewares";
 import {loginSchema, updateSchema} from "../user/schema";
 import {loginUser, updateUser} from "../user/services";
 import {ValidationError} from "yup";
 import {logger} from "../logger/logger";
 
-const MODELS = [
-  User,
-  Game,
-  GameTurn,
-  CardDeck,
-  CardDeckUserRef,
-  BlackCard,
-  BlackCardRef,
-  WhiteCard,
-  WhiteCardRef,
-]
-
 const adminRouter = Router();
 
 adminRouter.get('/login', (req: Request, res: Response) => {
-  if(req.session.user.admin) {
+  if(req.session?.user?.admin) {
     res.redirect('/admin')
   }
   return res.render('login', {err: req.query.err, layouts: false})
@@ -53,32 +38,33 @@ adminRouter.post('/login', async (req: Request, res: Response) => {
 
 adminRouter.use(adminRequired);
 
-adminRouter.get('/', (req, res) => {
-  const modelNames = MODELS.map((model) => {
-    return model.name
-  });
-  res.render('home', {models: modelNames})
+adminRouter.get('/', async (req, res) => {
+  const models = await Promise.all(MODELS.map(async (model) => {
+    return {
+      name: model.name,
+      count: await model.count(),
+    }
+  }));
+  res.render('home', {models})
 });
 
 adminRouter.get('/:modelName', async (req: Request, res: Response) => {
   const modelName = req.params.modelName;
-  const model = MODELS.find((m) => m.name === modelName).getRepository()
-  res.render('model', {
-    model: modelName,
-    columns: getColumnNames(model),
-    rows: await getModelRows(model),
-  });
+  const tableData = await getModelData(modelName);
+  console.log(tableData);
+  res.render('model', {tableData})
 });
+
+adminRouter.delete('/:modelName/:id', async (req: Request, res: Response) => {
+  const {modelName, id} = req.params;
+  await deleteModel(modelName, id);
+  return res.status(202).json({ok: true})
+})
 
 adminRouter.get('/:modelName/details/:id', async (req: Request, res: Response) => {
   const { modelName, id } = req.params;
-  const model = MODELS.find((m) => m.name === modelName).getRepository()
-  res.render('model_details', {
-    model: modelName,
-    columns: getColumnNames(model),
-    row: await getSingleRow(model, id),
-    id,
-  });
+  const details = await getModelDetails(modelName, id);
+  res.render('model_details', details)
 });
 
 adminRouter.get('/User/change-password/:id', async (req: Request, res: Response) => {

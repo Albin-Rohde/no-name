@@ -1,8 +1,13 @@
 <h2>Models</h2>
 <Table>
+    <tr>
+        <th>Model name</th>
+        <th>Rows</th>
+    </tr>
     {{#each models}}
         <tr>
-            <td><a href="/admin/{{this}}">{{this}}</a></td>
+            <td><a href="/admin/{{this.name}}">{{this.name}}</a></td>
+            <td>{{this.count}}</td>
         </tr>
     {{/each}}
 </Table>
