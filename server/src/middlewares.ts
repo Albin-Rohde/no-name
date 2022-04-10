@@ -32,10 +32,7 @@ const authUser = async (sessionUser: User) => {
     relations: ['game', 'game._users'],
   });
   if(!user) {
-    throw new NotFoundError(`Could not find <User> with id ${sessionUser.id}`)
-  }
-  if(user.email !== sessionUser.email || user.password !== sessionUser.password) {
-    throw new AuthenticationError('AUTH_FAILED')
+    throw new AuthenticationError('User not found')
   }
   return user
 }
