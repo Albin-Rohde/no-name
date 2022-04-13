@@ -51,11 +51,11 @@ export const adminRequired = async (req: Request, res: Response, next: NextFunct
   try {
     const user = await authUser(req.session.user)
     if (!user.admin) {
-      return res.redirect('/admin/login');
+      return res.redirect('/login');
     }
     next();
   } catch (err) {
-    return res.redirect('/admin/login');
+    return res.redirect('/login');
   }
 }
 

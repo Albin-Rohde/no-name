@@ -10,5 +10,8 @@ RUN npm install
 ## build app when image is created.
 RUN npm run build
 
+## Copy hsb files
+RUN cp -r ./src/admin/views ./build/src/admin/views
+
 ## run the node process
 CMD ["npm", "run", "prod"]

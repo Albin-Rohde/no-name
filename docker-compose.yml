@@ -54,6 +54,23 @@ services:
     env_file:
       - 'config/.env.dev'
 
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - server
+    networks:
+      - local
+      - public
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/:/etc/letsencrypt
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf
+
 networks:
   local:
     driver: bridge

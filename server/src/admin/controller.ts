@@ -16,7 +16,7 @@ const adminRouter = Router();
 
 adminRouter.get('/login', (req: Request, res: Response) => {
   if(req.session?.user?.admin) {
-    res.redirect('/admin')
+    res.redirect('/')
   }
   return res.render('login', {err: req.query.err, layouts: false})
 })
@@ -26,11 +26,11 @@ adminRouter.post('/login', async (req: Request, res: Response) => {
     const input = loginSchema.validateSync(req.body);
     const user = await loginUser(input);
     if (!user.admin) {
-      return res.redirect('/admin/login')
+      return res.redirect('/login')
     }
     req.session.user = user;
     req.session.save();
-    res.redirect('/admin');
+    res.redirect('/');
   } catch (err) {
     handleAdminError(req, res, err);
   }
@@ -85,7 +85,7 @@ adminRouter.post('/User/change-password/:id', async (req: Request, res: Response
     }
     const input = updateSchema.validateSync({password: password1, id: user.id});
     await updateUser(input);
-    return res.redirect(`/admin/User/details/${user.id}`);
+    return res.redirect(`/User/details/${user.id}`);
   } catch (err) {
     handleAdminError(req, res, err);
   }
@@ -95,7 +95,7 @@ adminRouter.post('/User/change-password/:id', async (req: Request, res: Response
 function handleAdminError(req: Request, res: Response, err: Error) {
   if (err instanceof ValidationError) {
     logger.warn(err);
-    return res.redirect(`/admin/${req.path}?err=${err.message}`);
+    return res.redirect(`/${req.path}?err=${err.message}`);
   } else {
     return res.redirect(req.path);
   }
