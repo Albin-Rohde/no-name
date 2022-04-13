@@ -129,19 +129,19 @@ const getColumnNames = (model: Repository<AnyModel>): string[] => {
 
 const getGenericColumnLink = (coll: ColumnMetadata, row: any): string | undefined => {
   if (coll.relationMetadata?.inverseEntityMetadata.targetName) {
-    return `/admin/${coll.relationMetadata.inverseEntityMetadata.targetName}/details/${row[coll.propertyName]}`
+    return `/${coll.relationMetadata.inverseEntityMetadata.targetName}/details/${row[coll.propertyName]}`
   }
   if (coll.isPrimary) {
-    return `/admin/${coll.entityMetadata.targetName}/details/${row[coll.propertyName]}`
+    return `/${coll.entityMetadata.targetName}/details/${row[coll.propertyName]}`
   }
   if (coll.propertyName === 'hostUserId') {
-    return `/admin/User/details/${row[coll.propertyName]}`
+    return `/User/details/${row[coll.propertyName]}`
   }
   if (coll.propertyName === 'game_key') {
-    return `/admin/Game/details/${row[coll.propertyName]}`
+    return `/Game/details/${row[coll.propertyName]}`
   }
   if (coll.propertyName === 'currentTurn') {
-    return `/admin/GameTurn/details/${row.currentTurn}`
+    return `/GameTurn/details/${row.currentTurn}`
   }
   return undefined
 }
@@ -154,7 +154,7 @@ const transformSingleRow = <T=AnyModel>(model: Repository<T>, row: any): ModelRo
         columnData.push({
           name: 'password',
         value: 'change password',
-        link: `/admin/User/change-password/${row.id}`,
+        link: `/User/change-password/${row.id}`,
         });
         break;
       case 'card_wizz_user_id_fk':
@@ -244,8 +244,8 @@ const getTableData = async (model: Repository<AnyModel>, id: string): Promise<Ta
       const cardsOnHand = user.cards.filter((c) => c.state === CardState.HAND);
       const rows: ModelRow[][] = cardsOnHand.map<ModelRow[]>((card) => {
         return [
-          {name: 'id', value: card.id, link: `/admin/WhiteCardRef/${card.id}`},
-          {name: 'WhiteCard', value: card.white_card.id, link: `/admin/WhiteCard/${card.white_card.id}`},
+          {name: 'id', value: card.id, link: `/WhiteCardRef/${card.id}`},
+          {name: 'WhiteCard', value: card.white_card.id, link: `/WhiteCard/details/${card.white_card.id}`},
           {name: 'text', value: card.white_card.text}
         ]
       })

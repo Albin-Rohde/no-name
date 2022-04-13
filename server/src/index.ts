@@ -47,6 +47,7 @@ declare module 'http' {
       user: User
       save: (...args: any[]) => void
       destroy: (...args: any[]) => void
+      readonly id: string,
     }
     /** uuid for tracking logs */
     tracingId: string

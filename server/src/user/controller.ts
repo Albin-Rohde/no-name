@@ -73,8 +73,8 @@ userRouter.post('/login', async (req: Request, res: Response): Promise<Response>
     const input: LoginInput = loginSchema.validateSync(req.body)
     const user = await loginUser(input);
     user.password = undefined;
-    req.session.user = user
-    req.session.save(() => null)
+    req.session.user = user;
+    await new Promise(resolve => req.session.save(resolve));
     const response: RestResponse<User> = {
       ok: true,
       err: null,

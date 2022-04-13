@@ -115,25 +115,25 @@ function getRedisSessionStore(): RedisStore {
 }
 
 async function initApp() {
+  const options: ServerOptions = {
+    port: Number(process.env.PORT),
+    clientUrl: process.env.CLIENT_URL!,
+  }
   await createConnection();
   const store = getRedisSessionStore();
   const userSession = session({
     store,
     name: 'sid',
     secret: process.env.COOKIE_SECRET,
-    resave: false,
     saveUninitialized: false,
+    resave: false,
     cookie: {
-      secure: false,
+      secure: true,
       maxAge: 1000 * 60 * 60 * 24, // 24 hours
-      httpOnly: false,
-      sameSite: false,
+      httpOnly: true,
+      sameSite: 'none',
     }
   });
-  const options: ServerOptions = {
-    port: Number(process.env.PORT),
-    clientUrl: process.env.CLIENT_URL!,
-  }
   const app = getExpressApp(options, userSession);
   const server = getHttpServer(app, options, userSession);
   server.listen(options.port, () => {

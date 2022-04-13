@@ -75,8 +75,8 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
-      - ./${NGINX_CONF_FILE}:/etc/nginx/nginx.conf
+      - ${NGINX_CERT_DIR}:/etc/letsencrypt
+      - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf
     healthcheck:
       test: ["CMD", "service", "nginx", "status"]
       interval: 10s

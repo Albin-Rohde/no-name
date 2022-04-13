@@ -39,8 +39,8 @@ jobs:
         -t ${FRONTEND_IMAGE}:latest \
         -f ./frontend/Dockerfile.prod \
         --cache-from ${FRONTEND_IMAGE}:latest \
-        --build-arg REACT_APP_API_BASE_URL=https://fasoner.party/api \
-        --build-arg REACT_APP_SOCKET_BASE_URL=https://fasoner.party \
+        --build-arg REACT_APP_API_BASE_URL=https://api.fasoner.party \
+        --build-arg REACT_APP_SOCKET_BASE_URL=https://api.fasoner.party \
         --build-arg REACT_APP_CLIENT_URL=https://fasoner.party \
         --platform=linux/arm64 \
         --output type=image,push=true \
