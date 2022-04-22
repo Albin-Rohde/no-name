@@ -1,5 +1,5 @@
 compose-prod = @docker-compose -f docker-compose.prod.yml
-host=http://localhost
+host=https://api.localhost
 server_ip=79.136.83.11
 
 PURPLE=\033[;35m
@@ -12,21 +12,7 @@ all:
 	@echo "not implemented"
 
 init:
-	@echo -e "$(PURPLE)==== Copying .env files ====$(NC)"
-	@cp config/.env.prod .env && cp config/.env.dev ./frontend/.env && cp config/.env.dev ./server/.env
-	@echo -e "$(GREEN)==== Done ====$(NC)"
-	@echo -e "$(PURPLE)==== pulling docker images for dev ====$(NC)"
-	@docker-compose pull
-	@echo -e "$(GREEN)==== Done ====$(NC)"
-	@echo -e "$(PURPLE)==== Building docker images for dev ====$(BLUE)"
-	@docker-compose build frontend server
-	@echo -e "$(GREEN)==== Done ====$(NC)"
-	@echo -e "$(PURPLE)==== Installing dependencies locally ====$(NC)"
-	@cd ./frontend && npm i && cd ../server && npm i && cd ../
-	@npm i -g ts-node typeorm
-	@echo -e "$(PURPLE)==== setting up grafana permissions ====$(NC)"
-	@sudo chown -R $(USER) ./grafana && chmod -R 777 ./grafana
-	@echo -e "$(GREEN)====== Done with setup ======$(NC)"
+	@chmod +x init.sh && ./init.sh
 
 migrate:
 	cd ./server && npm run migration:run && cd ..
