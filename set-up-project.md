@@ -12,6 +12,7 @@ getting started.
 When requirements are met run `make init` from root.
 This will prepare everything that's needed in order to run the project.
 `make init` will copy all .env files to correct directories and pull/build all docker images for the dev environment.
+
 ---
 ## Starting in development mode
 Development mode will spin up backend(server) and frontend with autoreload to make development as easy as possible.
@@ -33,6 +34,7 @@ docker images, followed by `make prod` to start everything.
 - graylog will start on https://logs.localhost
 - grafana will start on https://grafana.localhost
 if db is not up to date, one can run migrations with `make prod-migrate`.
+
 ---
 ## Starting app for live enviroment
 Some additional steps are required to start app for live environment.
