@@ -12,32 +12,38 @@ getting started.
 When requirements are met run `make init` from root.
 This will prepare everything that's needed in order to run the project.
 `make init` will copy all .env files to correct directories and pull/build all docker images for the dev environment.
-
+---
 ## Starting in development mode
 Development mode will spin up backend(server) and frontend with autoreload to make development as easy as possible.
 easiest way to start project in development mode is to run `make dev`.
-- Frontend will start on localhost:3000
-- Backend will start on localhost:5000
+Frontend and backend are started behind a nginx layer and can be accessed on:
+- Frontend - https://localhost
+- Backend - https://api.localhost
 - postgres will start on localhost:5432
 
-After starting the app for the first time you will want to run the migrations
-`make migrate`
-
+---
 ## Starting in production mode
-Production mode spins up everything behind nginx, this is the exact same setup as the live server.
+Production mode spins up everything, including grafana graylog etc.
 Spinning up in production mode is a great way to test that everything works as expected locally before merge to master.
-
-In order for grafana to be able to persist data on host first run:
-`sudo chown -R $USER ./grafana && chmod -R 777 ./grafana`. Then continue with the steps bellow.
 
 Easiest way to start in production mode is with make commands. First run `make prod-build` to build production 
 docker images, followed by `make prod` to start everything.
-- Frontend will start on localhost
-- Backend will start on localhost/api
-- graylog will start on logs.localhost
-- grafana will start on grafana.localhost
+- Frontend will start on https://localhost
+- Backend will start on https://api.localhost/api
+- graylog will start on https://logs.localhost
+- grafana will start on https://grafana.localhost
 if db is not up to date, one can run migrations with `make prod-migrate`.
+---
+## Starting app for live enviroment
+Some additional steps are required to start app for live environment.
+- Get the `.env` file for live from 1password and put it in the root of this repo.
+- Make sure to set up correct port forwarding.
+- Make sure the cloudlfare DNS it pointing towards your public IP.
+- Build the live version of docker images with `make live-build`.
+- Generate SSL certificates with certbot with `make cert`
+- When certbot is done and images are built run `make prod` to start everything.
 
+---
 ## Migration
 ### Running migrations
 Whenever there are changes to the database schema/tables one will need to run the migrations.
@@ -53,19 +59,25 @@ Check that it looks correct and make changes if needed. When happy apply the mig
 ### Reverting migration
 To revert a migration run `npm run migration:revert` from server root (`./server`).
 
+---
 ## Running app outside docker
 It is possible to run the app outside of docker, however the database and redis is easier to run through docker.
 First you need to alter the db and redis host in the `.env` file in the server root (`./server`).
-Replace `redis` and `db` with `localhost` respectively.
+Replace `redis` and `db` with `localhost` respectively. Additionally the url the app expects to find frontend 
+and backend on will have to be updated since they won't be running behind nginx. 
 ```
 POSTGRES_HOST=localhost
 REDIS_HOST=localhost
+CLIENT_URL=localhost:3000
+REACT_APP_API_BASE_URL=localhost:5000
+REACT_APP_SOCKET_BASE_URL=localhost:5000
+REACT_APP_CLIENT_URL=localhost:3000
 ```
+Start the db and redis with docker `docker-compose up db redis`.
+Start the server on host go to server root (`./server`) and run `npm run dev`.
+Start the frontend on host go to frontend root (`./frontend`) and run `npm run dev`.
 
-To start the server on host go to server root (`./server`) and run `npm run dev`.
-To start the frontend on host go to frontend root (`./frontend`) and run `npm run dev`
-
-
+---
 ## Commands cheat sheet
 | Make command        | Description                                           |
 |---------------------|-------------------------------------------------------|

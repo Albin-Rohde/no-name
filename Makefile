@@ -30,9 +30,9 @@ prod-build:
 
 prod-build-frontend:
 	docker build --no-cache -t ghcr.io/albinr99salt/no-name_frontend:latest \
-	--build-arg REACT_APP_API_BASE_URL=$(host) \
-	--build-arg REACT_APP_SOCKET_BASE_URL=$(host) \
-	--build-arg REACT_APP_CLIENT_URL=$(host) \
+	--build-arg REACT_APP_API_BASE_URL=https://api.localhost \
+	--build-arg REACT_APP_SOCKET_BASE_URL=https://api.localhost \
+	--build-arg REACT_APP_CLIENT_URL=https://localhost \
 	-f ./frontend/Dockerfile.prod ./frontend
 
 prod-build-server:

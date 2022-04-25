@@ -156,7 +156,7 @@ export const loggerMiddleware = (socket: Socket, meta: MiddlewareMetaData): void
     userId: socket.request.session.user.id,
     tracingId: socket.request.tracingId,
   }
-  socketLogger.info(`WS ${info.eventName} user: ${info.userId}`, info)
+  socketLogger.debug(`WS ${info.eventName} user: ${info.userId}`, info)
 }
 
 export const expressLoggingMiddleware = (req: Request, _res: Response, next: NextFunction) => {
