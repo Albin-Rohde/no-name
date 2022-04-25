@@ -56,13 +56,6 @@ export default function LeftMenu(props: LeftMenuProps) {
               <ListItemText primary='Delete Game' />
             </ListItem>
           )}
-          {props.user?.admin && (
-            <Link href={`${process.env.REACT_APP_API_BASE_URL}/admin`}>
-              <ListItem button key='go-to-admin'>
-                  <ListItemText primary='Admin' />
-              </ListItem>
-            </Link>
-          )}
         </List>
       )}
     </Box>
