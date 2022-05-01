@@ -8,7 +8,7 @@ import MenuAppBar from "./components/MenuAppBar";
 import RestClient from "./clients/RestClient";
 import Spinner from "./components/Spinner";
 import { useDispatch, useSelector } from "react-redux";
-import {ReduxState, updateUser, setError, updateGame, notification} from "./redux/redux";
+import {ReduxState, updateUser, setError, updateGame} from "./redux/redux";
 import { UserData} from "./clients/ResponseTypes";
 import User from "./clients/User";
 import LoggedIn from "./screens/loggedIn/LoggedIn";
@@ -20,7 +20,7 @@ import JoinGame from "./screens/loggedIn/inGame/JoinGame";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
-  const [screen, setScreen] = useState<'register' | 'login' | 'forgot'>('register');
+  const [screen, setScreen] = useState<'register' | 'login' | 'forgot' | 'new-deck'>('register');
   const [longPollActive, setLongPollActive] = useState<boolean>(false);
   const user = useSelector<ReduxState, User | undefined>((state) => state.user);
   const error = useSelector<ReduxState, string>((state) => state.error);

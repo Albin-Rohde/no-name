@@ -8,8 +8,8 @@ import {
 } from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {
-  AddCircleOutline, Clear,
-  DeleteForever,
+  AddCircleOutline,
+  Clear,
   InfoOutlined
 } from "@mui/icons-material";
 import RestClient from "../../clients/RestClient";
@@ -19,7 +19,6 @@ import {AddDeckModal} from "../../components/modals/AddDeckModal";
 import {useDispatch} from "react-redux";
 import {setError} from "../../redux/redux";
 import {DeckCard} from "../../components/DeckCard";
-import Spinner from "../../components/Spinner";
 
 interface Props {
   setScreen: (screen: 'home' | 'create-game' | 'decks') => void,
