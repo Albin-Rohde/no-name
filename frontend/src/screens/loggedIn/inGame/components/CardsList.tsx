@@ -4,6 +4,7 @@ import {BlackCardResponse, CardResponse, CardState} from '../../../../clients/Re
 import {useDispatch, useSelector} from "react-redux";
 import {ReduxState, setError} from "../../../../redux/redux";
 import * as GameClient from "../../../../clients/Game";
+import {getFontSize} from "../../../../utils/utils";
 
 interface CardsListProps {
   cards: CardResponse[];
@@ -93,28 +94,6 @@ const CardsList = (props: CardsListProps) => {
     return props.blackCard.text.length + card.text.length
   }
 
-  const getFontSize = (card: CardResponse): string => {
-    const textLength = getTotalTextLength(card);
-    if (isMobile) {
-      let fontSize = '1.6em';
-      if (textLength > 78) {
-        fontSize = '1.4em';
-      }
-      if (textLength > 85) {
-        fontSize = '1.3em';
-      }
-      return fontSize;
-    }
-    let fontSize = '1.3vw';
-    if (textLength > 78) {
-      fontSize = '1.2vw';
-    }
-    if (textLength > 85) {
-      fontSize = '1.1vw';
-    }
-    return fontSize;
-  }
-
   const cards = props.cards.map((card) => {
     const cardStyle = isMobile ? CARD_STYLE_MOBILE : CARD_STYLE_DESKTOP;
     const selected = props.selectedCards.includes(card);
@@ -126,7 +105,7 @@ const CardsList = (props: CardsListProps) => {
         onClick={() => props.cardClickCb(card)}
       >
         <CardContent>
-          <Typography style={{fontSize: getFontSize(card)}}>
+          <Typography style={{fontSize: getFontSize(getTotalTextLength(card), isMobile)}}>
             {getCardText(card)}
           </Typography>
         </CardContent>
