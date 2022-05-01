@@ -21,7 +21,7 @@ import {setError} from "../../redux/redux";
 import {DeckCard} from "../../components/DeckCard";
 
 interface Props {
-  setScreen: (screen: 'home' | 'create-game' | 'decks') => void,
+  setScreen: (screen: 'home' | 'create-game' | 'decks' | 'new-deck') => void,
   user: UserData,
 }
 export const ManageDecks = (props: Props) => {
@@ -204,6 +204,13 @@ export const ManageDecks = (props: Props) => {
         <Box sx={myDecksStyle}>
           {renderMyDecks()}
         </Box>
+        <Button
+            onClick={() => props.setScreen('new-deck')}
+            variant="outlined"
+            sx={{minHeight: '2vh', borderRadius: '15px', minWidth: isMobile ? '60vw' : '375px'}}
+          >
+            <AddCircleOutline/>
+          </Button>
       </Box>
       <Box sx={{display: 'flex', justifyContent: 'center'}}>
         <Divider sx={{marginTop: '5vh', width: '90vw'}}/>
