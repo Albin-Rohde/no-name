@@ -5,20 +5,20 @@ import type { RestResponse } from "./ResponseTypes";
 import {config} from "dotenv";
 config()
 
-type Routes = 'game' | 'user' | 'deck'
+type Routes = 'game' | 'user' | 'deck' | 'card'
 type HttpMethods = 'put' | 'get' | 'post' | 'delete'
 
-interface RestRequestOptions {
+interface RestRequestOptions<D> {
   method: HttpMethods;
   route: Routes;
-  data?: Record<any, any>;
+  data?: D | Record<any, any>;
   action?: string;
   query?: Record<string, string>;
 }
 
 export default class RestClient {
   private readonly baseUrl = process.env.REACT_APP_API_BASE_URL;
-  public async makeRequest<T>(option: RestRequestOptions): Promise<T> {
+  public async makeRequest<T, D=Record<any, any>>(option: RestRequestOptions<D>): Promise<T> {
     try {
       option.action = option.action ? `/${option.action}` : '';
       const queryString = option.query ? '?' + new URLSearchParams(option.query).toString() : ''
