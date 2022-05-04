@@ -17,17 +17,34 @@ import {
   removeDeckFromLibrary,
   normalizeDeckWithUser,
   removeInviteToDeck,
-  updateDeck
+  updateDeck,
+  createDeck
 } from "./services";
 import {
-  addToLibSchema, inviteUserSchema,
+  addToLibSchema, createDeckSchema, inviteUserSchema,
   updateDeckSchema,
 } from "./schema";
 import {ExpectedError} from "../error";
+import {CardDeckUserRef} from "./models/CardDeckUserRef";
 
 const deckRouter = Router();
 
 deckRouter.use(loginRequired);
+
+/**
+ * Create a new card deck, owner will be requesting user.
+ */
+deckRouter.post('/new', async (req: Request, res: Response) => {
+  try {
+    const newDeck = await createDeck(req.session.user, createDeckSchema.validateSync(req.body));
+    const deckRef = new CardDeckUserRef();
+    deckRef.deck = newDeck;
+    deckRef.user = req.session.user;
+    await deckRef.save();
+  } catch (err) {
+    handleRestError(req, res, err);
+  }
+});
 
 /**
  * All decks available for the player

@@ -105,6 +105,20 @@ export const updateDeck = async (id: number, user: User, input: UpdateDeckInput)
   return deck.save();
 }
 
+export interface CreateDeckInput {
+  name: string
+  description: string
+  public: boolean
+}
+export const createDeck = async (user: User, input: CreateDeckInput): Promise<CardDeck> => {
+  const deck = new CardDeck();
+  deck.name = input.name;
+  deck.description = input.description;
+  deck.public = input.public;
+  deck.owner = user;
+  return deck.save();
+}
+
 export const getAvailableDecks = async (user: User): Promise<CardDeck[]> => {
   return CardDeck.createQueryBuilder('cd')
     .leftJoin(CardDeckUserRef, 'cdur', 'cdur.card_deck_fk = cd.id')
