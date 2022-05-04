@@ -41,6 +41,11 @@ deckRouter.post('/new', async (req: Request, res: Response) => {
     deckRef.deck = newDeck;
     deckRef.user = req.session.user;
     await deckRef.save();
+    return res.json({
+      ok: true,
+      err: null,
+      data: newDeck
+    } as RestResponse<CardDeck>);
   } catch (err) {
     handleRestError(req, res, err);
   }

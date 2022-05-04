@@ -76,4 +76,24 @@ const createBlackCardRef = async (input: CreateBlackCardRefInput): Promise<Black
   return blackCardRef
 }
 
-export { getUnusedWhiteCards, getUnusedBlackCard, createWhiteCardRef, createBlackCardRef }
+const getOrCreateWhiteCard = async (id?: number): Promise<WhiteCard> => {
+  if (id) {
+    const card = await WhiteCard.findOne(id);
+    if (card) {
+      return card
+    }
+  }
+  return WhiteCard.create();
+}
+
+const getOrCreateBlackCard = async (id?: number): Promise<BlackCard> => {
+  if (id) {
+    const card = await BlackCard.findOne(id);
+    if (card) {
+      return card
+    }
+  }
+  return BlackCard.create();
+}
+
+export { getUnusedWhiteCards, getUnusedBlackCard, createWhiteCardRef, createBlackCardRef, getOrCreateBlackCard, getOrCreateWhiteCard }

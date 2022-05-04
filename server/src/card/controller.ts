@@ -4,9 +4,15 @@ import {WhiteCard, WhiteCardType} from "./models/WhiteCard";
 import {BlackCard} from "./models/BlackCard";
 import {CardDeck} from "../deck/models/CardDeck";
 import {RestResponse} from "../types";
-import {createBlackCardSchema, createWhiteCardSchema} from "./schema";
+import {
+  createBlackCardSchema,
+  createManyBlackCardSchema,
+  createManyWhiteCardSchema,
+  createWhiteCardSchema
+} from "./schema";
 import {getAvailableDecks} from "../deck/services";
 import {NotFoundError} from "../error";
+import {getOrCreateBlackCard, getOrCreateWhiteCard} from "./services";
 
 const cardRouter = Router();
 
@@ -83,7 +89,7 @@ cardRouter.post('/black', async (req: Request, res: Response) => {
   try {
     const { deckId, text } = createBlackCardSchema.validateSync(req.body);
     const deck = await CardDeck.findOneOrFail(deckId);
-    const blackCard = new BlackCard();
+    const blackCard = BlackCard.create();
     blackCard.deck = deck;
     blackCard.text = text;
     await blackCard.save();
@@ -110,6 +116,50 @@ cardRouter.post('/white', async (req: Request, res: Response) => {
     whiteCard.text = text;
     whiteCard.type = cardType;
     await whiteCard.save();
+    return res.json({
+      ok: true,
+      err: null,
+      data: 'ok',
+    } as RestResponse<'ok'>)
+  } catch (err) {
+    handleRestError(req, res, err);
+  }
+});
+
+cardRouter.put('/black/bulk', async (req: Request, res: Response) => {
+  try {
+    const { cards, deckId } = createManyBlackCardSchema.validateSync(req.body);
+    const deck = await CardDeck.findOneOrFail(deckId);
+    const saveCards = cards.map(async (cardData) => {
+      const blackCard = await getOrCreateBlackCard(cardData.id)
+      blackCard.deck = deck;
+      blackCard.text = cardData.text;
+      blackCard.blanks = (cardData.text.match(/_/g) || []).length
+      return blackCard.save();
+    });
+    await Promise.all(saveCards);
+    return res.json({
+      ok: true,
+      err: null,
+      data: 'ok',
+    } as RestResponse<'ok'>)
+  } catch (err) {
+    handleRestError(req, res, err);
+  }
+});
+
+cardRouter.put('/white/bulk', async (req: Request, res: Response) => {
+  try {
+    const { cards, deckId } = createManyWhiteCardSchema.validateSync(req.body);
+    const deck = await CardDeck.findOneOrFail(deckId);
+    const saveCards = cards.map(async (cardData) => {
+      const whiteCard = await getOrCreateWhiteCard(cardData.id);
+      whiteCard.deck = deck;
+      whiteCard.type = WhiteCardType[cardData.type];
+      whiteCard.text = cardData.text;
+      return whiteCard.save();
+    });
+    await Promise.all(saveCards);
     return res.json({
       ok: true,
       err: null,
