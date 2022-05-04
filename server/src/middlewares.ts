@@ -16,6 +16,7 @@ import {ValidationError} from "yup";
 import {Socket} from "socket.io";
 import {MiddlewareMetaData} from "./lib/socket/types";
 import {v4 as uuid} from 'uuid';
+import {EntityNotFoundError} from "typeorm";
 
 export const initTracingId = (req: Request, res: Response, next: NextFunction) => {
   if(!req.tracingId) {
@@ -111,6 +112,14 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
     }
     logger.warn(err);
     return res.status(200).json(response)
+  }
+  if (err instanceof EntityNotFoundError || err instanceof NotFoundError) {
+    logger.warn('Entity not found', err)
+    return res.status(200).json({
+      ok: true,
+      err: {name: 'not found', message: 'Could not find requested resource'},
+      data: null,
+    } as RestResponse<null>)
   }
   // makes sure any unexpected error is not sent to client.
   err = new WrappedError(err, extraErrorMeta)
