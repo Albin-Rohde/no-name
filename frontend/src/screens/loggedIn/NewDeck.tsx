@@ -1,5 +1,16 @@
 import React, {useState} from "react";
-import {Box, Button, Card, CardContent, Icon, TextareaAutosize, TextField, Tooltip, Typography} from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Icon,
+  Switch,
+  TextareaAutosize,
+  TextField,
+  Tooltip,
+  Typography
+} from "@mui/material";
 import {AddCircleOutline, EditOutlined, HighlightOff} from "@mui/icons-material";
 import {useDispatch} from "react-redux";
 import {setWarning} from "../../redux/redux";
@@ -30,18 +41,6 @@ const CARD_STYLE_DESKTOP = {
   marginLeft: '5px',
   minWidth: '11.8vw',
   maxWidth: '11.8vw',
-}
-
-interface EditIconProps {
-  onClick?: () => any;
-}
-
-const EditIcon = (props: EditIconProps) => {
-  return (
-    <Icon sx={{cursor: 'pointer', float: 'right'}}>
-      <EditOutlined sx={{maxHeight: '16px', marginTop: '6px'}} onClick={props?.onClick}/>
-    </Icon>
-  )
 }
 
 interface NewCard {
@@ -178,6 +177,9 @@ export const NewDeck = () => {
   const cardStyle = isMobile ? CARD_STYLE_MOBILE : CARD_STYLE_DESKTOP;
   const [whiteCards, setWhiteCards] = useState<NewCard[]>([]);
   const [blackCards, setBlackCards] = useState<NewCard[]>([]);
+  const [isPublic, setIsPublic] = useState<boolean>(false);
+  const [deckName, setDeckName] = useState<string>('');
+  const [deckDescription, setDeckDescription] = useState<string>('');
   const dispatch = useDispatch();
 
   const closeWhiteCard = (card: NewCard) => {
@@ -251,9 +253,20 @@ export const NewDeck = () => {
           Save your deck
         </Typography>
       </Divider>
-      <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '3vh', marginBottom: '3vh'}}>
-          <TextField placeholder={'name'}></TextField>
-          <Button color='primary' variant={'outlined'}>Save</Button>
+      <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '3vh'}}>
+        <Typography color={'#8795ab'} variant={'h5'} sx={{}}>
+          Public
+        </Typography>
+        <Switch checked={isPublic} onChange={() => setIsPublic(!isPublic)}></Switch>
+      </Box>
+      <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '0.8vh'}}>
+        <TextField value={deckName} onChange={(e) => setDeckName(e.target.value)} placeholder={'Name'}></TextField>
+      </Box>
+      <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '0.8vh'}}>
+        <TextField value={deckDescription} onChange={(e) => setDeckDescription(e.target.value)} placeholder={'Description'}></TextField>
+      </Box>
+      <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '0.8vh', marginBottom: '3vh'}}>
+        <Button sx={{minWidth: '6vw'}} variant={'outlined'}>Save</Button>
       </Box>
     </React.Fragment>
   )
