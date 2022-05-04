@@ -5,6 +5,8 @@ import {BlackCard} from "./models/BlackCard";
 import {CardDeck} from "../deck/models/CardDeck";
 import {RestResponse} from "../types";
 import {createBlackCardSchema, createWhiteCardSchema} from "./schema";
+import {getAvailableDecks} from "../deck/services";
+import {NotFoundError} from "../error";
 
 const cardRouter = Router();
 
@@ -15,7 +17,16 @@ cardRouter.use(loginRequired);
  */
 cardRouter.get('/white/:id', async (req: Request, res: Response) => {
   try {
-    return WhiteCard.findOneOrFail(req.params.id);
+    const whiteCard = await WhiteCard.findOneOrFail(req.params.id);
+    const availableDecks = await getAvailableDecks(req.session.user);
+    if (!availableDecks.some((deck) => deck.id === whiteCard.deck_fk)) {
+      throw new NotFoundError('Card found but user does not have access to card deck');
+    }
+    return res.json({
+      ok: true,
+      err: null,
+      data: whiteCard,
+    } as RestResponse<WhiteCard>)
   } catch (err) {
     handleRestError(req, res, err)
   }
@@ -26,7 +37,16 @@ cardRouter.get('/white/:id', async (req: Request, res: Response) => {
  */
 cardRouter.get('/black/:id', async (req: Request, res: Response) => {
   try {
-    return BlackCard.findOneOrFail(req.params.id);
+    const blackCard = await BlackCard.findOneOrFail(req.params.id);
+    const availableDecks = await getAvailableDecks(req.session.user);
+    if (!availableDecks.some((deck) => deck.id === blackCard.deck_fk)) {
+      throw new NotFoundError('Card found but user does not have access to card deck');
+    }
+    return res.json({
+      ok: true,
+      err: null,
+      data: blackCard,
+    } as RestResponse<BlackCard>)
   } catch (err) {
     handleRestError(req, res, err);
   }
@@ -38,6 +58,10 @@ cardRouter.get('/black/:id', async (req: Request, res: Response) => {
 cardRouter.get('/deck/:id', async (req: Request, res: Response) => {
   try {
     const deck = await CardDeck.findOneOrFail(req.params.id, {relations: ['blackCards', 'whiteCards']});
+    const availableDecks = await getAvailableDecks(req.session.user);
+    if (!availableDecks.some((d) => d.id === deck.id)) {
+      throw new NotFoundError('Deck found but user does not have access to it');
+    }
     const response: RestResponse<{blackCard: BlackCard[], whiteCard: WhiteCard[]}> = {
       ok: true,
       err: null,
@@ -95,3 +119,5 @@ cardRouter.post('/white', async (req: Request, res: Response) => {
     handleRestError(req, res, err);
   }
 });
+
+export default cardRouter;

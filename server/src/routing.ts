@@ -7,12 +7,16 @@ import {
   deleteGameEvent,
   getGameEvent,
   joinGameEvent,
-  leaveGameEvent, nextRoundEvent, notifyCardWizzEvent, notifyWinnerEvent,
+  leaveGameEvent,
+  nextRoundEvent,
+  notifyCardWizzEvent,
+  notifyWinnerEvent,
   playAgainEvent,
   startGameEvent
 } from "./game/events";
 import {flipCardEvent, playCardEvent, voteCardEvent} from "./card/events";
 import {adminRouter} from "./admin/controller";
+import cardRouter from "./card/controller";
 
 enum Events {
   GET_GAME = 'get-game',
@@ -44,6 +48,7 @@ function registerRoutes(app: Application): void {
   app.use('/user', userRoute);
   app.use('/game', gameRouter);
   app.use('/deck', deckRouter);
+  app.use('/card', cardRouter);
   app.use('/admin', adminRouter);
 }
 

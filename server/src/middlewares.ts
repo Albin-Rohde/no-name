@@ -114,15 +114,16 @@ export const handleRestError = (req: Request, res: Response, err: Error) => {
     return res.status(200).json(response)
   }
   if (err instanceof EntityNotFoundError || err instanceof NotFoundError) {
-    logger.warn('Entity not found', err)
+    err = new WrappedError(err, extraErrorMeta)
+    logger.warn('', err)
     return res.status(200).json({
-      ok: true,
-      err: {name: 'not found', message: 'Could not find requested resource'},
+      ok: false,
+      err: {name: 'NOT_FOUND', message: 'Could not find requested resource'},
       data: null,
     } as RestResponse<null>)
   }
-  // makes sure any unexpected error is not sent to client.
   err = new WrappedError(err, extraErrorMeta)
+  // makes sure any unexpected error is not sent to client.
   logger.error("Rest Error", err)
   response.err = {name: 'INTERNAL_ERROR', message: 'UNKNOWN_INTERNAL_ERROR'}
   return res.status(500).json(response)
