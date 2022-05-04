@@ -17,6 +17,8 @@ import {setWarning} from "../../redux/redux";
 import Divider from "@mui/material/Divider";
 import {getFontSize} from "../../utils/utils";
 import {v4 as uuid} from 'uuid';
+import RestClient from "../../clients/RestClient";
+import {CardDeckResponse} from "../../clients/ResponseTypes";
 
 const CARD_STYLE = {
   backgroundColor: '#505050',
@@ -171,8 +173,25 @@ const cardList = (props: CardListProps) => {
     </React.Fragment>
   )
 }
+interface CreateDeckInput {
+  name: string;
+  description: string;
+  public: boolean;
+}
 
-export const NewDeck = () => {
+interface CreateCardsInput {
+  deckId: number;
+  cards: {
+    id?: number
+    text: string;
+  }
+}
+
+interface Props {
+  setScreen: (screen: 'home' | 'create-game' | 'decks'  | 'new-deck') => void;
+}
+
+export const NewDeck = (props: Props) => {
   const isMobile = window.screen.width < 800;
   const cardStyle = isMobile ? CARD_STYLE_MOBILE : CARD_STYLE_DESKTOP;
   const [whiteCards, setWhiteCards] = useState<NewCard[]>([]);
@@ -181,6 +200,43 @@ export const NewDeck = () => {
   const [deckName, setDeckName] = useState<string>('');
   const [deckDescription, setDeckDescription] = useState<string>('');
   const dispatch = useDispatch();
+  const rest = new RestClient();
+
+  const saveDeck = async () => {
+    const deck = await rest.makeRequest<CardDeckResponse, CreateDeckInput>({
+      route: 'deck',
+      method: 'post',
+      action: 'new',
+      data: {
+        name: deckName,
+        description: deckDescription,
+        public: isPublic,
+      }
+    });
+    await rest.makeRequest<'ok', CreateCardsInput>({
+      route: 'card',
+      method: 'put',
+      action: 'white/bulk',
+      data: {
+        deckId: deck.id,
+        cards: whiteCards.map((wc) => ({
+          text: wc.text,
+        }))
+      }
+    });
+    await rest.makeRequest<'ok', CreateCardsInput>({
+      route: 'card',
+      method: 'put',
+      action: 'black/bulk',
+      data: {
+        deckId: deck.id,
+        cards: blackCards.map((bc) => ({
+          text: bc.text,
+        }))
+      }
+    });
+    props.setScreen('decks')
+  }
 
   const closeWhiteCard = (card: NewCard) => {
     if (card.text.length === 0) {
@@ -266,7 +322,7 @@ export const NewDeck = () => {
         <TextField value={deckDescription} onChange={(e) => setDeckDescription(e.target.value)} placeholder={'Description'}></TextField>
       </Box>
       <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '0.8vh', marginBottom: '3vh'}}>
-        <Button sx={{minWidth: '6vw'}} variant={'outlined'}>Save</Button>
+        <Button sx={{minWidth: '6vw'}} variant={'outlined'} onClick={saveDeck}>Save</Button>
       </Box>
     </React.Fragment>
   )

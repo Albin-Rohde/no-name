@@ -84,7 +84,7 @@ const LoggedIn = () => {
       case 'decks':
         return <ManageDecks user={user} setScreen={setScreen}/>
       case 'new-deck':
-        return <NewDeck/>
+        return <NewDeck setScreen={setScreen}/>
     }
   }
 
