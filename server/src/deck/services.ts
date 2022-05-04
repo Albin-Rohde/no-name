@@ -119,6 +119,12 @@ export const createDeck = async (user: User, input: CreateDeckInput): Promise<Ca
   return deck.save();
 }
 
+/**
+ * All decks a user has direct or indirect access to
+ * - Indirect access, public deck or user is invited to the deck
+ * - Direct access, user has added deck to their library
+ * @param user
+ */
 export const getAvailableDecks = async (user: User): Promise<CardDeck[]> => {
   return CardDeck.createQueryBuilder('cd')
     .leftJoin(CardDeckUserRef, 'cdur', 'cdur.card_deck_fk = cd.id')
