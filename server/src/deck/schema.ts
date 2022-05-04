@@ -1,5 +1,11 @@
 import * as yup from 'yup';
 
+export const createDeckSchema = yup.object({
+  name: yup.string().required(),
+  description: yup.string().required(),
+  public: yup.boolean().default(false),
+})
+
 export const inviteUserSchema = yup.object({
   cardDeckId: yup.number().required(),
   userId: yup.number().required(),
