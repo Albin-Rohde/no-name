@@ -111,7 +111,7 @@ export interface CreateDeckInput {
   public: boolean
 }
 export const createDeck = async (user: User, input: CreateDeckInput): Promise<CardDeck> => {
-  const deck = new CardDeck();
+  const deck = CardDeck.create();
   deck.name = input.name;
   deck.description = input.description;
   deck.public = input.public;
