@@ -6,9 +6,10 @@ import {CardDeckResponse, GameResponse} from "../../clients/ResponseTypes";
 import RestClient from "../../clients/RestClient";
 import SelectInputField from "../../components/SelectInputField";
 import {useDispatch, useSelector} from "react-redux";
-import {ReduxState, setError, updateGame, updateScreen} from "../../redux/redux";
+import {ReduxState, setError, updateGame} from "../../redux/redux";
 import Game from "../../clients/Game";
 import User from "../../clients/User";
+import {useHistory} from "react-router-dom";
 
 interface SetupGameProps {
   setScreen: (screen: 'home' | 'create-game') => void;
@@ -21,6 +22,7 @@ const SetupGame = (props: SetupGameProps) => {
   const [cardLimit, _setCardLimit] = useState(6);
   const [tooManyCards, setTooManyCards] = useState<boolean>(false);
   const user = useSelector<ReduxState, User | undefined>((state) => state.user);
+  const history = useHistory();
   const rest = new RestClient();
 
   const dispatch = useDispatch();
@@ -44,6 +46,7 @@ const SetupGame = (props: SetupGameProps) => {
       }
       const newGame = new Game(user.getData());
       dispatch(updateGame(newGame))
+      history.push('/game')
     } catch (err) {
       dispatch(setError(err.message));
     }
