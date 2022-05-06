@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   ReduxState,
   setError,
@@ -9,25 +9,27 @@ import {
 import User from "../../clients/User";
 import Spinner from "../../components/Spinner";
 import RestClient from "../../clients/RestClient";
-import Game from "../../clients/Game";
 import {GameResponse} from "../../clients/ResponseTypes";
 import MenuAppBar from "../../components/MenuAppBar";
 import Home from "./Home";
 import SetupGame from "./SetupGame";
 import InGame from "./inGame/InGame";
 import JoinGame from "./inGame/JoinGame";
-import {Route} from "react-router-dom";
+import {Route, Switch, useHistory} from "react-router-dom";
 import {ManageDecks} from "./ManageDecks";
 import {NewDeck} from "./NewDeck";
 
 const LoggedIn = () => {
-  const [screen, setScreen] = useState<'home' | 'create-game' | 'decks'  | 'new-deck'>('home');
   const [loading, setLoading] = useState(true);
   const [hasGame, setHasGame] = useState(false);
   const user = useSelector<ReduxState, User | null>((state) => state.user);
-  const game = useSelector<ReduxState, Game | null>((state) => state.game);
   const rest = new RestClient();
   const dispatch = useDispatch();
+  const history = useHistory();
+
+  const setScreen = (screen: 'home' | 'create-game' | 'decks'  | 'new-deck' | 'game', id?: string) => {
+    history.push(id ? `/${screen}/${id}` : `/${screen}`)
+  }
 
   if (!user) {
     dispatch(setError('You are not logged in'))
@@ -42,61 +44,66 @@ const LoggedIn = () => {
   }
   const handleLogout = async () => {
     try {
-      console.log('log out request');
       await rest.makeRequest({method: 'post', route: 'user', action: 'logout'});
-      console.log('dispatch null user');
       dispatch(updateUser(null));
-      console.log('user', user);
     } catch (err) {
       setError(err.message);
     }
   }
   useEffect(() => {
+    setScreen('home');
     (async () => {
       const userHaveGame = await checkForGame();
       if (!userHaveGame) {
         setLoading(false);
         return;
+      } else {
+        setScreen('game')
+        setHasGame(true);
+        setLoading(false);
       }
-      setHasGame(true);
     })()
   }, [])
 
-  if (hasGame || game) {
-    return <InGame
-      handleLogout={handleLogout}
-      setLoggedInScreen={setScreen}
-      setHasGame={setHasGame}
-      setLoading={setLoading}
-    />
-  }
 
-  if (loading) {
+  if (loading && !hasGame) {
     return <Spinner/>
-  }
-
-  const renderScreen = () => {
-    switch (screen) {
-      case 'home':
-        return <Home setScreen={setScreen}/>
-      case 'create-game':
-        return <SetupGame setScreen={setScreen}/>
-      case 'decks':
-        return <ManageDecks user={user} setScreen={setScreen}/>
-      case 'new-deck':
-        return <NewDeck setScreen={setScreen}/>
-    }
   }
 
   return (
     <React.Fragment>
-      <MenuAppBar user={user} logout={handleLogout}/>
-      <Route path={"/join"}>
-        <JoinGame/>
-      </Route>
-      <Route path={"/"}>
-        {renderScreen()}
-      </Route>
+      <Switch>
+        <Route path={"/game"}>
+          <InGame
+            handleLogout={handleLogout}
+            setLoggedInScreen={setScreen}
+            setHasGame={setHasGame}
+            setLoading={setLoading}
+          />
+        </Route>
+      </Switch>
+      <Switch>
+        <Route path={"/join"}>
+        <MenuAppBar user={user} logout={handleLogout}/>
+          <JoinGame/>
+        </Route>
+        <Route path={"/home"}>
+          <MenuAppBar user={user} logout={handleLogout}/>
+          <Home setScreen={setScreen}/>
+        </Route>
+        <Route path={"/create-game"}>
+          <MenuAppBar user={user} logout={handleLogout}/>
+          <SetupGame setScreen={setScreen}/>
+        </Route>
+        <Route path={"/decks"}>
+          <MenuAppBar user={user} logout={handleLogout}/>
+          <ManageDecks user={user} setScreen={setScreen}/>
+        </Route>
+        <Route path={"/new-deck"}>
+          <MenuAppBar user={user} logout={handleLogout}/>
+          <NewDeck setScreen={setScreen}/>
+        </Route>
+      </Switch>
     </React.Fragment>
   );
 }
