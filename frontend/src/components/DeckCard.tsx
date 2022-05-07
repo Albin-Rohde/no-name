@@ -1,6 +1,6 @@
 import {Box, Button, Card, Chip, Icon, Switch, TextField, Tooltip, Typography} from "@mui/material";
 import {CardDeckResponse, UserData} from "../clients/ResponseTypes";
-import {AddCircleOutline, Clear, EditOutlined} from "@mui/icons-material";
+import {AddCircleOutline, Clear, EditOutlined, HighlightOff} from "@mui/icons-material";
 import Divider from "@mui/material/Divider";
 import React, {useState} from "react";
 import {FindPlayerModal} from "./modals/FindPlayerModal";
@@ -10,6 +10,7 @@ import {setError} from "../redux/redux";
 
 const CARD_STYLE = {
   backgroundColor: '#3d3d3d',
+  marginTop: '2vh'
 }
 
 const CARD_STYLE_MOBILE = {
@@ -264,6 +265,18 @@ export const DeckCard = (props: Props) => {
         </Box>
         <Box sx={{width: '92%', marginLeft: '4%', paddingBottom: '5%',display: 'flex', flexDirection: 'row'}}>
           <Box sx={BLACK_CARD_ICON}/><Typography fontSize={'0.8em'}>{props.blackCount}</Typography>
+        </Box>
+        <Box sx={{display: 'flex', justifyContent: 'space-between', marginLeft: '10px', marginRight: '10px', marginBottom: '5%'}}>
+          <Icon sx={{cursor: 'pointer'}}>
+            <Tooltip title={"Edit"}>
+              <EditOutlined sx={{maxHeight: '16px', marginTop: '6px'}} onClick={() => console.log('edit')}/>
+            </Tooltip>
+          </Icon>
+          <Icon sx={{cursor: 'pointer'}}>
+            <Tooltip title={"Delete"}>
+              <HighlightOff sx={{maxHeight: '16px', marginTop: '6px'}} onClick={() => console.log('delete')}/>
+            </Tooltip>
+          </Icon>
         </Box>
       </Card>
     </React.Fragment>
