@@ -15,7 +15,7 @@ import Home from "./Home";
 import SetupGame from "./SetupGame";
 import InGame from "./inGame/InGame";
 import JoinGame from "./inGame/JoinGame";
-import {Route, Switch, useHistory} from "react-router-dom";
+import {Redirect, Route, Switch, useHistory} from "react-router-dom";
 import {ManageDecks} from "./ManageDecks";
 import {NewDeck} from "./NewDeck";
 
@@ -51,7 +51,6 @@ const LoggedIn = () => {
     }
   }
   useEffect(() => {
-    setScreen('home');
     (async () => {
       const userHaveGame = await checkForGame();
       if (!userHaveGame) {
@@ -81,15 +80,8 @@ const LoggedIn = () => {
             setLoading={setLoading}
           />
         </Route>
-      </Switch>
-      <Switch>
         <Route path={"/join"}>
-        <MenuAppBar user={user} logout={handleLogout}/>
           <JoinGame/>
-        </Route>
-        <Route path={"/home"}>
-          <MenuAppBar user={user} logout={handleLogout}/>
-          <Home setScreen={setScreen}/>
         </Route>
         <Route path={"/create-game"}>
           <MenuAppBar user={user} logout={handleLogout}/>
@@ -102,6 +94,13 @@ const LoggedIn = () => {
         <Route path={"/new-deck"}>
           <MenuAppBar user={user} logout={handleLogout}/>
           <NewDeck setScreen={setScreen}/>
+        </Route>
+        <Route path={"/home"}>
+          <MenuAppBar user={user} logout={handleLogout}/>
+          <Home setScreen={setScreen}/>
+        </Route>
+        <Route path={"/"}>
+          <Redirect to={"/home"}/>
         </Route>
       </Switch>
     </React.Fragment>
