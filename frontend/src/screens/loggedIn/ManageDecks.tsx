@@ -110,12 +110,12 @@ export const ManageDecks = (props: Props) => {
   }
 
   const renderMyDecks = () => {
-    const width = isMobile ? '60vw' : '340px';
+    const width = isMobile ? '60vw' : '375px';
     const height = isMobile ? '300px' : '320px';
     const style = {
       marginLeft: isMobile ? '5%' : '14px',
       marginRight: isMobile ? '5%' : '14px',
-      borderRadius: isMobile? '0.3vw' : '0.3vw'
+      borderRadius: isMobile ? '0.3vw' : '0.3vw',
     }
     if (loading) {
       return (
@@ -180,12 +180,6 @@ export const ManageDecks = (props: Props) => {
 
   const yourDecksToolTip: string = 'There are the decks that you have created, you may edit these.'
   const libraryToolTip: string = 'These are the decks you have added to your library.'
-  const myDecksStyle = {
-    width: isMobile ? '100vw' : '60vw',
-    display: 'flex',
-    justifyContent: isMobile ? 'left' : 'center',
-    overflow: isMobile ? 'scroll' : 'none',
-  }
   return (
     <React.Fragment>
       <AddDeckModal
@@ -200,17 +194,41 @@ export const ManageDecks = (props: Props) => {
           Your Decks <Tooltip title={yourDecksToolTip}><Icon><InfoOutlined/></Icon></Tooltip>
         </Typography>
       </Box>
-      <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '2vh'}}>
-        <Box sx={myDecksStyle}>
-          {renderMyDecks()}
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+      }}>
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'left',
+          alignItems: 'left',
+          flexWrap: 'wrap',
+          marginTop: '2vh',
+        }}>
+          <Box sx={{
+            width: isMobile ? '100vw' : '80vw',
+            flexWrap: 'wrap',
+            display: 'flex',
+            justifyContent: isMobile ? 'left' : 'center',
+            overflow: isMobile ? 'scroll' : 'none',
+          }}>
+            {renderMyDecks()}
+            <Button
+                onClick={() => props.setScreen('new-deck')}
+                variant="outlined"
+                sx={{
+                  marginTop: '2vh',
+                  minHeight: '320px',
+                  borderRadius: isMobile? '0.3vw' : '0.3vw',
+                  minWidth: isMobile ? '60vw' : '375px',
+                  marginLeft: isMobile ? '5%' : '14px',
+                  marginRight: isMobile ? '5%' : '14px',
+            }}
+              >
+                <AddCircleOutline/>
+              </Button>
+          </Box>
         </Box>
-        <Button
-            onClick={() => props.setScreen('new-deck')}
-            variant="outlined"
-            sx={{minHeight: '2vh', borderRadius: '15px', minWidth: isMobile ? '60vw' : '375px'}}
-          >
-            <AddCircleOutline/>
-          </Button>
       </Box>
       <Box sx={{display: 'flex', justifyContent: 'center'}}>
         <Divider sx={{marginTop: '5vh', width: '90vw'}}/>
