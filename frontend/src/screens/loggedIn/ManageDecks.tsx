@@ -21,7 +21,7 @@ import {setError} from "../../redux/redux";
 import {DeckCard} from "../../components/DeckCard";
 
 interface Props {
-  setScreen: (screen: 'home' | 'create-game' | 'decks' | 'new-deck') => void,
+  setScreen: (screen: 'home' | 'create-game' | 'decks' | 'deck') => void,
   user: UserData,
 }
 export const ManageDecks = (props: Props) => {
@@ -214,7 +214,7 @@ export const ManageDecks = (props: Props) => {
           }}>
             {renderMyDecks()}
             <Button
-                onClick={() => props.setScreen('new-deck')}
+                onClick={() => props.setScreen('deck')}
                 variant="outlined"
                 sx={{
                   marginTop: '2vh',

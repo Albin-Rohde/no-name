@@ -244,4 +244,24 @@ deckRouter.post('/invite/remove', async (req: Request, res: Response): Promise<R
   }
 })
 
+/**
+ * Get card deck by id.
+ */
+deckRouter.get('/:id', async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const deckId = req.params.id;
+    if (!deckId) {
+      return res.status(404);
+    }
+    const deck = await CardDeck.findOneOrFail(deckId);
+    return res.json({
+      ok: true,
+      err: null,
+      data: deck,
+    } as RestResponse<CardDeck>)
+  } catch (err) {
+    handleRestError(req, res, err);
+  }
+})
+
 export default deckRouter;
