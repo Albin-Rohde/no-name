@@ -27,7 +27,7 @@ const LoggedIn = () => {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const setScreen = (screen: 'home' | 'create-game' | 'decks'  | 'new-deck' | 'game', id?: string) => {
+  const setScreen = (screen: 'home' | 'create-game' | 'decks'  | 'deck' | 'game', id?: string) => {
     history.push(id ? `/${screen}/${id}` : `/${screen}`)
   }
 
@@ -91,7 +91,7 @@ const LoggedIn = () => {
           <MenuAppBar user={user} logout={handleLogout}/>
           <ManageDecks user={user} setScreen={setScreen}/>
         </Route>
-        <Route path={"/new-deck"}>
+        <Route path={"/deck"}>
           <MenuAppBar user={user} logout={handleLogout}/>
           <NewDeck setScreen={setScreen}/>
         </Route>

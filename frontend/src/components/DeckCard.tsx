@@ -7,6 +7,7 @@ import {FindPlayerModal} from "./modals/FindPlayerModal";
 import RestClient from "../clients/RestClient";
 import {useDispatch} from "react-redux";
 import {setError} from "../redux/redux";
+import {useHistory} from "react-router-dom";
 
 const CARD_STYLE = {
   backgroundColor: '#3d3d3d',
@@ -83,10 +84,7 @@ export const DeckCard = (props: Props) => {
   const [invitedUser, setInvitedUsers] = useState<UserData[]>(props.invitedUsers);
   const [users, setUsers] = useState<UserData[]>(props.addedUsers);
   const [isPublic, setIsPublic] = useState<boolean>(props.public);
-  const [title, setTitle] = useState<string>(props.title);
-  const [description, setDescription] = useState<string>(props.description);
-  const [editTitle, setEditTitle] = useState<boolean>(false);
-  const [editDescription, setEditDescription] = useState<boolean>(false);
+  const history = useHistory();
 
   const isMobile = window.screen.width < 800;
   const dispatch = useDispatch();
@@ -136,22 +134,6 @@ export const DeckCard = (props: Props) => {
     await updateDeck({id: props.id, public: val})
   }
 
-  const handleUpdateTitle = async (): Promise<void> => {
-    setEditTitle(false);
-    if (title === props.title) {
-      return;
-    }
-    await updateDeck({id: props.id, name: title});
-  }
-
-  const handleUpdateDesc = async (): Promise<void> => {
-    setEditDescription(false);
-    if (description === props.description) {
-      return;
-    }
-    await updateDeck({id: props.id, description});
-  }
-
   const renderUsersChip = () => {
     const userChips = users.filter((user) => user.id !== props.currentUser.id)
       .map((user) => {
@@ -187,6 +169,10 @@ export const DeckCard = (props: Props) => {
     return [...userChips, ...invitedUserChips]
   }
 
+  const editCard = () => {
+    history.push(`/deck/${props.id}`)
+  }
+
   return (
     <React.Fragment>
       <FindPlayerModal
@@ -197,41 +183,13 @@ export const DeckCard = (props: Props) => {
         invited={[...users, ...invitedUser]}
       />
       <Card sx={isMobile ? CARD_STYLE_MOBILE : CARD_STYLE_DESKTOP}>
-        {editTitle && (
-          <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '5%'}}>
-            <TextField
-              variant={'standard'}
-              autoFocus
-              onBlur={handleUpdateTitle}
-              onKeyDown={(e) => e.key === 'Enter' && handleUpdateTitle()}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              sx={{width: '50%'}}
-            />
-          </Box>
-        )}
-        {!editTitle && (
-          <Typography onClick={() => setEditTitle(true)} variant={'h5'} sx={{marginTop: '5%', textAlign: 'center'}}>
-            {title} <EditIcon/>
-          </Typography>
-        )}
+        <Typography variant={'h5'} sx={{marginTop: '5%', textAlign: 'center'}}>
+          {props.title}
+        </Typography>
         <Box sx={{display: 'flex', justifyContent: 'center'}}>
-          {editDescription && (
-            <TextField
-              variant={'standard'}
-              autoFocus
-              onBlur={handleUpdateDesc}
-              onKeyDown={(e) => e.key === 'Enter' && handleUpdateDesc()}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              sx={{width: '90%', marginTop: '1%', fontSize: '0.9em'}}
-            />
-          )}
-          {!editDescription && (
-            <Typography onClick={() => setEditDescription(true)} fontSize={'0.9em'} variant={'body1'} sx={{textAlign: 'center', marginTop: '1%', maxWidth: '80%'}}>
-              {props.description} <EditIcon/>
-            </Typography>
-          )}
+          <Typography fontSize={'0.9em'} variant={'body1'} sx={{textAlign: 'center', marginTop: '1%', maxWidth: '80%'}}>
+            {props.description}
+          </Typography>
         </Box>
         <Box sx={{display: 'flex', justifyContent: 'center', flexDirection: 'row', marginTop: '5%', marginBottom: '3%'}}>
           <Divider style={{width: '92%'}}/>
@@ -269,7 +227,7 @@ export const DeckCard = (props: Props) => {
         <Box sx={{display: 'flex', justifyContent: 'space-between', marginLeft: '10px', marginRight: '10px', marginBottom: '5%'}}>
           <Icon sx={{cursor: 'pointer'}}>
             <Tooltip title={"Edit"}>
-              <EditOutlined sx={{maxHeight: '16px', marginTop: '6px'}} onClick={() => console.log('edit')}/>
+              <EditOutlined sx={{maxHeight: '16px', marginTop: '6px'}} onClick={editCard}/>
             </Tooltip>
           </Icon>
           <Icon sx={{cursor: 'pointer'}}>

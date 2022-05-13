@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
   Box,
   Button,
@@ -18,7 +18,7 @@ import Divider from "@mui/material/Divider";
 import {getFontSize} from "../../utils/utils";
 import {v4 as uuid} from 'uuid';
 import RestClient from "../../clients/RestClient";
-import {CardDeckResponse} from "../../clients/ResponseTypes";
+import {BlackCardResponse, CardDeckResponse, CardResponse} from "../../clients/ResponseTypes";
 
 const CARD_STYLE = {
   backgroundColor: '#505050',
@@ -187,8 +187,13 @@ interface CreateCardsInput {
   }
 }
 
+interface GetCardsResponse {
+  blackCard: BlackCardResponse[];
+  whiteCard: CardResponse[];
+}
+
 interface Props {
-  setScreen: (screen: 'home' | 'create-game' | 'decks'  | 'new-deck') => void;
+  setScreen: (screen: 'home' | 'create-game' | 'decks'  | 'deck') => void;
 }
 
 export const NewDeck = (props: Props) => {
@@ -201,6 +206,45 @@ export const NewDeck = (props: Props) => {
   const [deckDescription, setDeckDescription] = useState<string>('');
   const dispatch = useDispatch();
   const rest = new RestClient();
+
+  useEffect(() => {
+    if (whiteCards.length) {
+      return;
+    }
+    (async () => {
+      const path = window.location.pathname.split('/')
+      if (path.length > 2 && path[2]) {
+        const deckId = path[2];
+        console.log(deckId)
+        const deck = await rest.makeRequest<CardDeckResponse>({
+          method: 'get',
+          route: 'deck',
+          action: deckId.toString(),
+        });
+        const data = await rest.makeRequest<GetCardsResponse>({
+          method: 'get',
+          route: 'card',
+          action: `deck/${deckId}`,
+        });
+        const blacks = data.blackCard.map<NewCard>((c) => ({
+          text: c.text,
+          id: c.id,
+          externalId: c.id,
+          open: false,
+        }));
+        const whites = data.whiteCard.map<NewCard>((c) => ({
+          text: c.text,
+          id: c.id,
+          externalId: c.id,
+          open: false,
+        }));
+        setBlackCards(blacks);
+        setWhiteCards(whites);
+        setDeckDescription(deck.description);
+        setDeckName(deck.name);
+      }
+    })();
+  }, []);
 
   const saveDeck = async () => {
     const deck = await rest.makeRequest<CardDeckResponse, CreateDeckInput>({
