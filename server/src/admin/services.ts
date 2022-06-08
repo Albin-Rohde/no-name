@@ -11,6 +11,7 @@ import {WhiteCard} from "../card/models/WhiteCard";
 import {CardState, WhiteCardRef} from "../card/models/WhiteCardRef";
 import {deleteGameFromUser} from "../game/services";
 import {getUserWithRelation} from "../user/services";
+import {logger} from "../logger/logger";
 
 interface ModelRow {
   name: string;
@@ -60,7 +61,11 @@ export type AnyModel = User
   | WhiteCardRef
 
 export const getModel = <T=AnyModel>(name: string): Repository<T> => {
-  return MODELS.find((m) => m.name === name).getRepository() as unknown as Repository<T>
+  const model = MODELS.find((m) => m.name === name)
+  if (!model) {
+    throw new Error(`Could not find model with name ${name}`)
+  }
+  return model.getRepository() as unknown as Repository<T>
 }
 
 export const getModelData = async (modelName: string): Promise<TableData[]> => {
