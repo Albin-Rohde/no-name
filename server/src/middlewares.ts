@@ -160,13 +160,16 @@ export const loggerMiddleware = (socket: Socket, meta: MiddlewareMetaData): void
 }
 
 export const expressLoggingMiddleware = (req: Request, _res: Response, next: NextFunction) => {
-  let body = undefined
+  let body = req.body
   if (req.path.startsWith('/health')) {
     next();
     return;
   }
-  if (!(req.path.startsWith('/user') && req.method == "POST")) {
-    body = req.body
+  if ((req.path.startsWith('/user') && req.method == "POST")) {
+    body = undefined
+  }
+  if (req.path.includes("/admin/login") && req.method == "POST") {
+    body = undefined
   }
   let message = `${req.method} ${req.path}`
   if (req.session?.user?.id) {

@@ -39,32 +39,48 @@ adminRouter.post('/login', async (req: Request, res: Response) => {
 adminRouter.use(adminRequired);
 
 adminRouter.get('/', async (req, res) => {
-  const models = await Promise.all(MODELS.map(async (model) => {
-    return {
-      name: model.name,
-      count: await model.count(),
-    }
-  }));
-  res.render('home', {models})
+  try {
+    const models = await Promise.all(MODELS.map(async (model) => {
+      return {
+        name: model.name,
+        count: await model.count(),
+      }
+    }));
+    res.render('home', {models});
+  } catch (err) {
+    handleAdminError(req, res, err);
+  }
 });
 
 adminRouter.get('/:modelName', async (req: Request, res: Response) => {
-  const modelName = req.params.modelName;
-  const tableData = await getModelData(modelName);
-  console.log(tableData);
-  res.render('model', {tableData})
+  try {
+    const modelName = req.params.modelName;
+    const tableData = await getModelData(modelName);
+    console.log(tableData);
+    res.render('model', {tableData});
+  } catch (err) {
+    handleAdminError(req, res, err);
+  }
 });
 
 adminRouter.delete('/:modelName/:id', async (req: Request, res: Response) => {
-  const {modelName, id} = req.params;
-  await deleteModel(modelName, id);
-  return res.status(202).json({ok: true})
+  try {
+    const {modelName, id} = req.params;
+    await deleteModel(modelName, id);
+    return res.status(202).json({ok: true})
+  } catch (err) {
+    handleAdminError(req, res, err);
+  }
 })
 
 adminRouter.get('/:modelName/details/:id', async (req: Request, res: Response) => {
-  const { modelName, id } = req.params;
-  const details = await getModelDetails(modelName, id);
-  res.render('model_details', details)
+  try {
+    const { modelName, id } = req.params;
+    const details = await getModelDetails(modelName, id);
+    res.render('model_details', details)
+  } catch (err) {
+    handleAdminError(req, res, err);
+  }
 });
 
 adminRouter.get('/User/change-password/:id', async (req: Request, res: Response) => {
@@ -97,6 +113,7 @@ function handleAdminError(req: Request, res: Response, err: Error) {
     logger.warn(err);
     return res.redirect(`/${req.path}?err=${err.message}`);
   } else {
+    logger.error(err);
     return res.redirect(req.path);
   }
 }
