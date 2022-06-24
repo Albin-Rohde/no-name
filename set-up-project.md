@@ -30,10 +30,13 @@ Spinning up in production mode is a great way to test that everything works as e
 Easiest way to start in production mode is with make commands. First run `make prod-build` to build production 
 docker images, followed by `make prod` to start everything.
 - Frontend will start on https://localhost
-- Backend will start on https://api.localhost/api
+- Backend will start on https://api.localhost
+- Admin will start on https://admin.localhost
 - graylog will start on https://logs.localhost
 - grafana will start on https://grafana.localhost
+
 if db is not up to date, one can run migrations with `make prod-migrate`.
+Note that in order to trust the self signed certificate it is recomended to visit https://api.localhost once and "accepting" the site in browser before using the frontend to login etc. It is likely that the browser will block trafic from frontend to backend until this is done.
 
 ---
 ## Starting app for live enviroment
