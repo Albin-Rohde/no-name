@@ -52,6 +52,11 @@ adminRouter.get('/', async (req, res) => {
   }
 });
 
+// To catch the favicon request.
+adminRouter.get('/favicon.ico', (req: Request, res: Response) => {
+  res.status(404);
+})
+
 adminRouter.get('/:modelName', async (req: Request, res: Response) => {
   try {
     const modelName = req.params.modelName;
