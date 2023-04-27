@@ -112,7 +112,7 @@ export async function createNewGame (user: User, options: GameSettings): Promise
  */
 export async function deleteGameFromUser (user: User): Promise<void> {
   if(!user.isHost) {
-    throw new GameRuleError('User is not host, Only host can delete game')
+    throw new GameRuleError(`User ${user.id} is not host, Only host can delete game`)
   }
   const gameKey = user.game_fk
   const resetUser = User.createQueryBuilder()
