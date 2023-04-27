@@ -160,15 +160,20 @@ export const loggerMiddleware = (socket: Socket, meta: MiddlewareMetaData): void
 }
 
 export const expressLoggingMiddleware = (req: Request, _res: Response, next: NextFunction) => {
-  let body = req.body
-  if (req.path.startsWith('/health')) {
+  const excludedPaths = [
+    '/health',
+    '/admin/favicon.ico'
+  ]
+  const excludeBodyPaths = [
+    '/user',
+    '/admin/login'
+  ]
+  if (excludedPaths.some((path) => req.path.startsWith(path))) {
     next();
     return;
   }
-  if ((req.path.startsWith('/user') && req.method == "POST")) {
-    body = undefined
-  }
-  if (req.path.includes("/admin/login") && req.method == "POST") {
+  let body = req.body
+  if (excludeBodyPaths.some((path) => req.path.startsWith(path)) && req.method == "POST") {
     body = undefined
   }
   let message = `${req.method} ${req.path}`
