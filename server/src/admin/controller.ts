@@ -16,7 +16,7 @@ const adminRouter = Router();
 
 adminRouter.get('/login', (req: Request, res: Response) => {
   if(req.session?.user?.admin) {
-    res.redirect('/')
+    res.redirect('/admin')
   }
   return res.render('login', {err: req.query.err, layouts: false})
 })
@@ -26,11 +26,11 @@ adminRouter.post('/login', async (req: Request, res: Response) => {
     const input = loginSchema.validateSync(req.body);
     const user = await loginUser(input);
     if (!user.admin) {
-      return res.redirect('/login')
+      return res.redirect('/admin/login')
     }
     req.session.user = user;
     req.session.save();
-    res.redirect('/');
+    res.redirect('/admin');
   } catch (err) {
     handleAdminError(req, res, err);
   }
