@@ -42,7 +42,7 @@ jobs:
         --build-arg REACT_APP_API_BASE_URL=https://api.fasoner.party \
         --build-arg REACT_APP_SOCKET_BASE_URL=https://api.fasoner.party \
         --build-arg REACT_APP_CLIENT_URL=https://fasoner.party \
-        --platform=linux/arm64 \
+        --platform=linux/amd64 \
         --output type=image,push=true \
         ./frontend
 
@@ -53,6 +53,6 @@ jobs:
         -t ${BACKEND_IMAGE}:latest \
         -f ./server/Dockerfile.prod \
         --cache-from ${BACKEND_IMAGE}:latest \
-        --platform=linux/arm64 \
+        --platform=linux/amd64 \
         --output type=image,push=true \
         ./server
