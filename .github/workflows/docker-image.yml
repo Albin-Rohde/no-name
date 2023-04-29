@@ -8,8 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      FRONTEND_IMAGE: ghcr.io/albinr99salt/no-name_frontend
-      BACKEND_IMAGE: ghcr.io/albinr99salt/no-name_server
+      FRONTEND_IMAGE: ghcr.io/Albin-Rohde/no-name_frontend
+      BACKEND_IMAGE: ghcr.io/Albin-Rohde/no-name_server
+      APP_IMAGE: ghcr.io/albinr99salt/no-name_app
+      APP_BASE_URL: https://cards.rohde.se
     steps:
     - name: check out code
       uses: actions/checkout@v2
@@ -32,27 +34,16 @@ jobs:
         docker pull ${FRONTEND_IMAGE}:latest
         docker pull ${BACKEND_IMAGE}:latest
 
-    - name: Build and Push frontend
+    - name: Build and Push app
       run: |
         docker buildx build \
-        -t ${FRONTEND_IMAGE}:${GITHUB_SHA::7} \
-        -t ${FRONTEND_IMAGE}:latest \
-        -f ./frontend/Dockerfile.prod \
+        -t ${APP_IMAGE}:${GITHUB_SHA::7} \
+        -t ${APP_IMAGE}:latest \
+        -f ./Dockerfile \
         --cache-from ${FRONTEND_IMAGE}:latest \
-        --build-arg REACT_APP_API_BASE_URL=https://api.fasoner.party \
-        --build-arg REACT_APP_SOCKET_BASE_URL=https://api.fasoner.party \
-        --build-arg REACT_APP_CLIENT_URL=https://fasoner.party \
+        --build-arg REACT_APP_API_BASE_URL=https://cards.rohde.se/api \
+        --build-arg REACT_APP_SOCKET_BASE_URL=https://cards.rohde.se \
+        --build-arg REACT_APP_CLIENT_URL=https://cards.rohde.se \
         --platform=linux/amd64 \
         --output type=image,push=true \
-        ./frontend
-
-    - name: Build and Push server
-      run: |
-        docker buildx build \
-        -t ${BACKEND_IMAGE}:${GITHUB_SHA::7} \
-        -t ${BACKEND_IMAGE}:latest \
-        -f ./server/Dockerfile.prod \
-        --cache-from ${BACKEND_IMAGE}:latest \
-        --platform=linux/amd64 \
-        --output type=image,push=true \
-        ./server
+        ./
