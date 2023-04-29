@@ -8,8 +8,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      FRONTEND_IMAGE: ghcr.io/albin-rohde/no-name_frontend
-      BACKEND_IMAGE: ghcr.io/albin-rohde/no-name_server
       APP_IMAGE: ghcr.io/albin-rohde/no-name_app
       APP_BASE_URL: https://cards.rohde.se
     steps:
@@ -31,8 +29,7 @@ jobs:
 
     - name: Pull images
       run: |
-        docker pull ${FRONTEND_IMAGE}:latest
-        docker pull ${BACKEND_IMAGE}:latest
+        docker pull ${APP_IMAGE}:latest
 
     - name: Build and Push app
       run: |
@@ -41,9 +38,9 @@ jobs:
         -t ${APP_IMAGE}:latest \
         -f ./Dockerfile \
         --cache-from ${FRONTEND_IMAGE}:latest \
-        --build-arg REACT_APP_API_BASE_URL=https://cards.rohde.se/api \
-        --build-arg REACT_APP_SOCKET_BASE_URL=https://cards.rohde.se \
-        --build-arg REACT_APP_CLIENT_URL=https://cards.rohde.se \
+        --build-arg REACT_APP_API_BASE_URL=${APP_BASE_URL}/api \
+        --build-arg REACT_APP_SOCKET_BASE_URL=${APP_BASE_URL} \
+        --build-arg REACT_APP_CLIENT_URL=${APP_BASE_URL} \
         --platform=linux/amd64 \
         --output type=image,push=true \
         ./
