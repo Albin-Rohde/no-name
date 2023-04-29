@@ -1,4 +1,4 @@
-import {Application} from "express";
+import {Application, Router, static as express_static} from "express";
 import userRoute from "./user/controller";
 import gameRouter from "./game/controller";
 import deckRouter from "./deck/controller";
@@ -17,6 +17,7 @@ import {
 import {flipCardEvent, playCardEvent, voteCardEvent} from "./card/events";
 import {adminRouter} from "./admin/controller";
 import cardRouter from "./card/controller";
+import path from "path";
 
 enum Events {
   GET_GAME = 'get-game',
@@ -42,13 +43,26 @@ function appendListeners(io: SocketServer): void {
 }
 
 function registerRoutes(app: Application): void {
-  app.get('/health', (_req, res) => {
+  // React routes
+  const reactRouter = Router();
+  const reactStatic = express_static(path.join(__dirname, '..', '..', 'frontend', 'build'))
+  const reactPaths = ['/', '/join/:key', '/reset', '/game', '/create-game', '/decks', '/deck', '/home']
+  reactPaths.forEach((path) => {
+    reactRouter.use(path, reactStatic)
+  })
+  // API routes
+  const apiRouter = Router();
+  apiRouter.use('/user', userRoute);
+  apiRouter.use('/game', gameRouter);
+  apiRouter.use('/deck', deckRouter);
+  apiRouter.use('/card', cardRouter);
+  apiRouter.get('/health', (_req, res) => {
     res.status(200).send("OK");
   })
-  app.use('/user', userRoute);
-  app.use('/game', gameRouter);
-  app.use('/deck', deckRouter);
-  app.use('/card', cardRouter);
+
+  // register routes
+  app.use('/api', apiRouter);
+  app.use(reactRouter);
   app.use('/admin', adminRouter);
 }
 
