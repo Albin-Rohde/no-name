@@ -132,10 +132,10 @@ async function initApp() {
     saveUninitialized: false,
     resave: false,
     cookie: {
-      secure: true,
+      secure: false,
       maxAge: 1000 * 60 * 60 * 24, // 24 hours
       httpOnly: true,
-      sameSite: 'none',
+      sameSite: false,
     }
   });
   const app = getExpressApp(options, userSession);
