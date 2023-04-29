@@ -40,7 +40,11 @@ function getExpressApp(options: ServerOptions, session: RequestHandler): Applica
   app.use(bodyParser.json())
   app.use(cookieParser())
   app.set('trust proxy', true)
-  app.use(cors({origin: options.clientUrl, credentials: true}));
+  app.use(cors({
+      origin: options.clientUrl,
+      credentials: true,
+      methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+  }));
   app.use((_req, res, next) => {
     res.header({'Access-Control-Allow-Headers': options.clientUrl});
     next();
