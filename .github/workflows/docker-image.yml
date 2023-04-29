@@ -8,9 +8,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      FRONTEND_IMAGE: ghcr.io/Albin-Rohde/no-name_frontend
-      BACKEND_IMAGE: ghcr.io/Albin-Rohde/no-name_server
-      APP_IMAGE: ghcr.io/albinr99salt/no-name_app
+      FRONTEND_IMAGE: ghcr.io/albin-rohde/no-name_frontend
+      BACKEND_IMAGE: ghcr.io/albin-rohde/no-name_server
+      APP_IMAGE: ghcr.io/albin-rohde/no-name_app
       APP_BASE_URL: https://cards.rohde.se
     steps:
     - name: check out code
