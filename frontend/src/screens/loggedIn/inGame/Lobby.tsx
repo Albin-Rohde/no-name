@@ -13,7 +13,7 @@ interface LobbyProps {
 const Lobby = (props: LobbyProps) => {
   const copyText = (value: string) => {
     const input = document.body.appendChild(document.createElement("input"))
-    input.value = value
+    input.value = `${window.location.host}${value}`
     input.focus();
     input.select();
     document.execCommand('copy')
@@ -50,7 +50,7 @@ const Lobby = (props: LobbyProps) => {
           <Button
             variant={'outlined'}
             sx={{width: '29%', height: '56px'}}
-            onClick={() => copyText(`${process.env.REACT_APP_CLIENT_URL}/join/${game.joinKey}`)}
+            onClick={() => copyText(`/join/${game.joinKey}`)}
           >
             Copy link
           </Button>
