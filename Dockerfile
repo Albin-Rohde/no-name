@@ -21,7 +21,8 @@ RUN cp -r ./src/admin/views ./build/src/admin/views
 FROM install-server AS collector
 WORKDIR /app
 COPY --from=build-frontend /usr/src/frontend/build /app/frontend/build
-COPY --from=build-server /usr/src/server /app/server
+COPY --from=build-frontend /usr/src/frontend/build/static /app/frontend/build/static
+COPY --from=build-server /usr/src/server/ /app/server
 
 FROM collector AS runner
 WORKDIR /app/server
