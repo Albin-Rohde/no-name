@@ -17,7 +17,7 @@ interface RestRequestOptions<D> {
 }
 
 export default class RestClient {
-  private readonly baseUrl = process.env.REACT_APP_API_BASE_URL;
+  private readonly baseUrl = process.env.REACT_APP_API_BASE_URL || '/api';
   public async makeRequest<T, D=Record<any, any>>(option: RestRequestOptions<D>): Promise<T> {
     try {
       option.action = option.action ? `/${option.action}` : '';

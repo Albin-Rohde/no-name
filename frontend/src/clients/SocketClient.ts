@@ -25,7 +25,7 @@ enum Events {
 }
 
 export class SocketClient {
-  private readonly baseUrl: string = process.env.REACT_APP_SOCKET_BASE_URL;
+  private readonly baseUrl: string = process.env.REACT_APP_SOCKET_BASE_URL || '';
   private game: Game
   public socket: Socket
   public nextGameKey: string
