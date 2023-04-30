@@ -18,21 +18,21 @@ function getTransports(name: string): (winston.transport | WinstonGraylog2)[] {
   const consoleLevel = process.env.DEBUG ? 'debug' : 'info'
   const console = new winston.transports.Console({ format: winstonConsoleFormat, level: consoleLevel })
   const transports: (winston.transport | WinstonGraylog2)[] = [console];
-  const graylog = new WinstonGraylog2({
-    level: 'debug',
-    name,
-    format: graylogFormat,
-    graylog: {
-      servers: [{host: process.env.GRAYLOG_HOST, port: Number.parseInt(process.env.GRAYLOG_PORT)}],
-      facility: name
-    }
-  })
-  const sentry = new Sentry({
-    level: 'error',
-    dsn: process.env.SENTRY_DSN,
-    tags: { key: name },
-  })
-  if (process.env.NODE_ENV == "production") {
+  if (process.env.GRAYLOG_PORT && process.env.SENTRY_DSN && process.env.NODE_ENV === 'production') {
+    const graylog = new WinstonGraylog2({
+      level: 'debug',
+      name,
+      format: graylogFormat,
+      graylog: {
+        servers: [{host: process.env.GRAYLOG_HOST, port: Number.parseInt(process.env.GRAYLOG_PORT)}],
+        facility: name
+      }
+    })
+    const sentry = new Sentry({
+      level: 'error',
+      dsn: process.env.SENTRY_DSN,
+      tags: { key: name },
+    })
     transports.push(graylog, sentry)
   }
   return transports;
