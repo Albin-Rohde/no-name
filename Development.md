@@ -26,7 +26,7 @@ This will install all dependencies and pull the required docker images.
     To create all tables in the postgres database this app uses migrations. 
     Run all migrations before starting the app.
     ```shell
-    cd ./server && npm run migration:run
+    cd ./server && npm run migration-ts:run
     ```
 3. Start Frontend
     Start the frontend app in development mode will make it auto reload on changes
