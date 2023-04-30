@@ -1,18 +1,28 @@
-FROM node:14.16.1
-
-## Set up frontend
+FROM node:14.16.1 AS install-frontend
 WORKDIR /usr/src/frontend
 COPY ./frontend .
 RUN npm install
+
+FROM install-frontend AS build-frontend
+WORKDIR /usr/src/frontend
 RUN npm run build
 
-# Set up server
+FROM node:14.16.1 AS install-server
 WORKDIR /usr/src/server
 COPY ./server .
 RUN npm install
+
+FROM install-server AS build-server
+WORKDIR /usr/src/server
 RUN npm run build
-## Copy hsb files
 RUN cp -r ./src/admin/views ./build/src/admin/views
 
-## run the node process
+
+FROM install-server AS collector
+WORKDIR /app
+COPY --from=build-frontend /usr/src/frontend/build /app/frontend/build
+COPY --from=build-server /usr/src/server /app/server
+
+FROM collector AS runner
+WORKDIR /app/server
 CMD ["npm", "run", "prod"]
