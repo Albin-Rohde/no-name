@@ -137,10 +137,10 @@ async function initApp() {
     saveUninitialized: false,
     resave: false,
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       maxAge: 1000 * 60 * 60 * 24, // 24 hours
       httpOnly: true,
-      sameSite: false,
+      sameSite: process.env.NODE_ENV === 'production',
     }
   });
   const app = getExpressApp(options, userSession);
