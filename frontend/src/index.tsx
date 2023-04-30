@@ -9,7 +9,7 @@ import {createTheme, ThemeProvider} from "@mui/material";
 import {Provider} from "react-redux";
 import { store } from './redux/redux';
 
-config()
+config({path: '../.env'})
 
 
 const darkTheme = createTheme({

@@ -5,8 +5,9 @@ No-name is a project centered around the popular card game _Cards Against Humani
 The project intend to make it possible to play _Cards Against Humanity_ online with friends.
 
 
-### Getting started
-Clone this repo and follow the steps in [set-up-project](./set-up-project.md) to get started with development.
+### Developing this project
+To contribute to this project follow the instructing in [Development.md](./Development.md)
+to get started.
 
 
 ### Key features
@@ -17,15 +18,61 @@ Clone this repo and follow the steps in [set-up-project](./set-up-project.md) to
 ### Features coming up
 - Creating your own card deck
 
-### Tech stack
-This project consists of two parts; A Frontend and a Backend. These are called [`frontend`](./frontend/README.md) and [`server`](./server/README.md) in the repo.
+### Running
+This project has a Docker image that can be used to run the app in production environment.
+Easiest is to use docker-compose. A compose file could look something like this:
+```yaml
+networks:
+  local:
+    driver: bridge
 
-The frontend is a react typescript project with material ui for most of the components. 
-It uses redux as store for state management. Read more about the frontend [here](./frontend/README.md)
+services:
+  no-name:
+    container_name: no-name
+    image: ghcr.io/albin-rohde/no-name_app:latest
+    ports:
+      - 5000:5000
+    restart: unless-stopped
+    networks:
+      - local
+    depends_on:
+      - pg_db
+      - redis
+    environment:
+      - PORT=5000
+      - COOKIE_SECRET="some-secret"
+      - CLIENT_URL="https://example.com"
+      - POSTGRES_HOST=pg_db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=no_name_db
 
-The backend is developed in typescript using `express` and `socket-io` as rest and socket frameworks/lib.
-Read more about the server [here](./server/README.md).
+  pg_db:
+    container_name: pg_db
+    image: postgres
+    restart: unless-stopped
+    networks:
+      - local
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=no_name_db
 
+  redis:
+    container_name: redis
+    image: "redis:alpine"
+    command: redis-server
+    networks:
+      - local
+    ports:
+      - 6379:6379
+    environment:
+      - REDIS_REPLICATION_MODE=master
+```
 
 ### How to play
 Begin by signing up or signing in. When logged in one is greeted by the "dashboard", from here the player can create a

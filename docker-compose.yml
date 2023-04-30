@@ -1,23 +1,6 @@
 version: '3'
 
 services:
-  server:
-    container_name: server
-    restart: unless-stopped
-    build: ./server
-    volumes:
-      - './server:/usr/src/server'
-    ports:
-      - '5000:5000'
-    depends_on:
-      - db
-      - redis
-    networks:
-      - local
-      - public
-    env_file:
-      - 'config/.env.dev'
-
   db:
     container_name: pg_db
     image: postgres
@@ -40,39 +23,6 @@ services:
     environment:
       - REDIS_REPLICATION_MODE=master
 
-  frontend:
-    container_name: frontend
-    restart: unless-stopped
-    build: ./frontend
-    volumes:
-      - './frontend:/usr/src/frontend'
-    ports:
-      - '3000:3000'
-    networks:
-      - local
-      - public
-    env_file:
-      - 'config/.env.dev'
-
-  nginx:
-    container_name: nginx
-    image: nginx:latest
-    restart: unless-stopped
-    depends_on:
-      - frontend
-      - server
-    networks:
-      - local
-      - public
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - ./nginx/:/etc/letsencrypt
-      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf
-
 networks:
   local:
-    driver: bridge
-  public:
     driver: bridge

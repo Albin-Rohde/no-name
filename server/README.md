@@ -25,7 +25,7 @@ Both the rest server and socket server are using sessions for authentication, au
 
 ## Migrations
 Run all migrations:
-- `npm run migrate:latest`
+- `npm run migration:run`
 
 Add new migration
 - Alter Models in source code
@@ -33,8 +33,8 @@ Add new migration
 - Create migration `npm run typeorm migration:generate -- -n <NameOfMigration>`
 - Check/alter migration so that it looks correct
 - Migrations are created in .ts, so we need to build `npm run build`
-- Now we can run our new migration `npm run migrate:latest`
-- Always test that the revert also works as expected `npm run typeorm migration:revert`
+- Now we can run our new migration `npm run migration:run`
+- Always test that the revert also works as expected `npm run migration:revert`
 
 ## Coding guidelines
 This backend server is built with the MVC design pattern in mind. Read more about it here https://help.hcltechsw.com/commerce/9.1.0/developer/concepts/csdmvcdespat.html
