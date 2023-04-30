@@ -296,7 +296,7 @@ export const getEditModelData = async (modelName: string, id: string) => {
 const getEditRow = <T=AnyModel>(model: Repository<T>, row: any): EditRow[] => {
   const columnData: EditRow[] = [];
   const nonEditColls = ['password', 'id', 'game_fk'];
-  const boolColls = ['admin', 'hasPlayed'];
+  const boolColls = ['admin', 'hasPlayed', 'privateLobby', 'active'];
   const numberColls = ['score'];
   const dateColls = ['created_at', 'deleted_at'];
   for (const coll of model.metadata.columns) {
