@@ -1,0 +1,40 @@
+networks:
+  local:
+    driver: bridge
+
+services:
+  no_name:
+    container_name: no-name-app
+    image: ghcr.io/albin-rohde/no-name_app:latest
+    expose:
+      - 5000
+    restart: no
+    networks:
+      - local
+    depends_on:
+      - no_name_db
+      - no_name_redis
+    env_file:
+      - './.env'
+
+  no_name_db:
+    container_name: no_name_db
+    image: postgres
+    restart: unless-stopped
+    networks:
+      - local
+    ports:
+      - 5432:5432
+    env_file:
+      - './.env'
+
+  no_name_redis:
+    container_name: no_name_redis
+    image: "redis:alpine"
+    command: redis-server
+    networks:
+      - local
+    ports:
+      - 6379:6379
+    environment:
+      - REDIS_REPLICATION_MODE=master
