@@ -7,7 +7,7 @@
     "prod": "NODE_ENV=production node ./build/src/index.js",
     "dev": "NODE_ENV=development TYPEORM_ENTITIES=src/**/models/*.ts nodemon",
     "build": "rimraf ./build && tsc",
-    "typeorm": "POSTGRES_HOST=localhost ts-node ./node_modules/typeorm/cli.js",
+    "typeorm": "ts-node ./node_modules/typeorm/cli.js",
     "migration:run": "npm run typeorm migration:run",
     "migration:revert": "npm run typeorm migration:revert",
     "migration-prod:run": "node ./node_modules/typeorm/cli.js migration:run",
