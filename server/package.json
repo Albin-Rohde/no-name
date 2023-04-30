@@ -4,7 +4,7 @@
   "description": "",
   "main": "innit.js",
   "scripts": {
-    "prod": "NODE_ENV=production node ./build/src/index.js",
+    "prod": "NODE_ENV=production TYPEORM_ENTITIES=build/src/**/models/*.js TYPEORM_MIGRATIONS=src/build/migrations/*.js node ./build/src/index.js",
     "dev": "NODE_ENV=development TYPEORM_ENTITIES=src/**/models/*.ts nodemon",
     "build": "rimraf ./build && tsc",
     "typeorm": "TYPEORM_ENTITIES=build/src/**/models/*.js TYPEORM_MIGRATIONS=build/src/migrations/*.js TYPEORM_MIGRATIONS_OUT=src/migrations ts-node ./node_modules/typeorm/cli.js",

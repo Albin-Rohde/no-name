@@ -4,7 +4,7 @@ import Raven from "raven";
 import {initApp} from "./app";
 import {User} from "./user/models/User";
 
-dotenv.config({path: '../.env'});
+dotenv.config({path: '.env'});
 
 /** Setup for sentry **/
 declare global {

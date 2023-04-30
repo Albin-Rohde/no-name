@@ -10,7 +10,7 @@ services:
     ports:
       - 5432:5432
     env_file:
-      - 'config/.env.dev'
+      - './server/.env'
 
   redis:
     container_name: redis
