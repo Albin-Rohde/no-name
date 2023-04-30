@@ -45,7 +45,10 @@ function appendListeners(io: SocketServer): void {
 function registerRoutes(app: Application): void {
   // React routes
   const reactRouter = Router();
-  const reactStatic = express_static(path.join(__dirname, '..', '..', 'frontend', 'build'))
+  const staticPath = process.env.NODE_ENV === 'production'
+    ? path.join(__dirname, '..', '..', '..', 'frontend', 'build')
+    : path.join(__dirname, '..', '..', 'frontend', 'build')
+  const reactStatic = express_static(staticPath)
   const reactPaths = ['/', '/join/:key', '/reset', '/game', '/create-game', '/decks', '/deck', '/home']
   reactPaths.forEach((path) => {
     reactRouter.use(path, reactStatic)
