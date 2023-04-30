@@ -9,10 +9,7 @@ requirements:
 
 copy and paset this into your terminal:
 ```shell
-git clone git@github.com:Albin-Rohde/no-name.git
-&& cd ./no-name
-&& chmod +x init.sh
-&& ./init.sh
+git clone git@github.com:Albin-Rohde/no-name.git && cd ./no-name && chmod +x init.sh && ./init.sh
 ```
 This will install all dependencies and pull the required docker images.
 
