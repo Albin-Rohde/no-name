@@ -23,6 +23,7 @@ import redis from "redis";
 import {createConnection} from "typeorm";
 import {engine} from "express-handlebars";
 import path from "path";
+import {isStringTrue, typeIsBool} from "./admin/hbsHelpers";
 
 export interface ServerOptions {
   port: number
@@ -33,7 +34,11 @@ function getExpressApp(options: ServerOptions, session: RequestHandler): Applica
   const app: Application = express();
   /** Handlebars engine **/
   app.set('views', path.join(__dirname, './admin', 'views'))
-  app.engine('.hbs', engine({extname: '.hbs', defaultLayout: 'main.hbs'}));
+  app.engine('.hbs', engine({
+    extname: '.hbs',
+    defaultLayout: 'main.hbs',
+    helpers: {typeIsBool, isStringTrue}
+  }));
   app.set('view engine', 'hbs');
   /** Generic middlewares **/
   app.use(bodyParser.urlencoded({extended: false}))
