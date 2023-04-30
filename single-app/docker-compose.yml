@@ -6,8 +6,8 @@ services:
   no_name:
     container_name: no-name-app
     image: ghcr.io/albin-rohde/no-name_app:latest
-    expose:
-      - 5000
+    ports:
+      - 5000:5000
     restart: no
     networks:
       - local
