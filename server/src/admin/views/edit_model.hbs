@@ -1,0 +1,56 @@
+<h1>Details for <a href="/admin/{{detailsTable.model}}">{{detailsTable.model}}</a> {{id}}</h1>
+<form method="post" action="">
+    <table>
+        <tr>
+            <th>Column</th>
+            <th>Value</th>
+        </tr>
+        {{#each detailsTable.row}}
+            <tr>
+                <td>{{this.name}}</td>
+                {{#if this.canEdit }}
+                    <td>
+                        {{# if (typeIsBool this.type) }}
+                            <select name="{{this.name}}">
+                                {{#if (isStringTrue this.value)}}
+                                    <option selected value="true">true</option>
+                                    <option value="false">false</option>
+                                {{else}}
+                                    <option selected value="false">false</option>
+                                    <option value="true">true</option>
+                                {{/if}}
+                            </select>
+                        {{else}}
+                            <input min="0" type="{{this.type}}" name="{{this.name}}" value="{{this.value}}"/>
+                        {{/if}}
+                    </td>
+                {{else}}
+                    {{#if this.link}}
+                        <td><a href="/admin/{{this.link}}">{{this.value}}</a></td>
+                    {{else}}
+                        <td>{{this.value}}</td>
+                    {{/if}}
+                {{/if}}
+            </tr>
+        {{/each}}
+    </table>
+    <button type="submit" class="save">Save {{detailsTable.model}}</button>
+</form>
+<script>
+    const button = document.querySelector('.delete')
+    button.addEventListener('click', () => {
+        const yes = confirm('are you sure you want to delete this {{detailsTable.model}}, this may delete its relations as well')
+        if (yes) {
+            window.fetch('/{{detailsTable.model}}/{{detailsTable.id}}', {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+            }).then((res) => {
+                if (res.ok) {
+                    window.location.replace('/{{detailsTable.model}}')
+                }
+            });
+        }
+    })
+</script>

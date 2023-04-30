@@ -33,6 +33,21 @@ export interface DetailsTableData {
   id: string;
 }
 
+interface EditRow {
+  name: string;
+  value: string;
+  canEdit: boolean;
+  link?: string;
+  type: 'bool' | 'text' | 'date' | 'number'
+}
+
+export interface EditModelData {
+  model: string;
+  columns: string[];
+  row: EditRow[];
+  id: string;
+}
+
 export interface DetailsData {
   detailsTable: DetailsTableData,
   tableData: TableData[],
@@ -262,4 +277,78 @@ const getTableData = async (model: Repository<AnyModel>, id: string): Promise<Ta
     }
   }
   return tableData;
+}
+
+export const getEditModelData = async (modelName: string, id: string) => {
+  const model = getModel(modelName);
+  const row = getEditRow(model, await model.findOne(id));
+  const details: EditModelData = {
+    model: modelName,
+    columns: getColumnNames(model),
+    row,
+    id,
+  }
+  return {
+    detailsTable: details,
+  }
+}
+
+const getEditRow = <T=AnyModel>(model: Repository<T>, row: any): EditRow[] => {
+  const columnData: EditRow[] = [];
+  const nonEditColls = ['password', 'id', 'game_fk'];
+  const boolColls = ['admin', 'hasPlayed'];
+  const numberColls = ['score'];
+  const dateColls = ['created_at', 'deleted_at'];
+  for (const coll of model.metadata.columns) {
+    let canEdit: boolean = true;
+    let type: string = 'text';
+    if (nonEditColls.some((v) => v == coll.propertyName)) {
+      canEdit = false
+    }
+    if (boolColls.some((v) => v == coll.propertyName)) {
+      type = 'bool';
+    }
+    if (dateColls.some((v) => v == coll.propertyName)) {
+      type = 'date';
+    }
+    if (numberColls.some((v) => v == coll.propertyName)) {
+      type = 'number';
+    }
+    switch (coll.propertyName) {
+      case 'password':
+        columnData.push({
+          name: 'password',
+          value: 'change password',
+          link: `/User/change-password/${row.id}`,
+          type: 'text',
+          canEdit: false,
+        });
+        break;
+      case 'created_at':
+        columnData.push({
+          name: coll.propertyName,
+          value: row[coll.propertyName] && row[coll.propertyName].toLocaleDateString('se-SV'),
+          type: 'date',
+          canEdit: true,
+        });
+        break;
+      case 'deleted_at':
+        columnData.push({
+          name: coll.propertyName,
+          value: row[coll.propertyName] && row[coll.propertyName].toLocaleDateString('se-SV'),
+          type: 'date',
+          canEdit: true,
+        });
+        break;
+      default:
+        columnData.push({
+          name: coll.propertyName,
+          value: row[coll.propertyName],
+          canEdit: canEdit,
+          type: type as any,
+        });
+        break;
+    }
+  }
+  return columnData;
 }

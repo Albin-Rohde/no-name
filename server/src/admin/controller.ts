@@ -4,7 +4,8 @@ import {
   deleteModel,
   getModelData,
   getModelDetails,
-  MODELS,
+  getEditModelData,
+  MODELS, getModel,
 } from "./services";
 import {adminRequired} from "../middlewares";
 import {loginSchema, updateSchema} from "../user/schema";
@@ -16,7 +17,8 @@ const adminRouter = Router();
 
 adminRouter.get('/login', (req: Request, res: Response) => {
   if(req.session?.user?.admin) {
-    res.redirect('/admin')
+    console.log('user is admin')
+    return res.redirect('/admin')
   }
   return res.render('login', {err: req.query.err, layouts: false})
 })
@@ -61,7 +63,6 @@ adminRouter.get('/:modelName', async (req: Request, res: Response) => {
   try {
     const modelName = req.params.modelName;
     const tableData = await getModelData(modelName);
-    console.log(tableData);
     res.render('model', {tableData});
   } catch (err) {
     handleAdminError(req, res, err);
@@ -88,6 +89,35 @@ adminRouter.get('/:modelName/details/:id', async (req: Request, res: Response) =
   }
 });
 
+adminRouter.get('/:modelName/edit/:id', async (req: Request, res: Response) => {
+  try {
+    const {modelName, id} = req.params;
+    const editData = await getEditModelData(modelName, id);
+    res.render('edit_model', editData)
+  } catch (err) {
+    handleAdminError(req, res, err);
+  }
+})
+
+adminRouter.post('/:modelName/edit/:id', async (req: Request, res: Response) => {
+  try {
+    const {modelName, id} = req.params;
+    const model = getModel(modelName)
+    const updateData = {}
+    console.log(req.body)
+    Object.entries<any>(req.body)
+      .filter(([_key, value]) => value !== undefined && value !== '')
+      .forEach(([key, value]) => {
+        updateData[key] = value === 'true' || value === 'false' ? JSON.parse(value) : value
+      })
+    console.log({updateData})
+    await model.update({id: parseInt(id)}, updateData)
+    res.redirect(`/admin/${req.path}`)
+  } catch (err) {
+    handleAdminError(req, res, err);
+  }
+})
+
 adminRouter.get('/User/change-password/:id', async (req: Request, res: Response) => {
   try {
     const user = await User.findOneOrFail(req.params.id);
@@ -106,7 +136,7 @@ adminRouter.post('/User/change-password/:id', async (req: Request, res: Response
     }
     const input = updateSchema.validateSync({password: password1, id: user.id});
     await updateUser(input);
-    return res.redirect(`/User/details/${user.id}`);
+    return res.redirect(`/admin/User/details/${user.id}`);
   } catch (err) {
     handleAdminError(req, res, err);
   }
@@ -116,10 +146,10 @@ adminRouter.post('/User/change-password/:id', async (req: Request, res: Response
 function handleAdminError(req: Request, res: Response, err: Error) {
   if (err instanceof ValidationError) {
     logger.warn(err);
-    return res.redirect(`/${req.path}?err=${err.message}`);
+    return res.redirect(`/admin/${req.path}?err=${err.message}`);
   } else {
     logger.error(err);
-    return res.redirect(req.path);
+    return res.redirect(`/admin/${req.path}`);
   }
 }
 
