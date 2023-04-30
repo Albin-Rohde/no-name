@@ -6,7 +6,7 @@ export NC="\033[0m"
 
 echo $PURPLE
 echo -e "$PURPLE==== Copying .env file ====$NC"
-cp ./frontend/.env.copy ./frontend.env
+cp ./frontend/.env.copy ./frontend/.env
 cp ./server/.env.copy ./server/.env
 echo -e "$GREEN==== Done ====$NC"
 echo -e "$PURPLE==== pulling docker images for dev ====$NC"
