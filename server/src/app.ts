@@ -129,6 +129,7 @@ async function initApp() {
     clientUrl: process.env.CLIENT_URL!,
   }
   await createConnection();
+  logger.info(`Connected to postgres`)
   const store = getRedisSessionStore();
   const userSession = session({
     store,

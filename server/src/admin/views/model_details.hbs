@@ -43,14 +43,14 @@
     button.addEventListener('click', () => {
         const yes = confirm('are you sure you want to delete this {{detailsTable.model}}, this may delete its relations as well')
         if (yes) {
-            window.fetch('/{{detailsTable.model}}/{{detailsTable.id}}', {
+            window.fetch('/admin/{{detailsTable.model}}/{{detailsTable.id}}', {
                 method: 'DELETE',
                 headers: {
                   'Content-Type': 'application/json'
                 },
             }).then((res) => {
                 if (res.ok) {
-                    window.location.replace('/{{detailsTable.model}}')
+                    window.location.replace('/admin/{{detailsTable.model}}')
                 }
             });
         }
