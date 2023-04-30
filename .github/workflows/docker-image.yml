@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       APP_IMAGE: ghcr.io/albin-rohde/no-name_app
-      APP_BASE_URL: https://cards.rohde.se
+      APP_BASE_URL: ''
     steps:
     - name: check out code
       uses: actions/checkout@v2
