@@ -37,7 +37,7 @@ jobs:
         -t ${APP_IMAGE}:${GITHUB_SHA::7} \
         -t ${APP_IMAGE}:latest \
         -f ./Dockerfile \
-        --cache-from ${FRONTEND_IMAGE}:latest \
+        --cache-from ${APP_IMAGE}:latest \
         --build-arg REACT_APP_API_BASE_URL=${APP_BASE_URL}/api \
         --build-arg REACT_APP_SOCKET_BASE_URL=${APP_BASE_URL} \
         --build-arg REACT_APP_CLIENT_URL=${APP_BASE_URL} \
