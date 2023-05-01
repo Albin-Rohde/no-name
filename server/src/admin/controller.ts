@@ -17,7 +17,6 @@ const adminRouter = Router();
 
 adminRouter.get('/login', (req: Request, res: Response) => {
   if(req.session?.user?.admin) {
-    console.log('user is admin')
     return res.redirect('/admin')
   }
   return res.render('login', {err: req.query.err, layouts: false})
@@ -104,13 +103,11 @@ adminRouter.post('/:modelName/edit/:id', async (req: Request, res: Response) => 
     const {modelName, id} = req.params;
     const model = getModel(modelName)
     const updateData = {}
-    console.log(req.body)
     Object.entries<any>(req.body)
       .filter(([_key, value]) => value !== undefined && value !== '')
       .forEach(([key, value]) => {
         updateData[key] = value === 'true' || value === 'false' ? JSON.parse(value) : value
-      })
-    console.log({updateData})
+      });
     await model.update({id: parseInt(id)}, updateData)
     res.redirect(`/admin/${req.path}`)
   } catch (err) {

@@ -88,7 +88,6 @@ const cardList = (props: CardListProps) => {
   }
 
   const deleteCard = (card: NewCard) => {
-    console.log(props.cards)
     const filteredCards = props.cards.filter((c) => c.id !== card.id)
     props.updateCards([...filteredCards]);
   }
