@@ -29,11 +29,13 @@ This will install all dependencies and pull the required docker images.
     cd ./server && npm run migration:run
     ```
 3. Start Frontend
+
     Start the frontend app in development mode will make it auto reload on changes
     ```shell
     cd ./frontend && npm run dev
     ```
 4. Start backend
+
     Start the backend in development mode will make it auto reload on changes.
     ```shell
     cd ./server && npm run dev
@@ -46,9 +48,8 @@ Frontend and backend can now be accessed on:
 ---
 ### Creating new migration
 To create new migration, first make the changes to the model(s). When you are happy with the alterations 
-go to server root (`./server`) and run `npm run migration:generate`. This will create a migration in `server/src/migrations`. 
-Check that it looks correct and make changes if needed. When happy apply the migrations by running either `make migrate` or
-`npm run migration:run`.
+go to server root (`./server`) and run `npm run typeorm migration:generate -- -n <name>`. This will create a migration in `server/src/migrations`. 
+Check that it looks correct and make changes if needed. When happy apply the migrations by running `npm run migration:run`.
 
 ### Reverting migration
 To revert a migration run `npm run migration:revert` from server root (`./server`).
