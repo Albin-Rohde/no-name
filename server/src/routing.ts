@@ -53,6 +53,9 @@ function registerRoutes(app: Application): void {
   reactPaths.forEach((path) => {
     reactRouter.use(path, reactStatic)
   })
+  // Serve public files
+  const publicFiles = express_static(path.join(__dirname, 'public'))
+  app.use('/public', publicFiles)
   // API routes
   const apiRouter = Router();
   apiRouter.use('/user', userRoute);
