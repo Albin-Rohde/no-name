@@ -11,7 +11,7 @@ import {
 } from "typeorm"
 import {User} from "../../user/models/User"
 import {GameTurn} from "./GameTurn"
-import {NotFoundError} from "../../error";
+import {GameRuleError, NotFoundError} from "../../error";
 import {createBlackCardRef, createWhiteCardRef, getUnusedBlackCard, getUnusedWhiteCards} from "../../card/services";
 import {CardState, WhiteCardRef} from "../../card/models/WhiteCardRef";
 import {CardDeck} from "../../deck/models/CardDeck";
@@ -176,6 +176,9 @@ export class Game extends BaseEntity {
    */
   public addPlayer = (user: User): void => {
     if(this.users.some(u => u.id === user.id)) return
+    if(this.users.length >= this.playerLimit) {
+      throw new GameRuleError('Player limit reached for the game you tried to join')
+    }
     this.users.push(user)
   }
 
