@@ -105,7 +105,9 @@ const CardsList = (props: CardsListProps) => {
         onClick={() => props.cardClickCb(card)}
       >
         <CardContent>
-          <Typography style={{fontSize: getFontSize(getTotalTextLength(card), isMobile)}}>
+          <Typography style={{
+            fontSize: getFontSize(getTotalTextLength(card), isMobile, window.screen.height)
+          }}>
             {getCardText(card)}
           </Typography>
         </CardContent>
