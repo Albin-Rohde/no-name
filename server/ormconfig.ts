@@ -1,12 +1,12 @@
 module.exports = {
   "type": "postgres",
-  "host": process.env.POSTGRES_HOST,
+  "host": process.env.POSTGRES_HOST || 'localhost',
   "port": process.env.POSTGRES_PORT || 5432,
-  "username": process.env.POSTGRES_USER,
+  "username": process.env.POSTGRES_USER || 'user',
   "password": process.env.POSTGRES_PASSWORD,
-  "database": process.env.POSTGRES_DB,
+  "database": process.env.POSTGRES_DB || 'no_name_db',
   "synchronize": false,
-  "logging": false,
+  "logging": process.env.DEBUG,
   "entities": [
     process.env.TYPEORM_ENTITIES,
   ],

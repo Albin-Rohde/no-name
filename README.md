@@ -4,12 +4,6 @@
 No-name is a project centered around the popular card game _Cards Against Humanity_. 
 The project intend to make it possible to play _Cards Against Humanity_ online with friends.
 
-
-### Developing this project
-To contribute to this project follow the instructing in [Development.md](./Development.md)
-to get started.
-
-
 ### Key features
 - Playing _Cards Against Humanity_ online
 - Easy to get going
@@ -18,9 +12,12 @@ to get started.
 ### Features coming up
 - Creating your own card deck
 
+---
+
 ### Running
 This project has a Docker image that can be used to run the app in production environment.
-Easiest is to use docker-compose. A compose file could look something like this:
+The app use postgres as database and redis for cache and session storage. Bellow is an
+for a docker-compose file to run the app.
 ```yaml
 networks:
   local:
@@ -39,14 +36,11 @@ services:
       - pg_db
       - redis
     environment:
-      - PORT=5000
       - COOKIE_SECRET="some-secret"
       - CLIENT_URL="https://example.com"
       - POSTGRES_HOST=pg_db
-      - POSTGRES_PORT=5432
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=no_name_db
 
   pg_db:
     container_name: pg_db
@@ -57,10 +51,8 @@ services:
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_PORT=5432
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=no_name_db
 
   redis:
     container_name: redis
@@ -73,6 +65,33 @@ services:
     environment:
       - REDIS_REPLICATION_MODE=master
 ```
+#### Environment - no-name
+| Environment         | Description                                           | Default                 |
+|---------------------|-------------------------------------------------------|-------------------------|
+| `PORT`              | Defines the port the app will run on.                 | `5000`                  |
+| `COOKIE_SECRET`     | A random string used to sign session cookie.          | __Required__            |
+| `CLIENT URL`        | Full path where the app will be hosted.               | `http://localhost:5000` |
+| `POSTGRES_HOST`     | The app expect postgres to be running on this host    | `localhost`             |
+| `POSTGRES_PORT`     | The app expect postgres to be running on this port    | `5432`                  |
+| `POSTGRES_USER`     | The app will use this user to connect to postgres     | `user`                  |
+| `POSTGRES_PASSWORD` | The app will use this password to connect to postgres | __Required__            |
+| `POSTGRES_DB`       | The app will use this db when connection to postgres  | `no_name_db`            |
+| `DEBUG`             | Set this to `1` to get debug logs from app            | `0`                     |
+
+#### Environment - postgres
+| Environment         | Description                             | Default      |
+|---------------------|-----------------------------------------|--------------|
+| `POSTGRES_PORT`     | Defines the port postgres will start on | `5432`       |
+| `POSTGRES_USER`     | Defines the root user for postgres      | `user`       |
+| `POSTGRES_PASSWORD` | Defines the password for the root user  | __Required__ |
+
+---
+
+### Contributing to this project
+To contribute to this project follow the instructing in [Development.md](./Development.md)
+to get started.
+
+---
 
 ### How to play
 Begin by signing up or signing in. When logged in one is greeted by the "dashboard", from here the player can create a

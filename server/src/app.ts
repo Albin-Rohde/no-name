@@ -125,11 +125,11 @@ function getRedisSessionStore(): RedisStore {
 
 async function initApp() {
   const options: ServerOptions = {
-    port: Number(process.env.PORT),
-    clientUrl: process.env.CLIENT_URL!,
+    port: Number(process.env.PORT || 5000),
+    clientUrl: process.env.CLIENT_URL || `http://localhost:${process.env.PORT || 5000}`,
   }
   await createConnection();
-  logger.info(`Connected to postgres`)
+  logger.info(`Connected to postgres successfully`)
   const store = getRedisSessionStore();
   const userSession = session({
     store,
