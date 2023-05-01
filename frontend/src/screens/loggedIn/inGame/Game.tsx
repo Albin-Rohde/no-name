@@ -52,7 +52,7 @@ const Game = () => {
   }
   const isMobile = window.screen.width < 800;
 
-  const mainGridHeight = isMobile ? 'calc(94vh - 430px)' : 'calc(94vh - 21vw)'
+  const mainGridHeight = isMobile ? '30vh' : 'calc(94vh - 21vw)'
   return (
     <React.Fragment>
       <Grid container sx={{width: '100%', marginTop: '6vh', height: mainGridHeight}}>
@@ -76,10 +76,10 @@ const Game = () => {
         <Grid item xs={8} sm={6} md={6} sx={{display: 'flex', justifyContent: 'center'}}>
           <Card
             sx={{
-              minHeight: isMobile ? '250px' : '12.0vw',
-              maxHeight: isMobile ? '260px' : '12.0vw',
-              minWidth: isMobile ? '200px' : '10.8vw',
-              maxWidth: isMobile ? '200px' : '10.8vw',
+              minHeight: isMobile ? '29vh' : '12.0vw',
+              maxHeight: isMobile ? '30vh' : '12.0vw',
+              minWidth: isMobile ? '27vh' : '10.8vw',
+              maxWidth: isMobile ? '27vh' : '10.8vw',
             }}
           >
             <CardContent>
@@ -94,7 +94,7 @@ const Game = () => {
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
-        marginTop: '3vh',
+        marginTop: isMobile ? 'calc(28vh - 125px)' : '3vh',
       }}>
         <RenderCards
           {...{

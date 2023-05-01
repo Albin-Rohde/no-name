@@ -22,12 +22,12 @@ const CARD_STYLE = {
 
 const CARD_STYLE_MOBILE = {
   ...CARD_STYLE,
-  minHeight: '240px',
-  maxHeight: '240px',
+  minHeight: '32vh',
+  maxHeight: '32vh',
   marginRight: '2%',
   marginLeft: '2%',
-  minWidth: '200px',
-  maxWidth: '200px',
+  minWidth: '27vh',
+  maxWidth: '27vh',
 }
 
 const CARD_STYLE_DESKTOP = {
