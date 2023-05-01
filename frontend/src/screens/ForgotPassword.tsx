@@ -3,6 +3,7 @@ import {Box, Button, Container, Grid, TextField, Typography} from "@mui/material
 import RestClient from "../clients/RestClient";
 import {useDispatch} from "react-redux";
 import {setError, setNotification} from "../redux/redux";
+import Logo from "../components/Logo";
 
 interface ForgotPasswordProps {
   navigate: (screen: string) => void;
@@ -29,9 +30,9 @@ const ForgotPassword = (props: ForgotPasswordProps) => {
 
   return(
     <Container>
-      <Typography variant='h4' style={{color: 'white', textAlign: 'center', marginTop: '20vh'}}>
-        No-Name Game
-      </Typography>
+      <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '16vh'}}>
+        <Logo/>
+      </Box>
       <Grid container marginTop='18vh'>
         <Grid item xs={2} sm={3} md={4}/>
         <Grid item xs={8} sm={6} md={4}>
