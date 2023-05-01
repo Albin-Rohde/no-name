@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import {Box, Button, Container, Grid, TextField, Typography} from "@mui/material";
+import Logo from "../components/Logo";
 
 interface LoginProps {
   login: (email: string, password: string) => Promise<void>;
@@ -16,10 +17,10 @@ const Login = (props: LoginProps) => {
 
   return(
     <Container>
-      <Typography variant='h4' style={{color: 'white', textAlign: 'center', marginTop: '20vh'}}>
-        No-Name Game
-      </Typography>
-      <Grid container marginTop='18vh'>
+      <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '16vh'}}>
+        <Logo/>
+      </Box>
+      <Grid container marginTop='12vh'>
         <Grid item xs={2} sm={3} md={4}/>
         <Grid item xs={8} sm={6} md={4}>
           <Box sx={{display: 'flex', justifyContent: 'center'}}>
