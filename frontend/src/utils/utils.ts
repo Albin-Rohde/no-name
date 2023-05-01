@@ -34,3 +34,14 @@ export const getFontSize = (
     }
     return fontSize;
   }
+
+export const wrappedCardText = (text: string): string =>  {
+  const longWords = text.split(' ').filter((word) => word.length >= 13)
+  longWords.forEach((word) => {
+    const startOfWord = text.indexOf(word)
+    const part1 = text.slice(startOfWord, startOfWord + 13)
+    const part2 = text.slice(startOfWord + 13, startOfWord + word.length)
+    text = text.replaceAll(word, `${part1}- ${part2}`)
+  })
+  return text
+}

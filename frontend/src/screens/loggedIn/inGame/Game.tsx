@@ -10,6 +10,7 @@ import {useSelector} from "react-redux";
 import {ReduxState} from "../../../redux/redux";
 import * as GameClient from '../../../clients/Game';
 import RenderCards from "./components/RenderCards";
+import {getFontSize, wrappedCardText} from "../../../utils/utils";
 
 const Game = () => {
   const [confirmPlayOpen, setConfirmPlayOpen] = useState(false);
@@ -83,8 +84,10 @@ const Game = () => {
             }}
           >
             <CardContent>
-              <Typography style={{fontSize: isMobile ? '1.5em' : '1.2vw'}}>
-                {game.blackCard.text}
+              <Typography style={{
+                fontSize: getFontSize(game.blackCard.text.length, isMobile, window.screen.height)
+              }}>
+                {wrappedCardText(game.blackCard.text)}
               </Typography>
             </CardContent>
           </Card>

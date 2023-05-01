@@ -4,7 +4,7 @@ import {BlackCardResponse, CardResponse, CardState} from '../../../../clients/Re
 import {useDispatch, useSelector} from "react-redux";
 import {ReduxState, setError} from "../../../../redux/redux";
 import * as GameClient from "../../../../clients/Game";
-import {getFontSize} from "../../../../utils/utils";
+import {getFontSize, wrappedCardText} from "../../../../utils/utils";
 
 interface CardsListProps {
   cards: CardResponse[];
@@ -55,6 +55,7 @@ const CardsList = (props: CardsListProps) => {
 
   const mergedCardText = (card: CardResponse) => {
     try {
+      card.text = wrappedCardText(card.text)
       const blackTextParts = props.blackCard.text.split('_');
       if (props.blackCard.blanks === 1) {
         return (<React.Fragment>{blackTextParts[0]}<b>{card.text}</b> {blackTextParts[1]}</React.Fragment>);
@@ -74,7 +75,7 @@ const CardsList = (props: CardsListProps) => {
   const getCardText = (card: CardResponse) => {
     switch (card.state) {
       case CardState.HAND:
-        return card.text;
+        return wrappedCardText(card.text);
       case CardState.PLAYED_SHOW:
         return mergedCardText(card);
       case CardState.WINNER:
