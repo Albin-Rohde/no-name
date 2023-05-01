@@ -123,8 +123,8 @@ export const deleteModel = async (modelName: string, id: string): Promise<void> 
       await deleteGameFromUser(hostUser);
     }
     await CardDeckUserRef.createQueryBuilder('cdr')
-      .leftJoin(User, 'u', 'u.id = cdr.user_id_fk')
-      .where('u.id = :id', {id})
+      .from(CardDeckUserRef, 'cdr')
+      .where('user_id_fk = :id', {id})
       .delete()
       .execute();
     await model.delete(id);
@@ -295,9 +295,9 @@ export const getEditModelData = async (modelName: string, id: string) => {
 
 const getEditRow = <T=AnyModel>(model: Repository<T>, row: any): EditRow[] => {
   const columnData: EditRow[] = [];
-  const nonEditColls = ['password', 'id', 'game_fk'];
+  const nonEditColls = ['password', 'id', 'key', 'card_deck_fk', 'current_turn_fk', 'black_card_id_fk'];
   const boolColls = ['admin', 'hasPlayed', 'privateLobby', 'active'];
-  const numberColls = ['score'];
+  const numberColls = ['score', 'playCards', 'rounds', 'playerLimit'];
   const dateColls = ['created_at', 'deleted_at'];
   for (const coll of model.metadata.columns) {
     let canEdit: boolean = true;
