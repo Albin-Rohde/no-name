@@ -13,10 +13,10 @@ const Register = (props: RegisterProps) => {
 
   return(
     <Container>
-      <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '16vh'}}>
+      <Box sx={{display: 'flex', justifyContent: 'center', marginTop: '14vh'}}>
         <Logo/>
       </Box>
-      <Grid container marginTop='12vh'>
+      <Grid container marginTop='10vh'>
         <Grid item xs={2} sm={3} md={4}/>
         <Grid item xs={8} sm={6} md={4}>
           <Box sx={{display: 'flex', justifyContent: 'center'}}>

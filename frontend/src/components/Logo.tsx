@@ -1,6 +1,6 @@
 const Logo = () => {
   const isMobile = window.screen.width < 800
-  const size = isMobile ? '200vh' : '280vh';
+  const size = isMobile ? window.screen.height * 0.25 : '280px';
 
   return (
 
