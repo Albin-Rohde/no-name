@@ -1,6 +1,6 @@
 import * as http from "http";
 import "reflect-metadata";
-import express, {Application, RequestHandler} from "express";
+import express, {Application, RequestHandler, static as express_static, Router} from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -145,6 +145,23 @@ async function initApp() {
     }
   });
   const app = getExpressApp(options, userSession);
+
+  // Serve react app if in production
+  if (process.env.NODE_ENV === "production") {
+    const reactRouter = Router();
+    const staticPath = path.join(__dirname, "..", "..", "frontend", "build")
+    const reactStatic = express_static(staticPath)
+    const reactPaths = [
+      "/",
+      "/reset",
+      "/join",
+      "/home",
+    ]
+    reactPaths.forEach((path) => {
+      reactRouter.use(path, reactStatic)
+    })
+    app.use("/", reactRouter);
+  }
   const server = getHttpServer(app, options, userSession);
   server.listen(options.port, () => {
     logger.info(`server started on port ${options.port}`)
