@@ -27,7 +27,7 @@ import {isStringTrue, typeIsBool} from "./admin/hbsHelpers";
 
 export interface ServerOptions {
   port: number
-  clientUrl: string
+  clientUrl?: string
 }
 
 function getExpressApp(options: ServerOptions, session: RequestHandler): Application {
@@ -51,7 +51,9 @@ function getExpressApp(options: ServerOptions, session: RequestHandler): Applica
       methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
   }));
   app.use((_req, res, next) => {
-    res.header({'Access-Control-Allow-Headers': options.clientUrl});
+    if (options.clientUrl) {
+      res.header({'Access-Control-Allow-Headers': options.clientUrl});
+    }
     next();
   });
   /** Sentry middleware **/
@@ -126,7 +128,7 @@ function getRedisSessionStore(): RedisStore {
 async function initApp() {
   const options: ServerOptions = {
     port: Number(process.env.PORT || 5000),
-    clientUrl: process.env.CLIENT_URL || `http://localhost:${process.env.PORT || 5000}`,
+    clientUrl: process.env.CLIENT_URL || undefined,
   }
   await createConnection();
   logger.info(`Connected to postgres successfully`)
