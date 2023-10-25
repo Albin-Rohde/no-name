@@ -1,29 +1,24 @@
-FROM node:14.16.1 AS install-frontend
-WORKDIR /usr/src/frontend
+# Stage 1: Install and build frontend
+FROM node:14.16.1 AS frontend
+WORKDIR /tmp/src/frontend
 COPY ./frontend .
-RUN npm install
-
-FROM install-frontend AS build-frontend
-WORKDIR /usr/src/frontend
+RUN npm ci
+COPY ./frontend .
 RUN npm run build
 
-FROM node:14.16.1 AS install-server
-WORKDIR /usr/src/server
+# Stage 2: Install and build backend
+FROM node:14.16.1 AS server
+WORKDIR /tmp/src/server
+COPY ./server/package.json ./server/package-lock.json ./
+RUN npm ci
 COPY ./server .
-RUN npm install
-
-FROM install-server AS build-server
-WORKDIR /usr/src/server
 RUN npm run build
-RUN cp -r ./src/admin/views ./build/src/admin/views
 
-
-FROM install-server AS collector
+# Stage 3: Final image
+FROM node:14.16.1-alpine
 WORKDIR /app
-COPY --from=build-frontend /usr/src/frontend/build /app/frontend/build
-COPY --from=build-frontend /usr/src/frontend/build/static /app/frontend/build/static
-COPY --from=build-server /usr/src/server/build /app/server/build
-
-FROM collector AS runner
+COPY --from=frontend /tmp/src/frontend/build ./frontend/build
+COPY --from=server /tmp/src/server/ ./server/
 WORKDIR /app/server
+RUN npm i -g ts-node@9.1.1 typescript@4.2.4
 CMD ["npm", "run", "prod"]
