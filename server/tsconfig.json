@@ -3,6 +3,7 @@
   "display": "Node 14",
 
   "compilerOptions": {
+    "resolveJsonModule": true,
     "lib": ["es2020"],
     "module": "commonjs",
     "target": "es2015",
@@ -13,5 +14,11 @@
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
-  }
+  },
+
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.json",
+    "src/**/*.hbs"
+  ]
 }

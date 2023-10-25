@@ -3,7 +3,9 @@ name: Build and Publish Docker Image
 on:
   push:
     branches:
-      - '*'
+      - 'master'
+      - 'stage'
+      - '*-build'
 
 env:
   APP_IMAGE: ghcr.io/albin-rohde/no-name_app
