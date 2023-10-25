@@ -4,10 +4,11 @@
   "description": "",
   "main": "innit.js",
   "scripts": {
-    "prod": "NODE_ENV=production TYPEORM_ENTITIES=build/src/**/models/*.js TYPEORM_MIGRATIONS=src/build/migrations/*.js node ./build/src/index.js",
+    "prod": "NODE_ENV=production TYPEORM_ENTITIES=build/**/models/*.js TYPEORM_MIGRATIONS=build/migrations/*.js node ./build/index.js",
     "dev": "NODE_ENV=development TYPEORM_ENTITIES=src/**/models/*.ts TYPEORM_MIGRATIONS=src/migrations/*.ts nodemon",
-    "build": "rimraf ./build && tsc",
-    "typeorm-js": "TYPEORM_ENTITIES=build/src/**/models/*.js TYPEORM_MIGRATIONS=build/src/migrations/*.js TYPEORM_MIGRATIONS_OUT=src/migrations ts-node ./node_modules/typeorm/cli.js",
+    "build": "rimraf ./build && tsc && npm run copy-views",
+    "copy-views": "cp -r src/admin/views build/admin/views",
+    "typeorm-js": "TYPEORM_ENTITIES=build/**/models/*.js TYPEORM_MIGRATIONS=build/migrations/*.js TYPEORM_MIGRATIONS_OUT=src/migrations ts-node ./node_modules/typeorm/cli.js",
     "typeorm": "TYPEORM_ENTITIES=src/**/models/*.ts TYPEORM_MIGRATIONS=src/migrations/*.ts TYPEORM_MIGRATIONS_OUT=src/migrations ts-node ./node_modules/typeorm/cli.js",
     "migration:run": "npm run typeorm migration:run",
     "migration:revert": "npm run typeorm migration:revert",
@@ -64,7 +65,9 @@
     "winston": "^3.3.3",
     "winston-graylog2": "^2.1.2",
     "winston-sentry": "^0.2.1",
-    "yup": "^0.32.11"
+    "ts-node": "^9.1.1",
+    "yup": "^0.32.11",
+    "typescript": "^4.2.4"
   },
   "devDependencies": {
     "@faker-js/faker": "^6.0.0-alpha.6",
@@ -79,8 +82,6 @@
     "@types/node": "^14.14.44",
     "@types/passport-local": "^1.0.33",
     "nodemon": "^2.0.7",
-    "rimraf": "^3.0.2",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.2.4"
+    "rimraf": "^3.0.2"
   }
 }

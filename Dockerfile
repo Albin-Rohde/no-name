@@ -21,4 +21,5 @@ COPY --from=frontend /tmp/src/frontend/build ./frontend/build
 COPY --from=server /tmp/src/server/ ./server/
 WORKDIR /app/server
 RUN npm i -g ts-node@9.1.1 typescript@4.2.4
+RUN npm run copy-views
 CMD ["npm", "run", "prod"]
