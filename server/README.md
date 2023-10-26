@@ -139,3 +139,5 @@ a users id.
     }
     ```
     Our new endpoint will now be routed on `/api/highscore/user/<id>`.
+
+dummy test
